@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <title>Hello</title>
+</head>
+<body>
+<script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<div class="container">
+    <header class="header bg-info">
+        <div class="container">
+            <nav class="navbar bg-info" data-bs-theme="dark">
+                <a class="navbar-brand" th:href="@{/}">トップページ</a>
+            </nav>
+        </div>
+    </header>
+    <section layout:fragment="content"></section>
+    <footer class="footer bg-info mt-auto py-3 border-top">
+        <div class="container">
+            <span class="text-white">© ベテランペーパードライバー</span>
+        </div>
+    </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,33 @@
+spring:
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI}
+      # Atlas用の追加設定
+      auto-index-creation: true
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+server:
+  port: 8080
+  error:
+    include-message: never
+    include-stacktrace: never
+
+logging:
+  level:
+    root: INFO
+    com.example.MyBlog: INFO
+    org.springframework.data.mongodb: INFO  # MongoDB接続のデバッグ用
+  file:
+    name: /app/logs/myblog.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# MongoDB Atlas接続のタイムアウト設定
+spring.data.mongodb:
+  connection-timeout: 10000
+  socket-timeout: 10000

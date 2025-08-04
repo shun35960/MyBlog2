@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>Hello</title>
+</head>
+<body>
+<section layout:fragment="content">
+    <p class="display-3 mb-4" th:text="${Hellotitle}"></p>
+    <a th:href="@{/Hello/Edit}" class="btn btn-primary mt-3 mb-4">新規作成</a>
+    <a th:href="@{/Hello/Draft}" class="btn btn-secondary mt-3 mb-4">下書き一覧</a>
+<!--    <button class="btn btn-info mt-3 mb-4" type="button" id="createPasskey">create a passkey</button>-->
+    <div class="row row-cols-1 row-cols-md-3 g-4" th:if="${articles != null and !articles.empty}">
+        <div th:each="article : ${articles}">
+            <div class="col">
+                <div class="card mb-3">
+                    <h5 class="card-title" th:text="${article.title}">タイトル</h5>
+                    <a th:href="@{/Hello/Description/{id}(id=${article.id})}" class="card-link">詳細</a>
+                    <a class="text-muted" th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:unless="${articles != null and !articles.empty}">
+        <p>記事はありません。</p>
+    </div>
+</section>
+</body>
+</html>

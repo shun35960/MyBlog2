@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>詳細</title>
+</head>
+<body>
+<section layout:fragment="content">
+    <form th:action="@{/Hello/{id}(id=${description.id})}"
+          th:method="delete"
+          style="display:inline;"
+          onclick="return confirm('記事を削除しますか？')">
+        <button type="submit" class="btn btn-danger mt-3">記事を削除</button>
+    </form>
+
+    <form th:action="@{/Hello/Edit/{id}(id=${description.id})}"
+          style="display:inline;">
+        <button type="submit" class="btn btn-primary mt-3">記事を編集</button>
+    </form>
+
+    <h2 th:text="${description.title}"></h2>
+    <div class="article-content" th:utext="${renderedHtmlContent}"></div>
+    <p class="text-muted" th:text="${#dates.format(description.createdAt, 'yyyy-MM-dd HH:mm')}"></p>
+</section>
+</body>
+</html>

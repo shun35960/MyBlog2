@@ -1,0 +1,15 @@
+cat > .dockerignore << 'EOF'
+.gradle
+build
+.idea
+*.iml
+.git
+.gitignore
+README.md
+.env
+logs
+*.log
+.DS_Store
+mongodb/data
+nginx/logs
+EOF

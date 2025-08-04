@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>トップページ</title>
+</head>
+<body>
+<section layout:fragment="content">
+    <p class="display-3 mb-4" th:text="${Indextitle}"></p>
+    <div class="row row-cols-1 row-cols-md-3 g-4" th:if="${articles != null and !articles.empty}">
+        <div th:each="article : ${articles}">
+            <div class="col">
+                <div class="card mb-3">
+                    <!--<img src="..." class="card-img-top" alt="記事の画像">-->
+                    <h5 class="card-title" th:text="${article.title}">タイトル</h5>
+                    <a th:href="@{/ViewDescription/{id}(id=${article.id})}" class="card-link">詳細</a>
+                    <a class="text-muted" th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:unless="${articles != null and !articles.empty}">
+        <p>記事はありません。</p>
+    </div>
+</section>
+</body>
+</html>

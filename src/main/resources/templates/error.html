@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ja"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>エラー</title>
+</head>
+<body>
+<section layout:fragment="content">
+    <h1 th:text="${status} + ' ' + ${error}"></h1>
+    <p>申し訳ございません。ページを表示できませんでした</p>
+    <a th:href="@{/Hello}" class="btn btn-primary mt-3">トップページに戻る</a>
+</section>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+    <title>編集</title>
+</head>
+<body>
+<section layout:fragment="content">
+    <h2>入力項目を入力してください</h2>
+    <form class="edit-form"
+          th:action="${article.id != null} ? @{/Hello/Submit/{id}(id=${article.id})} : @{/Hello/Submit}"
+          th:object="${article}"
+          th:method="${article.id != null} ? put : post">
+        <div class="form-group">
+            <label for="title">記事のタイトル</label>
+            <input class="form-control" type="text" id="title" th:field="*{title}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="content">記事の内容</label>
+            <textarea class="form-control" id="content" rows="10" th:field="*{content}" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <p>保存方法を選択</p>
+            <div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="publish" th:field="*{published}" th:value="true"
+                           th:checked="${article.published}">
+                    <label for="publish">公開</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="draft" th:field="*{published}" th:value="false"
+                           th:checked="${article.published}">
+                    <label for="draft">下書き保存</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary" th:text="${article.id != null} ? '更新' : '登録'">登録
+            </button>
+        </div>
+    </form>
+</section>
+</body>
+</html>

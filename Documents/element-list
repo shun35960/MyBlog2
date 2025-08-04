@@ -1,0 +1,6 @@
+com.example.MyBlog
+com.example.MyBlog.Config
+com.example.MyBlog.Controller
+com.example.MyBlog.Entity
+com.example.MyBlog.Repository
+com.example.MyBlog.Service

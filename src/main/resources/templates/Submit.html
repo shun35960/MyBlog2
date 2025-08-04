@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ja"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>登録</title>
+</head>
+<body>
+<section layout:fragment="content">
+    <h1 th:text="${Submit}"></h1>
+    <p th:text="'記事のタイトル : ' + ${savedArticle.title}"></p>
+    <p th:text="'記事の内容 : ' + ${savedArticle.content}"></p>
+</section>
+</body>
+</html>
