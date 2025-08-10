@@ -2,9 +2,9 @@ name: MyBlog CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
 
 env:
   APP_NAME: myblog
@@ -63,7 +63,7 @@ jobs:
     name: Security Scan
     runs-on: ubuntu-latest
     needs: test
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
 
     steps:
       - name: Checkout code
@@ -110,7 +110,7 @@ jobs:
     name: Deploy to Production
     runs-on: ubuntu-latest
     needs: [test, security]
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
 
     environment:
       name: production
@@ -137,7 +137,7 @@ jobs:
             cd /home/shun-sv/IdeaProjects
             
             # Update source code
-            git pull origin main || echo "Git pull completed"
+            git pull origin master || echo "Git pull completed"
             
             # Set environment variables for deployment
             export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
