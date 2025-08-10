@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +34,7 @@ public class MyBlogServiceTest {
     @Test
     void test_findArticleById() {
         // Implement your test logic here
-        Article article = new Article("id1", "Title 1", "Content 1", true);
+        Article article = new Article("id1", "Title 1", "Content 1", true, new Date());
         when(myBlogRepository.findById("id1")).thenReturn(Optional.of(article));
 
         Article result = myBlogService.findArticleById("id1");
@@ -49,8 +50,8 @@ public class MyBlogServiceTest {
     @Test
     void test_findArticlePublishedTrue() {
         // Implement your test logic here
-        Article article1 = new Article("id1", "Title 1", "Content 1", true);
-        Article article2 = new Article("id2", "Title 2", "Content 2", false);
+        Article article1 = new Article("id1", "Title 1", "Content 1", true, new Date());
+        Article article2 = new Article("id2", "Title 2", "Content 2", false, new Date());
         when(myBlogRepository.findByPublishedTrue()).thenReturn(List.of(article1));
 
         List<Article> result = myBlogService.findArticlePublishedTrue();
@@ -64,8 +65,8 @@ public class MyBlogServiceTest {
     @Test
     void test_findArticlePublishedFalse() {
         // Implement your test logic here
-        Article article1 = new Article("id1", "Title 1", "Content 1", true);
-        Article article2 = new Article("id2", "Title 2", "Content 2", false);
+        Article article1 = new Article("id1", "Title 1", "Content 1", true, new Date());
+        Article article2 = new Article("id2", "Title 2", "Content 2", false, new Date());
         when(myBlogRepository.findByPublishedFalse()).thenReturn(List.of(article2));
 
         List<Article> result = myBlogService.findArticlePublishedFalse();
@@ -79,7 +80,7 @@ public class MyBlogServiceTest {
     @Test
     void test_submitArticle() {
         // Implement your test logic here
-        Article article = new Article("id1", "Title 1", "Content 1", true);
+        Article article = new Article("id1", "Title 1", "Content 1", true, new Date());
         when(myBlogRepository.save(article)).thenReturn(article);
 
         Article result = myBlogService.submitArticle(article);

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,8 +34,8 @@ public class MyBlogRepositoryTest {
     @Test
     void getAllBlogs() {
         // Add test data
-        Article article1 = new Article("id1", "Title 1", "Content 1", true);
-        Article article2 = new Article("id2", "Title 2", "Content 2", false);
+        Article article1 = new Article("id1", "Title 1", "Content 1", true, new Date());
+        Article article2 = new Article("id2", "Title 2", "Content 2", false, new Date());
 
         myBlogRepository.save(article1);
         myBlogRepository.save(article2);
@@ -52,8 +53,8 @@ public class MyBlogRepositoryTest {
     @Test
     void findByPublishedTrue() {
         // Add test data
-        Article article1 = new Article("id1", "Title 1", "Content 1", true);
-        Article article2 = new Article("id2", "Title 2", "Content 2", false);
+        Article article1 = new Article("id1", "Title 1", "Content 1", true, new Date());
+        Article article2 = new Article("id2", "Title 2", "Content 2", false, new Date());
 
         myBlogRepository.save(article1);
         myBlogRepository.save(article2);
@@ -74,8 +75,8 @@ public class MyBlogRepositoryTest {
     @Test
     void findByPublishedFalse() {
         // Add test data
-        Article article1 = new Article("id1", "Title 1", "Content 1", true);
-        Article article2 = new Article("id2", "Title 2", "Content 2", false);
+        Article article1 = new Article("id1", "Title 1", "Content 1", true, new Date());
+        Article article2 = new Article("id2", "Title 2", "Content 2", false, new Date());
 
         myBlogRepository.save(article1);
         myBlogRepository.save(article2);

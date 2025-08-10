@@ -37,7 +37,7 @@ public class SecurityConfig {
                 ).logout(logout -> logout
                         .logoutSuccessUrl("/") // ログアウト成功後のリダイレクト先
                 ).authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "register", "authenticate", "/").permitAll() // ログインページは認証不要
+                        .requestMatchers("/login", "/register", "/authenticate", "/").permitAll() // ログインページは認証不要
                         .requestMatchers("/Hello/**").authenticated()
                         .anyRequest().permitAll() // その他のリクエストは認証が必要
 //                ).webAuthn((webAuthn) -> webAuthn
