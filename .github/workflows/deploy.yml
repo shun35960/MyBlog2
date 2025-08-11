@@ -6,6 +6,14 @@ on:
   pull_request:
     branches: [ master ]
 
+# ✅ 追加: GitHub Actions の権限設定
+permissions:
+  contents: read          # リポジトリの内容を読む
+  checks: write          # チェック結果を作成/更新
+  pull-requests: write   # プルリクエストにコメント
+  actions: read          # アクションの情報を読む
+  statuses: write        # ステータスチェックを書き込み
+
 env:
   APP_NAME: myblog
 
@@ -40,9 +48,6 @@ jobs:
 
       - name: Run tests
         run: ./gradlew test --no-daemon --info
-        env:
-          CI: true
-        continue-on-error: false
 
       - name: Generate test report
         uses: dorny/test-reporter@v1
@@ -51,6 +56,8 @@ jobs:
           name: Gradle Tests
           path: build/test-results/test/*.xml
           reporter: java-junit
+          # ✅ 追加: 明示的にトークンを指定
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload test results
         uses: actions/upload-artifact@v4

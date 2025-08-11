@@ -73,3 +73,4 @@
 
 ## 
 ## CI/DCパイプライン
+- GitHub Actionsを使用
