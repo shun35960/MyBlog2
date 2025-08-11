@@ -126,7 +126,7 @@ jobs:
   # ======== 本番環境デプロイ ========
   deploy:
     name: Deploy to Production
-    runs-on: self-hosted  # ← ここを変更
+    runs-on: self-hosted
     needs: [ test, security ]
     if: github.ref == 'refs/heads/master'
 
@@ -134,18 +134,40 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy application
+      - name: Sync to production directory
         run: |
           echo "🚀 Starting local deployment"
           
-          # アプリケーションディレクトリに移動
+          # 本番ディレクトリが存在することを確認
+          if [ ! -d "/home/shun-sv/IdeaProjects" ]; then
+            echo "Creating production directory..."
+            mkdir -p /home/shun-sv/IdeaProjects
+          fi
+          
+          # 現在の作業ディレクトリからファイルを本番ディレクトリにコピー
+          echo "📂 Syncing files to production directory..."
+          rsync -av --delete \
+            --exclude='.git' \
+            --exclude='actions-runner' \
+            --exclude='logs' \
+            --exclude='uploads' \
+            ./ /home/shun-sv/IdeaProjects/
+          
+          # 本番ディレクトリに移動してデプロイ実行
           cd /home/shun-sv/IdeaProjects
           
-          # 最新コードを取得
-          git pull origin master
+          echo "📋 Files in production directory:"
+          ls -la
           
-          # デプロイスクリプト実行
-          ./deploy.sh deploy
+          # deploy.shの実行権限を確認
+          if [ -f "./deploy.sh" ]; then
+            chmod +x ./deploy.sh
+            echo "🚀 Running deployment script..."
+            ./deploy.sh deploy
+          else
+            echo "❌ deploy.sh not found in production directory"
+            exit 1
+          fi
   # ======== 通知 ========
   notify:
     name: Notify Results
