@@ -85,11 +85,11 @@ $RECYCLE.BIN/
 
 ### Docker ###
 # 環境変数ファイル（重要：機密情報を含む）
-.env
-.env.local
-.env.*.local
-.env.development
-.env.production
+#.env
+#.env.local
+#.env.*.local
+#.env.development
+#.env.production
 
 # Docker関連の一時ファイル
 docker-compose.override.yml

@@ -6,7 +6,7 @@ build
 .git
 .gitignore
 README.md
-.env
+#.env
 logs
 *.log
 .DS_Store
