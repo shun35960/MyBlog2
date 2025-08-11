@@ -126,80 +126,31 @@ jobs:
   # ======== 本番環境デプロイ ========
   deploy:
     name: Deploy to Production
-    runs-on: ubuntu-latest
-    needs: [test, security]
+    runs-on: self-hosted  # ← ここを変更
+    needs: [ test, security ]
     if: github.ref == 'refs/heads/master'
-
-    environment:
-      name: production
-      url: http://192.168.10.106
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Notify deployment start
+      - name: Deploy application
         run: |
-          echo "🚀 Starting deployment of commit ${{ github.sha }}"
-
-      - name: Deploy to production server
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.PROD_HOST }}
-          username: ${{ secrets.PROD_USERNAME }}
-          key: ${{ secrets.PROD_SSH_KEY }}
-          port: ${{ secrets.PROD_PORT }}
-          command_timeout: 600s
-          script: |
-            # Navigate to application directory
-            cd /home/shun-sv/IdeaProjects
-            
-            # Update source code
-            git pull origin master || echo "Git pull completed"
-            
-            # Set environment variables for deployment
-            export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
-            export GITHUB_ACTOR="${{ github.actor }}"
-            
-            # Execute deployment script
-            ./deploy.sh deploy
-
-      - name: Verify deployment
-        run: |
-          echo "Waiting for deployment to complete..."
-          sleep 30
-
-      - name: Health check
-        run: |
-          max_attempts=10
-          attempt=1
+          echo "🚀 Starting local deployment"
           
-          while [ $attempt -le $max_attempts ]; do
-            echo "Health check attempt $attempt/$max_attempts"
+          # アプリケーションディレクトリに移動
+          cd /home/shun-sv/IdeaProjects
           
-            # Try to reach the application
-            if curl -f --connect-timeout 10 http://192.168.10.106/health 2>/dev/null; then
-              echo "✅ Health check passed!"
-              exit 0
-            elif curl -f --connect-timeout 10 http://192.168.10.106 2>/dev/null; then
-              echo "✅ Application is responding!"
-              exit 0
-            fi
+          # 最新コードを取得
+          git pull origin master
           
-            echo "❌ Health check failed, attempt $attempt/$max_attempts"
-            sleep 15
-            attempt=$((attempt + 1))
-          done
-          
-          echo "❌ Health check failed after $max_attempts attempts"
-          echo "This may be due to network restrictions, but deployment may have succeeded"
-          echo "Please verify manually at: http://192.168.10.106"
-
+          # デプロイスクリプト実行
+          ./deploy.sh deploy
   # ======== 通知 ========
   notify:
     name: Notify Results
     runs-on: ubuntu-latest
-    needs: [deploy]
+    needs: [ deploy ]
     if: always()
 
     steps:
