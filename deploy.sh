@@ -45,7 +45,7 @@ check_docker() {
         error_exit "Docker is not installed or not in PATH"
     fi
 
-    if ! docker compose version &> /dev/null 2>&1; then
+    if ! sudo docker compose version &> /dev/null 2>&1; then
         error_exit "Docker Compose is not available"
     fi
 
@@ -71,8 +71,8 @@ check_files() {
 stop_containers() {
     log "Stopping existing containers..."
 
-    if docker compose -f "$COMPOSE_FILE" ps -q | grep -q .; then
-        docker compose -f "$COMPOSE_FILE" down
+    if sudo docker compose -f "$COMPOSE_FILE" ps -q | grep -q .; then
+        sudo docker compose -f "$COMPOSE_FILE" down
         success "Existing containers stopped"
     else
         log "No running containers found"
@@ -84,10 +84,10 @@ cleanup_images() {
     log "Cleaning up old images..."
 
     # 使用されていないイメージを削除
-    docker image prune -f > /dev/null 2>&1 || true
+    sudo docker image prune -f > /dev/null 2>&1 || true
 
     # dangling imageを削除
-    docker images -f "dangling=true" -q | xargs -r docker rmi > /dev/null 2>&1 || true
+    sudo docker images -f "dangling=true" -q | xargs -r sudo docker rmi > /dev/null 2>&1 || true
 
     success "Image cleanup completed"
 }
@@ -97,10 +97,10 @@ deploy_app() {
     log "Building and starting application..."
 
     # 強制的にリビルド
-    docker compose -f "$COMPOSE_FILE" build --no-cache
+    sudo docker compose -f "$COMPOSE_FILE" build --no-cache
 
     # バックグラウンドで起動
-    docker compose -f "$COMPOSE_FILE" up -d
+    sudo docker compose -f "$COMPOSE_FILE" up -d
 
     success "Application containers started"
 }
@@ -147,10 +147,10 @@ health_check() {
 # コンテナステータス表示
 show_status() {
     log "Current container status:"
-    docker compose -f "$COMPOSE_FILE" ps
+    sudo docker compose -f "$COMPOSE_FILE" ps
 
     log "Application logs (last 20 lines):"
-    docker compose -f "$COMPOSE_FILE" logs --tail=20
+    sudo docker compose -f "$COMPOSE_FILE" logs --tail=20
 }
 
 # メイン デプロイ関数
@@ -196,13 +196,13 @@ case "$1" in
         deploy
         ;;
     status)
-        docker compose -f "$COMPOSE_FILE" ps
+        sudo docker compose -f "$COMPOSE_FILE" ps
         ;;
     logs)
-        docker compose -f "$COMPOSE_FILE" logs -f
+        sudo docker compose -f "$COMPOSE_FILE" logs -f
         ;;
     stop)
-        docker compose -f "$COMPOSE_FILE" down
+        sudo docker compose -f "$COMPOSE_FILE" down
         ;;
     *)
         usage
