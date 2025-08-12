@@ -151,6 +151,8 @@ jobs:
             --exclude='actions-runner' \
             --exclude='logs' \
             --exclude='uploads' \
+            --exclude='.env' \
+            --exclude='.env.*' \  
             ./ /home/shun-sv/IdeaProjects/
           
           # 本番ディレクトリに移動してデプロイ実行
