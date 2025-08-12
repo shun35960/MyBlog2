@@ -152,7 +152,7 @@ jobs:
             --exclude='logs' \
             --exclude='uploads' \
             --exclude='.env' \
-            --exclude='.env.*' \  
+            --exclude='.env.*' \
             ./ /home/shun-sv/IdeaProjects/
           
           # 本番ディレクトリに移動してデプロイ実行
@@ -160,6 +160,16 @@ jobs:
           
           echo "📋 Files in production directory:"
           ls -la
+          
+          # .envファイルの存在確認
+          if [ -f ".env" ]; then
+            echo "✅ .env file exists"
+            echo "📄 .env file permissions: $(ls -la .env)"
+          else
+            echo "❌ .env file not found!"
+            echo "🔧 Please create .env file manually with production values"
+            exit 1
+          fi
           
           # deploy.shの実行権限を確認
           if [ -f "./deploy.sh" ]; then
