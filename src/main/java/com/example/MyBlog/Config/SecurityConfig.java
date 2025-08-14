@@ -35,6 +35,9 @@ public class SecurityConfig {
                         .failureUrl("/login?error") // ログイン失敗時のリダイレクト先
                         .permitAll()
                 ).logout(logout -> logout
+                        .logoutUrl("/logout") // ログアウト処理のURL
+                        .invalidateHttpSession(true) // ログアウト時にセッションを無効化
+                        .deleteCookies("JSESSIONID") // ログアウト時にクッキー削除
                         .logoutSuccessUrl("/") // ログアウト成功後のリダイレクト先
                 ).authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/register", "/authenticate", "/").permitAll() // ログインページは認証不要
