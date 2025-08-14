@@ -39,6 +39,7 @@ public class SecurityConfig {
                         .invalidateHttpSession(true) // ログアウト時にセッションを無効化
                         .deleteCookies("JSESSIONID") // ログアウト時にクッキー削除
                         .logoutSuccessUrl("/") // ログアウト成功後のリダイレクト先
+                        .permitAll()
                 ).authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/register", "/authenticate", "/").permitAll() // ログインページは認証不要
                         .requestMatchers("/Hello/**").authenticated()

@@ -49,6 +49,8 @@ dependencies {
     implementation "org.springframework.security:spring-security-config"
     implementation "org.springframework.security:spring-security-core"
     implementation "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1"
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'  // これを追加
+
 
 }
 
