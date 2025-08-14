@@ -11,7 +11,7 @@
     <p class="display-3 mb-4" th:text="${Hellotitle}"></p>
     <a th:href="@{/Hello/Edit}" class="btn btn-primary mt-3 mb-4">新規作成</a>
     <a th:href="@{/Hello/Draft}" class="btn btn-secondary mt-3 mb-4">下書き一覧</a>
-<!--    <button class="btn btn-info mt-3 mb-4" type="button" id="createPasskey">create a passkey</button>-->
+    <a th:href="@{/logout}" class="btn btn-danger mt-3 mb-4">ログアウト</a>
     <div class="row row-cols-1 row-cols-md-3 g-4" th:if="${articles != null and !articles.empty}">
         <div th:each="article : ${articles}">
             <div class="col">
