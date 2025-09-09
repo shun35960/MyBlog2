@@ -1,0 +1,287 @@
+/* Scrapbox-inspired styling */
+:root {
+  --scrapbox-bg: #f8f9fa;
+  --scrapbox-text: #333;
+  --scrapbox-link: #0066cc;
+  --scrapbox-border: #ddd;
+  --scrapbox-shadow: rgba(0, 0, 0, 0.1);
+  --scrapbox-hover: #f0f0f0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+  background-color: var(--scrapbox-bg);
+  color: var(--scrapbox-text);
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header styling */
+.header {
+  background: white;
+  border-bottom: 1px solid var(--scrapbox-border);
+  box-shadow: 0 1px 3px var(--scrapbox-shadow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+}
+
+.navbar {
+  background: white !important;
+  padding: 15px 0;
+  width: 100%;
+}
+
+.navbar-brand {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--scrapbox-text) !important;
+  text-decoration: none;
+}
+
+.navbar-brand:hover {
+  color: var(--scrapbox-link) !important;
+}
+
+/* Card styling - Scrapbox page style */
+.card {
+  background: white;
+  border: 1px solid var(--scrapbox-border);
+  border-radius: 6px;
+  box-shadow: 0 1px 3px var(--scrapbox-shadow);
+  transition: all 0.2s ease;
+  margin-bottom: 16px;
+  padding: 16px;
+  position: relative;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card:hover {
+  box-shadow: 0 2px 8px var(--scrapbox-shadow);
+  transform: translateY(-1px);
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 8px 0;
+  color: var(--scrapbox-text);
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  flex: 1;
+}
+
+.card-link {
+  color: var(--scrapbox-link);
+  text-decoration: none;
+  font-size: 14px;
+  margin-right: 12px;
+}
+
+.card-link:hover {
+  text-decoration: underline;
+}
+
+.text-muted {
+  color: #888 !important;
+  font-size: 12px;
+}
+
+.card > div:last-child {
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Grid layout improvements */
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.col {
+  display: contents;
+}
+
+/* Article content styling */
+.article-content {
+  background: white;
+  border: 1px solid var(--scrapbox-border);
+  border-radius: 6px;
+  padding: 24px;
+  margin: 20px 0;
+  box-shadow: 0 1px 3px var(--scrapbox-shadow);
+  line-height: 1.7;
+}
+
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content h5,
+.article-content h6 {
+  margin: 24px 0 12px 0;
+  font-weight: 500;
+  color: var(--scrapbox-text);
+}
+
+.article-content h2 {
+  font-size: 20px;
+  border-bottom: 1px solid var(--scrapbox-border);
+  padding-bottom: 6px;
+}
+
+.article-content p {
+  margin: 12px 0;
+}
+
+.article-content ul, .article-content ol {
+  margin: 12px 0;
+  padding-left: 20px;
+}
+
+.article-content blockquote {
+  border-left: 4px solid var(--scrapbox-border);
+  margin: 16px 0;
+  padding: 8px 16px;
+  background: var(--scrapbox-bg);
+  font-style: italic;
+}
+
+.article-content code {
+  background: var(--scrapbox-bg);
+  border: 1px solid var(--scrapbox-border);
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-family: 'SF Mono', Monaco, 'Roboto Mono', Consolas, monospace;
+  font-size: 0.9em;
+}
+
+.article-content pre {
+  background: var(--scrapbox-bg);
+  border: 1px solid var(--scrapbox-border);
+  border-radius: 6px;
+  padding: 16px;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+
+.article-content pre code {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+/* Page title styling */
+.display-3 {
+  font-size: 28px;
+  font-weight: 500;
+  margin: 30px 0 20px 0;
+  color: var(--scrapbox-text);
+}
+
+/* Footer styling */
+.footer {
+  background: white !important;
+  border-top: 1px solid var(--scrapbox-border);
+  margin-top: 40px;
+  padding: 20px 0;
+}
+
+.footer span {
+  color: var(--scrapbox-text) !important;
+  font-size: 14px;
+}
+
+/* Section styling */
+section {
+  background: transparent !important;
+  padding: 20px 0;
+}
+
+/* Empty state styling */
+section > p:last-child {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  margin: 40px 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 15px;
+  }
+  
+  .row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .card {
+    padding: 12px;
+  }
+  
+  .article-content {
+    padding: 16px;
+  }
+  
+  .display-3 {
+    font-size: 24px;
+  }
+}
+
+/* Animation for smooth transitions */
+* {
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+/* Link styling throughout the app */
+a {
+  color: var(--scrapbox-link);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Button styling if needed */
+.btn {
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border: 1px solid var(--scrapbox-border);
+  background: white;
+  color: var(--scrapbox-text);
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  background: var(--scrapbox-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px var(--scrapbox-shadow);
+}
