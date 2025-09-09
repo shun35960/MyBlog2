@@ -9,14 +9,18 @@
 <body>
 <section layout:fragment="content">
     <p class="display-3 mb-4" th:text="${Drafttitle}"></p>
-    <a th:href="@{/Hello/Edit}" class="btn btn-primary mt-3 mb-4">新規作成</a>
-    <a th:href="@{/Hello}" class="btn btn-secondary mt-3 mb-4">公開記事一覧</a>
-    <div class="row row-cols-1 row-cols-md-3 g-4" th:if="${drafts != null and !drafts.empty}">
+    <div class="action-buttons">
+        <a th:href="@{/Hello/Edit}" class="btn">新規作成</a>
+        <a th:href="@{/Hello}" class="btn">公開記事一覧</a>
+    </div>
+    <div class="row" th:if="${drafts != null and !drafts.empty}">
         <div th:each="article : ${drafts}">
             <div class="col">
-                <div class="card mb-3">
+                <div class="card">
                     <h5 class="card-title" th:text="${article.title}">タイトル</h5>
-                    <a th:href="@{/Hello/Description/{id}(id=${article.id})}" class="card-link">詳細</a>
+                    <div>
+                        <a th:href="@{/Hello/Description/{id}(id=${article.id})}" class="card-link">詳細</a>
+                    </div>
                 </div>
             </div>
         </div>

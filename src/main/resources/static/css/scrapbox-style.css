@@ -269,19 +269,44 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Button styling if needed */
+/* Action buttons styling */
+.action-buttons {
+  margin: 20px 0 30px 0;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Button styling */
 .btn {
   border-radius: 6px;
   font-weight: 500;
-  padding: 8px 16px;
+  padding: 10px 20px;
   border: 1px solid var(--scrapbox-border);
   background: white;
   color: var(--scrapbox-text);
+  text-decoration: none;
   transition: all 0.2s ease;
+  display: inline-block;
+  font-size: 14px;
 }
 
 .btn:hover {
   background: var(--scrapbox-hover);
   transform: translateY(-1px);
   box-shadow: 0 2px 4px var(--scrapbox-shadow);
+  text-decoration: none;
+  color: var(--scrapbox-text);
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+}
+
+.btn-danger:hover {
+  background: #c82333;
+  color: white;
+  border-color: #bd2130;
 }
