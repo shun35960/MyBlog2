@@ -21,14 +21,15 @@
 <body>
 <section layout:fragment="content">
     <p class="display-3 mb-4" th:text="${Indextitle}"></p>
-    <div class="row row-cols-1 row-cols-md-3 g-4" th:if="${articles != null and !articles.empty}">
+    <div class="row" th:if="${articles != null and !articles.empty}">
         <div th:each="article : ${articles}">
             <div class="col">
-                <div class="card mb-3">
-                    <!--<img src="..." class="card-img-top" alt="記事の画像">-->
+                <div class="card">
                     <h5 class="card-title" th:text="${article.title}">タイトル</h5>
-                    <a th:href="@{/ViewDescription/{id}(id=${article.id})}" class="card-link">詳細</a>
-                    <a class="text-muted" th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></a>
+                    <div>
+                        <a th:href="@{/ViewDescription/{id}(id=${article.id})}" class="card-link">詳細</a>
+                        <span class="text-muted" th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+                    </div>
                 </div>
             </div>
         </div>
