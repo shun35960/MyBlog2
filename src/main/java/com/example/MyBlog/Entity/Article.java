@@ -1,5 +1,7 @@
 package com.example.MyBlog.Entity;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,7 +19,10 @@ import java.util.Date;
 public record Article(
         @Id
         String id, //object _id
+        @NotBlank(message = "タイトルは必須です")
+        @Size(max = 200, message = "タイトルは200文字以内で入力してください")
         String title, //記事のタイトル
+        @NotBlank(message = "記事内容は必須です")
         String content, //記事の内容
         boolean published, //公開状態
         @CreatedDate

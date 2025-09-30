@@ -20,14 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MyBlogServiceImpl implements MyBlogService {
 
-    @Autowired
     private final MyBlogRepository myBlogRepository;
-
-//    @Override
-//    public List<Article> getAllArticle() {
-//        return myBlogRepository.findAll();
-//    }
-//    使わないなら消す
 
     @Override
     public Article findArticleById(String id) {
@@ -54,12 +47,4 @@ public class MyBlogServiceImpl implements MyBlogService {
     public void deleteArticle(String id) {
         myBlogRepository.deleteById(id);
     }
-
-
 }
-
-
-//    @Override
-//    public Article editArticle(Article article) {
-//        return null;
-//    }

@@ -8,7 +8,9 @@ import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.data.MutableDataSet;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,6 +29,7 @@ import java.util.List;
  */
 
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/Hello")
@@ -49,9 +52,8 @@ public class MyBlogController {
     public String hello(Model model) {
         model.addAttribute("Hellotitle", "記事の一覧!");
         List<Article> articleList = myBlogService.findArticlePublishedTrue();
-        //System.out.println("getting" + articleList.size());
         model.addAttribute("articles", articleList);
-        //System.out.println("found" + articleList.size());
+        log.debug("Published articles found: {}", articleList.size());
         return "Hello";
     }
 
@@ -73,16 +75,16 @@ public class MyBlogController {
 
     //EditのSubmitをしたら確認画面に遷移
     @PostMapping("/Submit")
-    public String saveArticle(@PathVariable(value = "id", required = false) String id, @ModelAttribute Article article, Model model) {
+    public String saveArticle(@PathVariable(value = "id", required = false) String id, @Valid @ModelAttribute Article article, Model model) {
         Article submitArticle = myBlogService.submitArticle(article);
         model.addAttribute("savedArticle", submitArticle);
         model.addAttribute("Submit", "登録完了");
-        System.out.println("submit" + article);
+        log.info("Article submitted: title={}, published={}", article.title(), article.published());
         return "redirect:/Hello";
     }
 
     @PutMapping("/Submit/{id}")
-    public String updateArticle(@PathVariable("id") String id, @ModelAttribute Article article, Model model) {
+    public String updateArticle(@PathVariable("id") String id, @Valid @ModelAttribute Article article, Model model) {
         Article updatedArticle = new Article(
                 id, // IDはパスから取得
                 article.title(), // タイトルはフォームから取得
@@ -93,7 +95,7 @@ public class MyBlogController {
         Article savedArticle = myBlogService.submitArticle(updatedArticle);
         model.addAttribute("savedArticle", savedArticle);
         model.addAttribute("Submit", "更新完了");
-        System.out.println("submit" + savedArticle);
+        log.info("Article updated: id={}, title={}, published={}", id, savedArticle.title(), savedArticle.published());
         return "redirect:/Hello";
     }
 

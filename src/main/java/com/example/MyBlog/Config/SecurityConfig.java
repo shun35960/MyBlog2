@@ -44,13 +44,6 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/register", "/authenticate", "/").permitAll() // ログインページは認証不要
                         .requestMatchers("/Hello/**").authenticated()
                         .anyRequest().permitAll() // その他のリクエストは認証が必要
-//                ).webAuthn((webAuthn) -> webAuthn
-//                                .rpName("My Blog")
-//                                .rpId("localhost") // RP IDは通常、ドメイン名やIPアドレスを指定します
-//                                .allowedOrigins("http://localhost:8080") // クライアントのオリジンを指定します
-//                        // optional properties
-////                        .creationOptionsRepository(new CustomPublicKeyCredentialCreationOptionsRepository())
-////                        .messageConverter(new CustomHttpMessageConverter())
                 );
         return http.build();
     }

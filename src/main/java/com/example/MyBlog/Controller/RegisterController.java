@@ -2,6 +2,7 @@ package com.example.MyBlog.Controller;
 
 import com.example.MyBlog.Entity.Users;
 import com.example.MyBlog.Repository.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -30,7 +31,7 @@ public class RegisterController {
     }
 
     @PostMapping
-    public String Register(@ModelAttribute Users user) {
+    public String Register(@Valid @ModelAttribute Users user) {
 
         Users newUser = new Users(
                 user.id(),
