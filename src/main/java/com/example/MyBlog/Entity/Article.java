@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
@@ -16,6 +17,7 @@ import java.util.Date;
 
 
 @Document(collection = "Articles")
+@CompoundIndex(name = "published_createdAt_idx", def = "{'published': 1, 'createdAt': -1}")
 public record Article(
         @Id
         String id, //object _id

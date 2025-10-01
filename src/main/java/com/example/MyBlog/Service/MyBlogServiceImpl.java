@@ -3,9 +3,7 @@ package com.example.MyBlog.Service;
 import com.example.MyBlog.Entity.Article;
 import com.example.MyBlog.Repository.MyBlogRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,7 +14,6 @@ import java.util.List;
  */
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class MyBlogServiceImpl implements MyBlogService {
 
