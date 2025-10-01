@@ -241,15 +241,6 @@ GitHub Actionsによる自動デプロイメント:
    - rsyncでファイル同期
    - Docker Composeで起動
 
-### 本番環境
-
-- **URL**: http://192.168.10.106
-- **サーバー**: セルフホストサーバー
-- **コンテナ構成**:
-  - `myblog-app`: Spring Bootアプリケーション（ポート8080）
-  - `myblog-nginx`: Nginxリバースプロキシ（ポート80）
-- **ログ**: `/app/logs/myblog.log`
-
 ## 🧪 テスト
 
 ### テスト実行
