@@ -1,32 +1,44 @@
 package com.example.MyBlog.Config;
 
+import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
+import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension;
+import com.vladsch.flexmark.ext.tables.TablesExtension;
+import com.vladsch.flexmark.ext.gfm.tasklist.TaskListExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Arrays;
+
 /**
  * MarkdownConfigは、Flexmarkを使用してMarkdownのパースとHTMLレンダリングを設定するためのコンフィグクラスです。
- * Flexmarkのオプションや拡張機能を設定できます。
+ * GFM（GitHub Flavored Markdown）の拡張機能を有効化し、以下の機能をサポートします：
+ * - コードブロック（フェンスド・コードブロック）
+ * - テーブル
+ * - 打ち消し線
+ * - タスクリスト（チェックボックス）
+ * - 自動リンク
+ * - 順序付き/順序なしリスト
  */
 @Configuration
 public class MarkdownConfig {
-    // Markdownの設定をここに追加できます
-    // 例: Parser、HtmlRendererの設定など
-    // MutableDataSet options = new MutableDataSet();
-    // Parser parser = Parser.builder(options).build();
-    // HtmlRenderer renderer = HtmlRenderer.builder(options).build();
     @Bean
     public MutableDataSet flexmarkOptions() {
         MutableDataSet options = new MutableDataSet();
-        // ここでflexmarkのオプションや拡張機能を設定
-        // 例: テーブル拡張機能を追加
-        // options.set(Parser.EXTENSIONS, Arrays.asList(
-        //         TablesExtension.create(),
-        //         StrikethroughExtension.create()
-        // ));
-        // options.set(HtmlRenderer.SOFT_BREAK, "<br />\n"); // 改行の扱いなど
+
+        // GFM拡張機能を有効化
+        options.set(Parser.EXTENSIONS, Arrays.asList(
+                TablesExtension.create(),           // テーブルサポート
+                StrikethroughExtension.create(),    // 打ち消し線サポート（~~text~~）
+                TaskListExtension.create(),         // タスクリスト（- [ ] / - [x]）
+                AutolinkExtension.create()          // 自動リンク変換
+        ));
+
+        // 改行の扱いを設定
+        options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
+
         return options;
     }
 
