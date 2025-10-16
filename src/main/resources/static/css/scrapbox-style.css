@@ -284,6 +284,8 @@ body.dark-mode .card > div:last-child {
   margin: 20px 0;
   box-shadow: var(--shadow-sm);
   line-height: 1.7;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 body.dark-mode .article-content {
@@ -356,6 +358,13 @@ body.dark-mode .article-content blockquote {
   color: var(--dark-text-secondary);
 }
 
+.article-content a {
+  word-break: break-all;
+  overflow-wrap: break-word;
+  display: inline-block;
+  max-width: 100%;
+}
+
 .article-content code {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
@@ -364,6 +373,8 @@ body.dark-mode .article-content blockquote {
   font-family: 'SF Mono', Monaco, 'Roboto Mono', Consolas, monospace;
   font-size: 0.9em;
   color: var(--text-primary);
+  word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 body.dark-mode .article-content code {
@@ -379,6 +390,9 @@ body.dark-mode .article-content code {
   padding: 16px;
   overflow-x: auto;
   margin: 16px 0;
+  word-break: break-word;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 body.dark-mode .article-content pre {
@@ -551,6 +565,26 @@ body.dark-mode section > p:last-child {
 
   .card {
     padding: 16px;
+  }
+
+  .article-content {
+    padding: 16px;
+  }
+
+  .article-content a {
+    display: inline;
+    word-break: break-all;
+  }
+
+  .article-content pre {
+    padding: 12px;
+    font-size: 0.85em;
+    overflow-x: auto;
+  }
+
+  .article-content code {
+    font-size: 0.8em;
+    word-break: break-all;
   }
 }
 
