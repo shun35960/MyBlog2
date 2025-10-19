@@ -119,6 +119,8 @@ temp/
 tmp/
 *.tmp
 
+#ads.txt
+/src/main/resources/static/ads.txt
 # バックアップファイル
 backup/
 *.backup
