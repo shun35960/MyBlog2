@@ -3,10 +3,22 @@
 ## 問題
 Markdownのコードブロック（```で囲まれたテキスト）内の改行が反映されず、1行のテキストとして表示されていました。
 
-## 原因分析
-1. Flexmarkが```で囲まれたコードを`<code>`タグで生成していた
-2. OWASPサニタイザーが`<pre>`タグと`<code>`タグの改行を削除していた
-3. CSSで`white-space: pre-wrap`が指定されていなかった
+## 原因分析（修正版）
+
+### 第1段階：誤った分析と修正
+1. Flexmarkが```で囲まれたコードを正しく`<pre><code>`タグで生成していることを確認
+2. カスタムOWASPサニタイザーポリシーを作成し、`<pre>`タグを許可
+3. CSSに`white-space: pre-wrap`と`display: block`を追加
+
+### 第2段階：インラインコードとコードブロックの区別がない問題
+- すべての`<code>`タグがブロック要素になり、インラインコードまでコードブロック化
+- 原因：CSSで`.article-content code`に`display: block`を指定していた
+
+### 第3段階：最終的な根本原因の発見
+- `IndexController`で古い`POLICY`を使用していた
+- `Sanitizers.FORMATTING`などのポリシーが`<pre>`タグを削除していた
+- 結果として`IndexController`経由でアクセスすると、HTMLに`<pre>`タグがない
+- `MyBlogController`経由ではカスタムポリシーが使用されていた
 
 ## 実施した修正
 
@@ -92,10 +104,11 @@ private final PolicyFactory htmlSanitizationPolicy;
 String sanitizedHtmlContent = htmlSanitizationPolicy.sanitize(renderedHtmlContent);
 ```
 
-### 3. scrapbox-style.css - コードブロックの改行対応
+### 3. scrapbox-style.css - インラインコードとコードブロックの分離
 
-**ファイルパス:** `src/main/resources/static/css/scrapbox-style.css:368-380行`
+**ファイルパス:** `src/main/resources/static/css/scrapbox-style.css`
 
+**修正1: `.article-content code`（368-378行）- インラインコード用**
 ```css
 .article-content code {
   background: var(--bg-secondary);
@@ -107,47 +120,101 @@ String sanitizedHtmlContent = htmlSanitizationPolicy.sanitize(renderedHtmlConten
   color: var(--text-primary);
   word-break: break-all;
   overflow-wrap: break-word;
-  white-space: pre-wrap;  /* ← 追加: 改行を保持 */
-  display: block;         /* ← 追加: ブロック要素化 */
+  /* 削除: white-space: pre-wrap; */
+  /* 削除: display: block; */
+}
+```
+
+**修正2: `.article-content pre code`（403-409行）- コードブロック用**
+```css
+.article-content pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  display: block;           /* ← 追加: ブロック要素化 */
+  white-space: pre-wrap;    /* ← 追加: 改行を保持 */
 }
 ```
 
 **変更内容:**
-- `white-space: pre-wrap` - ソースコード内の改行と空白を保持
-- `display: block` - インライン要素からブロック要素に変更
+- インラインコード（`` `code` ``）：`<code>`単体でインライン表示
+- コードブロック（` ```code``` `）：`<pre><code>`で改行を保持してブロック表示
+
+### 4. IndexController.java - 古いサニタイザーポリシーの置き換え（最重要）
+
+**ファイルパス:** `src/main/java/com/example/MyBlog/Controller/IndexController.java`
+
+**問題:**
+`/ViewDescription`エンドポイントで古い`POLICY`を使用していた：
+```java
+// 変更前（削除）
+private final PolicyFactory POLICY = Sanitizers.FORMATTING
+        .and(Sanitizers.LINKS)
+        .and(Sanitizers.STYLES)
+        .and(Sanitizers.TABLES)
+        .and(Sanitizers.BLOCKS)     // ← これが<pre>タグを削除していた！
+        .and(Sanitizers.IMAGES);
+```
+
+**修正内容:**
+```java
+// 変更後（DI注入）
+private final PolicyFactory htmlSanitizationPolicy;
+
+// viewDescriptionメソッド内で使用
+String sanitizedHtmlContent = htmlSanitizationPolicy.sanitize(renderedHtmlContent);
+```
+
+**理由:**
+- `Sanitizers.BLOCKS`ポリシーが`<pre>`タグを削除していた
+- カスタムポリシー（`MarkdownConfig`で定義）に統一することで、`<pre>`タグが保持されるようになった
 
 ## 結果
 
+✅ インラインコードと**コードブロック**が正しく区別される
 ✅ コードブロック内の改行が正しく表示される
-✅ フェンスドコードブロック（```～```）が複数行で表示される
+✅ フェンスドコードブロック（` ```code``` `）が複数行で表示される
+✅ インラインコード（`` `code` ``）はインライン表示
 ✅ XSS対策は維持（カスタムポリシーで制御）
 ✅ ダークモード対応も保持
+✅ **両方の記事エンドポイント** (`/Hello/Description` と `/ViewDescription`) で正しく動作
 
 ## 修正の流れ
 
 1. **Flexmarkオプション設定** - デフォルト設定を確認（フェンスドコードブロック標準サポート）
 2. **カスタムサニタイザー作成** - OWASP HTML SanitizerBuilderを使用
-3. **DI注入と設定** - Springのコンポーネント化
-4. **CSS調整** - ブラウザレンダリングの最適化
-5. **ブラウザ検証** - 実際の表示確認
+3. **MyBlogController** - カスタムポリシーをDI注入で使用
+4. **CSS調整** - CSSセレクタの優先順位を利用してインラインコードとコードブロックを分離
+5. **IndexControllerの修正** - 古いポリシーを削除し、カスタムポリシーに統一
+6. **ブラウザ検証** - 両エンドポイントで動作確認
 
 ## 技術的なポイント
 
 ### なぜこれで解決したか
-- **Flexmark** - フェンスドコードブロック（```）をサポート（拡張不要）
-- **OWASP Sanitizer** - デフォルトポリシーは`<pre>`を削除していたため、カスタムポリシーで許可
-- **CSS** - `white-space: pre-wrap`でHTMLが持つ改行を表示
+- **Flexmark** - フェンスドコードブロック（```）を`<pre><code>`で正しく生成
+- **OWASP Sanitizer**
+  - 古いデフォルトポリシー：`Sanitizers.BLOCKS`が`<pre>`を削除
+  - カスタムポリシー：`<pre>`と`<code>`を明示的に許可
+- **CSS セレクタの優先順位**
+  - `.article-content code` - インラインコード用（インライン表示）
+  - `.article-content pre code` - コードブロック用（ブロック表示 + 改行保持）
 
 ### セキュリティ
 - XSS対策は維持（ホワイトリスト方式のカスタムポリシー使用）
 - 許可するHTML要素とアトリビュートを明示的に指定
 - ユーザー入力Markdownは安全にサニタイズ
+- 両方のコントローラーで同一のカスタムポリシーを使用
 
 ## 検証方法
 
-ブラウザで以下にアクセスして改行が正しく表示されることを確認：
+ブラウザで両方のエンドポイントにアクセスして表示を確認：
 ```
+# MyBlogController経由
 http://localhost:8080/Hello/Description/68f457d7aef9444567f1d5ad
+
+# IndexController経由（メインのビューページ）
+http://localhost:8080/ViewDescription/68f4dac523fd7c402ad502ba
 ```
 
-コードブロック内の複数行が正しく改行されて表示されます。
+両ページでコードブロック内の複数行が正しく改行されて表示される。
+インラインコードは背景色付きでインライン表示される。

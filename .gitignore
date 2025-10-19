@@ -166,3 +166,6 @@ yarn-error.log*
 
 # プロファイリング
 *.hprof
+
+# デバッグ用テンプレートファイル
+src/main/resources/templates/DebugMarkdown.html

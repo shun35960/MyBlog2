@@ -95,12 +95,43 @@ public class MyBlogController {
         Node document = markdownParser.parse(article.content() != null ? article.content() : "");
         String renderedHtmlContent = htmlRenderer.render(document);
 
+        log.debug("=== Markdown Rendering Debug ===");
+        log.debug("Flexmark output (first 500 chars): {}", renderedHtmlContent.substring(0, Math.min(500, renderedHtmlContent.length())));
+        log.debug("Contains <pre>: {}", renderedHtmlContent.contains("<pre"));
+        log.debug("Contains <code>: {}", renderedHtmlContent.contains("<code"));
+
         String sanitizedHtmlContent = htmlSanitizationPolicy.sanitize(renderedHtmlContent);
+
+        log.debug("After sanitization (first 500 chars): {}", sanitizedHtmlContent.substring(0, Math.min(500, sanitizedHtmlContent.length())));
+        log.debug("Sanitized contains <pre>: {}", sanitizedHtmlContent.contains("<pre"));
+        log.debug("=== End Debug ===");
+
         model.addAttribute("description", article);
         model.addAttribute("renderedHtmlContent", sanitizedHtmlContent);
         return "Description";
     }
 
+
+    @GetMapping("/DebugMarkdown")
+    public String debugMarkdown(Model model) {
+        String testMarkdown = "```\nif(条件式){\n    条件がtrueの場合の処理;\n}\n```";
+
+        Node document = markdownParser.parse(testMarkdown);
+        String flexmarkOutput = htmlRenderer.render(document);
+        String sanitizedOutput = htmlSanitizationPolicy.sanitize(flexmarkOutput);
+
+        model.addAttribute("testMarkdown", testMarkdown);
+        model.addAttribute("flexmarkOutput", flexmarkOutput);
+        model.addAttribute("sanitizedOutput", sanitizedOutput);
+
+        log.info("=== DEBUG MARKDOWN ===");
+        log.info("Input: {}", testMarkdown);
+        log.info("Flexmark output: {}", flexmarkOutput);
+        log.info("Sanitized output: {}", sanitizedOutput);
+        log.info("=== END DEBUG ===");
+
+        return "DebugMarkdown";
+    }
 
     @GetMapping("/Draft")
     public String showDraft(Model model) {

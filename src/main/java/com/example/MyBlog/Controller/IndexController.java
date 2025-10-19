@@ -6,7 +6,6 @@ import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import lombok.RequiredArgsConstructor;
 import org.owasp.html.PolicyFactory;
-import org.owasp.html.Sanitizers;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,16 +23,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class IndexController {
 
-    private final PolicyFactory POLICY = Sanitizers.FORMATTING
-            .and(Sanitizers.LINKS)
-            .and(Sanitizers.STYLES)
-            .and(Sanitizers.TABLES)
-            .and(Sanitizers.BLOCKS)
-            .and(Sanitizers.IMAGES);
-
     private final MyBlogService myBlogService;
     private final Parser markdownParser;
     private final HtmlRenderer htmlRenderer;
+    private final PolicyFactory htmlSanitizationPolicy;
 
     // index.htmlを返すためのメソッド
     @GetMapping("/")
@@ -49,7 +42,7 @@ public class IndexController {
         Article article = myBlogService.findArticleById(id);
         Node document = markdownParser.parse(article.content() != null ? article.content() : "");
         String renderedHtmlContent = htmlRenderer.render(document);
-        String sanitizedHtmlContent = POLICY.sanitize(renderedHtmlContent);
+        String sanitizedHtmlContent = htmlSanitizationPolicy.sanitize(renderedHtmlContent);
         model.addAttribute("article", article);
         model.addAttribute("renderedHtmlContent", sanitizedHtmlContent);
         return "ViewDescription"; // ViewDescription.htmlを返す
