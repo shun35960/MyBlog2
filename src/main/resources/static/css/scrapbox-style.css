@@ -375,6 +375,8 @@ body.dark-mode .article-content blockquote {
   color: var(--text-primary);
   word-break: break-all;
   overflow-wrap: break-word;
+  white-space: pre-wrap;
+  display: block;
 }
 
 body.dark-mode .article-content code {

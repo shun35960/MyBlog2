@@ -2,23 +2,16 @@ package com.example.MyBlog.Controller;
 
 import com.example.MyBlog.Entity.Article;
 import com.example.MyBlog.Service.MyBlogService;
-import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension;
-import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
-import com.vladsch.flexmark.util.data.MutableDataSet;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.owasp.html.PolicyFactory;
-import org.owasp.html.Sanitizers;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -38,14 +31,8 @@ public class MyBlogController {
     private final MyBlogService myBlogService;
     private final Parser markdownParser;
     private final HtmlRenderer htmlRenderer;
+    private final PolicyFactory htmlSanitizationPolicy;
     //MarkdownのパーサーとHTMLレンダラーを初期化
-
-    private final PolicyFactory POLICY = Sanitizers.FORMATTING
-            .and(Sanitizers.LINKS)
-            .and(Sanitizers.STYLES)
-            .and(Sanitizers.TABLES)
-            .and(Sanitizers.BLOCKS)
-            .and(Sanitizers.IMAGES);
 
     // http://localhost:8080/Hello -> Hello.htmlとモデルを呼び出し
     @GetMapping
@@ -108,7 +95,7 @@ public class MyBlogController {
         Node document = markdownParser.parse(article.content() != null ? article.content() : "");
         String renderedHtmlContent = htmlRenderer.render(document);
 
-        String sanitizedHtmlContent = POLICY.sanitize(renderedHtmlContent);
+        String sanitizedHtmlContent = htmlSanitizationPolicy.sanitize(renderedHtmlContent);
         model.addAttribute("description", article);
         model.addAttribute("renderedHtmlContent", sanitizedHtmlContent);
         return "Description";
