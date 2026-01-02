@@ -20,7 +20,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("ape/images")
+@RequestMapping("/api/images")
 @RequiredArgsConstructor
 public class ImageController {
 
@@ -37,7 +37,7 @@ public class ImageController {
             Map<String, String> response = new HashMap<>();
             response.put("fileId", fileId);
             response.put("url", "/api/images/" + fileId);
-            response.put("message", "画像のアップロード成功");
+            response.put("message", "uploadSuccess");
 
             log.info("Image uploaded successfully: fileId={}, user={}", fileId, username);
 
@@ -54,7 +54,7 @@ public class ImageController {
             log.error("Image upload failed", e);
 
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "画像のアップロードに失敗しました");
+            errorResponse.put("error", "uploadFailed");
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
@@ -75,7 +75,7 @@ public class ImageController {
             headers.setContentLength(resource.contentLength());
             headers.setCacheControl("public, max-age=2592000");
 
-            log.debug("Service image: fileId={}, contentType={}", fileId, contentType);
+            log.debug("Serving image: fileId={}, contentType={}", fileId, contentType);
             return ResponseEntity
                     .ok()
                     .headers(headers)
@@ -103,7 +103,7 @@ public class ImageController {
             imageService.deleteImage(fileId);
 
             Map<String, String> response = new HashMap<>();
-            response.put("message", "画像を削除しました");
+            response.put("message", "deleteSuccess");
             response.put("fileId", fileId);
 
             log.info("Image deleted successfully: fileId={}", fileId);
@@ -114,7 +114,7 @@ public class ImageController {
             log.warn("Failed to delete image: fileId={}, error={}", fileId, e.getMessage());
 
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "画像が見つかりません");
+            errorResponse.put("error", "file not found");
 
             return ResponseEntity.notFound().build();
 
@@ -122,7 +122,7 @@ public class ImageController {
             log.error("Failed to delete image: fileId={}", fileId, e);
 
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "画像の削除に失敗しました");
+            errorResponse.put("error", "deleteFailed");
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
