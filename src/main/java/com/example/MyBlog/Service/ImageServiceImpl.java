@@ -1,6 +1,7 @@
 package com.example.MyBlog.Service;
 
 import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.client.gridfs.model.GridFSUploadOptions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,11 +45,11 @@ public class ImageServiceImpl implements ImageService {
     /**
      * 画像をGridFSに保存します。
      *
-     * @param file アップロードされたファイル
+     * @param file       アップロードされたファイル
      * @param uploadedBy アップロードしたユーザー名
      * @return GridFSに保存されたファイルのID (ObjectIdの文字列表現)
      * @throws IllegalArgumentException ファイルが無効な場合
-     * @throws RuntimeException GridFSへの保存に失敗した場合
+     * @throws RuntimeException         GridFSへの保存に失敗した場合
      */
     @Override
     public String storeImage(MultipartFile file, String uploadedBy) {
@@ -104,12 +105,17 @@ public class ImageServiceImpl implements ImageService {
             ObjectId objectId = new ObjectId(fileId);
             Query query = new Query(Criteria.where("_id").is(objectId));
 
-            GridFsResource resource = gridFsTemplate.getResource(query);
+            // ✅ ステップ1: まずGridFSFileを取得
+            GridFSFile gridFSFile = gridFsTemplate.findOne(query);
 
-            if (!resource.exists()) {
+            // ✅ ステップ2: null チェック
+            if (gridFSFile == null) {
                 log.warn("Image not found: fileId={}", fileId);
                 throw new IllegalArgumentException("Image not found with id: " + fileId);
             }
+
+            // ✅ ステップ3: GridFSFileからGridFsResourceを取得
+            GridFsResource resource = gridFsTemplate.getResource(gridFSFile);
 
             log.debug("Image retrieved successfully: fileId={}", fileId);
             return resource;
