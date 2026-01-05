@@ -39,8 +39,8 @@ public class ImageServiceImpl implements ImageService {
             "image/webp"
     );
 
-    // 最大ファイルサイズ (10MB)
-    private static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
+    // 最大ファイルサイズ (100MB)
+    private static final long MAX_FILE_SIZE = 100 * 1024 * 1024;
 
     /**
      * 画像をGridFSに保存します。
@@ -68,16 +68,13 @@ public class ImageServiceImpl implements ImageService {
             metadata.put("fileSize", file.getSize());
             metadata.put("uploadDate", new java.util.Date());
 
-            // GridFSUploadOptionsの設定
-            GridFSUploadOptions options = new GridFSUploadOptions()
-                    .metadata(metadata);
-
-            // GridFSに保存
+            // GridFsTemplateを使用してファイルを保存
             InputStream inputStream = file.getInputStream();
-            ObjectId fileId = gridFSBucket.uploadFromStream(
-                    sanitizedFilename,
+            ObjectId fileId = gridFsTemplate.store(
                     inputStream,
-                    options
+                    sanitizedFilename,
+                    file.getContentType(),
+                    metadata
             );
 
             log.info("Image stored successfully: fileId={}, filename={}, uploadedBy={}",
@@ -136,7 +133,8 @@ public class ImageServiceImpl implements ImageService {
     public void deleteImage(String fileId) {
         try {
             ObjectId objectId = new ObjectId(fileId);
-            gridFSBucket.delete(objectId);
+            Query query = new Query(Criteria.where("_id").is(objectId));
+            gridFsTemplate.delete(query);
             log.info("Image deleted successfully: fileId={}", fileId);
 
         } catch (IllegalArgumentException e) {

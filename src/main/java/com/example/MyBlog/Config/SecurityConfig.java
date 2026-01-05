@@ -28,6 +28,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/api/images/**") // 画像API は CSRF 保護を無効化
+                )
                 .formLogin(login -> login
                         .loginPage("/login") // カスタムログインページのURL
                         .loginProcessingUrl("/authenticate") // ログイン処理のURL
