@@ -112,26 +112,26 @@ public class MyBlogController {
     }
 
 
-    @GetMapping("/DebugMarkdown")
-    public String debugMarkdown(Model model) {
-        String testMarkdown = "```\nif(条件式){\n    条件がtrueの場合の処理;\n}\n```";
-
-        Node document = markdownParser.parse(testMarkdown);
-        String flexmarkOutput = htmlRenderer.render(document);
-        String sanitizedOutput = htmlSanitizationPolicy.sanitize(flexmarkOutput);
-
-        model.addAttribute("testMarkdown", testMarkdown);
-        model.addAttribute("flexmarkOutput", flexmarkOutput);
-        model.addAttribute("sanitizedOutput", sanitizedOutput);
-
-        log.info("=== DEBUG MARKDOWN ===");
-        log.info("Input: {}", testMarkdown);
-        log.info("Flexmark output: {}", flexmarkOutput);
-        log.info("Sanitized output: {}", sanitizedOutput);
-        log.info("=== END DEBUG ===");
-
-        return "DebugMarkdown";
-    }
+//    @GetMapping("/DebugMarkdown")
+//    public String debugMarkdown(Model model) {
+//        String testMarkdown = "```\nif(条件式){\n    条件がtrueの場合の処理;\n}\n```";
+//
+//        Node document = markdownParser.parse(testMarkdown);
+//        String flexmarkOutput = htmlRenderer.render(document);
+//        String sanitizedOutput = htmlSanitizationPolicy.sanitize(flexmarkOutput);
+//
+//        model.addAttribute("testMarkdown", testMarkdown);
+//        model.addAttribute("flexmarkOutput", flexmarkOutput);
+//        model.addAttribute("sanitizedOutput", sanitizedOutput);
+//
+//        log.info("=== DEBUG MARKDOWN ===");
+//        log.info("Input: {}", testMarkdown);
+//        log.info("Flexmark output: {}", flexmarkOutput);
+//        log.info("Sanitized output: {}", sanitizedOutput);
+//        log.info("=== END DEBUG ===");
+//
+//        return "DebugMarkdown";
+//    }
 
     @GetMapping("/Draft")
     public String showDraft(Model model) {
