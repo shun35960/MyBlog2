@@ -65,7 +65,7 @@ tasks.named('test') {
 
         // MongoDB不要のテストのみ実行
         include '**/MyBlogServiceTest.class'
-
+        include '**/ImageServiceImplTest.class'
         // テスト実行時のプロファイル設定
         systemProperty 'spring.profiles.active', 'test'
         systemProperty 'spring.main.web-application-type', 'none'
