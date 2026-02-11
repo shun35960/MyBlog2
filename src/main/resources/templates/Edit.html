@@ -24,6 +24,37 @@
             <textarea class="form-control" id="content" rows="30" th:field="*{content}" required></textarea>
         </div>
 
+        <!-- 画像アップロードセクション -->
+        <div class="form-group">
+            <label>画像をアップロード</label>
+            <div class="image-upload-section">
+                <!-- ドラッグ&ドロップエリア -->
+                <div id="dropZone" class="drop-zone">
+                    <p>ここにファイルをドラッグ&ドロップするか、</p>
+                    <button type="button" id="uploadButton" class="btn btn-outline-secondary">
+                        ファイルを選択
+                    </button>
+                    <p class="text-muted small">対応形式: JPEG, PNG, GIF, WebP（最大100MB）</p>
+                </div>
+                <!-- ファイル入力（非表示） -->
+                <input type="file" id="imageFile" accept="image/jpeg,image/png,image/gif,image/webp"
+                       style="display: none;">
+
+                <!-- アップロード進行状況 -->
+                <div id="uploadStatus" style="display: none;" class="mt-3">
+                    <div class="alert alert-info">
+                        <span id="statusText">アップロード中...</span>
+                        <div class="progress mt-2">
+                            <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- アップロード済み画像リスト -->
+                <div id="uploadedImages" class="mt-3"></div>
+            </div>
+        </div>
+
         <div class="form-group">
             <p>保存方法を選択</p>
             <div>
@@ -44,6 +75,302 @@
             </button>
         </div>
     </form>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM 要素の取得
+            const dropZone = document.getElementById('dropZone');
+            const uploadButton = document.getElementById('uploadButton');
+            const imageFile = document.getElementById('imageFile');
+            const contentTextarea = document.getElementById('content');
+            const uploadStatus = document.getElementById('uploadStatus');
+            const statusText = document.getElementById('statusText');
+            const progressBar = document.getElementById('progressBar');
+            const uploadedImages = document.getElementById('uploadedImages');
+
+            // nullチェック
+            if (!uploadButton || !imageFile || !dropZone) {
+                console.error('Required DOM elements not found');
+                return;
+            }
+
+            // ファイル選択ボタンのイベントリスナー
+            uploadButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                imageFile.click();
+            });
+
+            // ファイル選択時のイベント
+            imageFile.addEventListener('change', (e) => {
+                handleFileSelect(e.target.files[0]);
+            });
+
+            // ドラッグオーバー時のイベント
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.add('dragover');
+            });
+
+            // ドラッグアウト時のイベント
+            dropZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('dragover');
+            });
+
+            // ドロップ時のイベント
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('dragover');
+
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFileSelect(files[0]);
+                }
+            });
+
+            // ファイル選択時の処理
+            function handleFileSelect(file) {
+                // ファイルの検証
+                if (!file) {
+                    showError('ファイルが選択されていません');
+                    return;
+                }
+
+                // ファイル形式の検証
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                if (!allowedTypes.includes(file.type)) {
+                    showError('対応していないファイル形式です。JPEG, PNG, GIF, WebP のみアップロード可能です。');
+                    return;
+                }
+
+                // ファイルサイズの検証（100MB以下）
+                const maxSize = 100 * 1024 * 1024; // 100MB
+                if (file.size > maxSize) {
+                    showError('ファイルサイズが大きすぎます。最大100MBのファイルのみアップロード可能です。');
+                    return;
+                }
+
+                // アップロード処理
+                uploadImage(file);
+            }
+
+            // 画像アップロード処理
+            function uploadImage(file) {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                // アップロード状態を表示
+                uploadStatus.style.display = 'block';
+                statusText.textContent = 'アップロード中...';
+                progressBar.style.width = '0%';
+
+                // XMLHttpRequest で POST リクエスト送信
+                const xhr = new XMLHttpRequest();
+
+                // 進捗イベント
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        progressBar.style.width = percentComplete + '%';
+                    }
+                });
+
+                // 完了時のイベント
+                xhr.addEventListener('load', () => {
+                    if (xhr.status === 200 || xhr.status === 201) {
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.fileId) {
+                                // 画像を textarea に Markdown 形式で挿入
+                                insertImageMarkdown(response.fileId, file.name);
+                                statusText.textContent = 'アップロード完了しました！';
+                                progressBar.style.width = '100%';
+
+                                // 3秒後にステータスを非表示
+                                setTimeout(() => {
+                                    uploadStatus.style.display = 'none';
+                                }, 3000);
+
+                                // ファイル入力をリセット
+                                imageFile.value = '';
+                            } else {
+                                showError('アップロードに失敗しました。ファイルIDが取得できません。');
+                            }
+                        } catch (e) {
+                            showError('レスポンスのパースに失敗しました。');
+                        }
+                    } else {
+                        let errorMessage = 'アップロードに失敗しました。';
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.message) {
+                                errorMessage = response.message;
+                            } else if (response.error) {
+                                errorMessage = response.error;
+                            }
+                        } catch (e) {
+                            // パースに失敗した場合はデフォルトメッセージを使用
+                        }
+                        showError(errorMessage);
+                    }
+                });
+
+                // エラー時のイベント
+                xhr.addEventListener('error', () => {
+                    showError('ネットワークエラーが発生しました。');
+                });
+
+                // アボート時のイベント
+                xhr.addEventListener('abort', () => {
+                    showError('アップロードがキャンセルされました。');
+                });
+
+                // CSRFトークンを取得
+                const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
+
+                // リクエスト送信
+                xhr.open('POST', '/api/images/upload');
+                if (csrfToken && csrfHeader) {
+                    xhr.setRequestHeader(csrfHeader, csrfToken);
+                }
+                xhr.send(formData);
+            }
+
+            // Markdown 形式で画像を textarea に挿入
+            function insertImageMarkdown(fileId, fileName) {
+                const imageUrl = `/api/images/${fileId}`;
+                const altText = fileName.replace(/\.[^.]+$/, ''); // ファイル拡張子を除去
+                const markdown = `![${altText}](${imageUrl})\n`;
+
+                // textarea の現在のカーソル位置を取得
+                const textarea = contentTextarea;
+                const startPos = textarea.selectionStart;
+                const endPos = textarea.selectionEnd;
+                const textBefore = textarea.value.substring(0, startPos);
+                const textAfter = textarea.value.substring(endPos);
+
+                // Markdown をカーソル位置に挿入
+                textarea.value = textBefore + markdown + textAfter;
+
+                // カーソル位置を更新
+                const newCursorPos = startPos + markdown.length;
+                textarea.selectionStart = newCursorPos;
+                textarea.selectionEnd = newCursorPos;
+                textarea.focus();
+
+                // アップロード済み画像情報を表示
+                displayUploadedImage(fileId, altText, imageUrl);
+            }
+
+            // アップロード済み画像情報を表示
+            function displayUploadedImage(fileId, altText, imageUrl) {
+                const imageInfo = document.createElement('div');
+                imageInfo.className = 'alert alert-success d-flex justify-content-between align-items-center';
+                imageInfo.innerHTML = `
+                    <div>
+                        <small><strong>アップロード済み:</strong> ${altText}</small>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-danger delete-image-btn" data-file-id="${fileId}">
+                        削除
+                    </button>
+                `;
+
+                uploadedImages.appendChild(imageInfo);
+
+                // 削除ボタンのイベントリスナー
+                imageInfo.querySelector('.delete-image-btn').addEventListener('click', () => {
+                    deleteImage(fileId, imageInfo);
+                });
+            }
+
+            // 画像削除処理
+            function deleteImage(fileId, element) {
+                if (!confirm('この画像を削除しますか？')) {
+                    return;
+                }
+
+                // CSRFトークンを取得
+                const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
+
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                if (csrfToken && csrfHeader) {
+                    headers[csrfHeader] = csrfToken;
+                }
+
+                fetch(`/api/images/${fileId}`, {
+                    method: 'DELETE',
+                    headers: headers
+                })
+                .then(response => {
+                    if (response.ok) {
+                        element.remove();
+                        // textarea からもマークダウンを削除するよう促す
+                        alert('MongoDB から画像が削除されました。Markdown テキストは手動で削除してください。');
+                    } else {
+                        showError('画像の削除に失敗しました。');
+                    }
+                })
+                .catch(error => {
+                    showError('エラーが発生しました: ' + error);
+                });
+            }
+
+            // エラー表示
+            function showError(message) {
+                uploadStatus.style.display = 'block';
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-danger';
+                alert.textContent = message;
+                uploadStatus.innerHTML = '';
+                uploadStatus.appendChild(alert);
+
+                // 5秒後にステータスを非表示
+                setTimeout(() => {
+                    uploadStatus.style.display = 'none';
+                }, 5000);
+            }
+        });
+    </script>
+
+    <style>
+        /* ドラッグ&ドロップエリアのスタイル */
+        .drop-zone {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #f9f9f9;
+        }
+
+        .drop-zone:hover {
+            border-color: #0d6efd;
+            background-color: #f0f7ff;
+        }
+
+        .drop-zone.dragover {
+            border-color: #0d6efd;
+            background-color: #e7f1ff;
+            box-shadow: 0 0 10px rgba(13, 110, 253, 0.3);
+        }
+
+        .drop-zone p {
+            margin: 0.5rem 0;
+        }
+
+        .image-upload-section {
+            margin-top: 1rem;
+        }
+    </style>
 </section>
 </body>
 </html>

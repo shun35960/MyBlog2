@@ -28,6 +28,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/api/images/**") // 画像API は CSRF 保護を無効化
+                )
                 .formLogin(login -> login
                         .loginPage("/login") // カスタムログインページのURL
                         .loginProcessingUrl("/authenticate") // ログイン処理のURL
@@ -43,6 +46,8 @@ public class SecurityConfig {
                 ).authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/register", "/authenticate", "/").permitAll() // ログインページは認証不要
                         .requestMatchers("/Hello/**").authenticated()
+                        .requestMatchers("/api/images/upload").authenticated() // 画像アップロードは認証必要
+                        .requestMatchers("/api/images/**").permitAll() // 画像取得・削除は誰でも可能
                         .anyRequest().permitAll() // その他のリクエストは認証が必要
                 );
         return http.build();
