@@ -37,6 +37,12 @@ public class IndexController {
         return "index"; // index.htmlを返す
     }
 
+    //~/About-> About.html
+    @GetMapping("/about")
+    public String About() {
+        return "About";
+    }
+
     @GetMapping("/ViewDescription/{id}")
     public String viewDescription(Model model, @PathVariable String id) {
         Article article = myBlogService.findArticleById(id);
