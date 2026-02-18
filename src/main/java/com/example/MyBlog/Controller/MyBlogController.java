@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.owasp.html.PolicyFactory;
+
 import java.util.Date;
 import java.util.List;
 
@@ -110,28 +111,6 @@ public class MyBlogController {
         model.addAttribute("renderedHtmlContent", sanitizedHtmlContent);
         return "Description";
     }
-
-
-//    @GetMapping("/DebugMarkdown")
-//    public String debugMarkdown(Model model) {
-//        String testMarkdown = "```\nif(条件式){\n    条件がtrueの場合の処理;\n}\n```";
-//
-//        Node document = markdownParser.parse(testMarkdown);
-//        String flexmarkOutput = htmlRenderer.render(document);
-//        String sanitizedOutput = htmlSanitizationPolicy.sanitize(flexmarkOutput);
-//
-//        model.addAttribute("testMarkdown", testMarkdown);
-//        model.addAttribute("flexmarkOutput", flexmarkOutput);
-//        model.addAttribute("sanitizedOutput", sanitizedOutput);
-//
-//        log.info("=== DEBUG MARKDOWN ===");
-//        log.info("Input: {}", testMarkdown);
-//        log.info("Flexmark output: {}", flexmarkOutput);
-//        log.info("Sanitized output: {}", sanitizedOutput);
-//        log.info("=== END DEBUG ===");
-//
-//        return "DebugMarkdown";
-//    }
 
     @GetMapping("/Draft")
     public String showDraft(Model model) {

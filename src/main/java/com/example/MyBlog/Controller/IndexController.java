@@ -37,6 +37,19 @@ public class IndexController {
         return "index"; // index.htmlを返す
     }
 
+    //~/About-> 筆者紹介の記事を返す
+    @GetMapping("/about")
+    public String About(Model model) {
+        String id = "6995c06ae07a812e6d97af1a"; //紹介記事のid
+        Article article = myBlogService.findArticleById(id);
+        Node document = markdownParser.parse(article.content() != null ? article.content() : "");
+        String renderedHtmlContent = htmlRenderer.render(document);
+        String sanitizedHtmlContent = htmlSanitizationPolicy.sanitize(renderedHtmlContent);
+        model.addAttribute("article", article);
+        model.addAttribute("renderedHtmlContent", sanitizedHtmlContent);
+        return "ViewDescription"; // ViewDescription.htmlを返す
+    }
+
     @GetMapping("/ViewDescription/{id}")
     public String viewDescription(Model model, @PathVariable String id) {
         Article article = myBlogService.findArticleById(id);
