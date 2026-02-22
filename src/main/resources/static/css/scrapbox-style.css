@@ -365,6 +365,12 @@ body.dark-mode .article-content blockquote {
   max-width: 100%;
 }
 
+.article-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
 .article-content code {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
