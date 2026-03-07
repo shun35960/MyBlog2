@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -31,7 +30,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/api/images/**") // 画像API は CSRF 保護を無効化
                 )
-                .formLogin(AbstractHttpConfigurer::disable
+                .formLogin(form -> form
+                        .loginPage("/login") // カスタムログインページ
+                        .loginProcessingUrl("/authenticate") // ログイン処理のURL
+                        .defaultSuccessUrl("/Hello", true) // ログイン成功後のリダイレクト先
+                        .failureUrl("/login?error") // ログイン失敗時のリダイレクト先
+                        .permitAll()
                 ).logout(logout -> logout
                 .logoutUrl("/logout") // ログアウト処理のURL
                 .invalidateHttpSession(true) // ログアウト時にセッションを無効化
