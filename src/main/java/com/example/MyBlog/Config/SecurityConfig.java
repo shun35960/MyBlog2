@@ -45,9 +45,9 @@ public class SecurityConfig {
                         .permitAll()
                 ).authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/register", "/authenticate", "/").permitAll() // ログインページは認証不要
-                        .requestMatchers("/Hello/**").authenticated()
-                        .requestMatchers("/api/images/upload").authenticated() // 画像アップロードは認証必要
-                        .requestMatchers("/api/images/**").permitAll() // 画像取得・削除は誰でも可能
+//                        .requestMatchers("/Hello/**").authenticated()
+//                        .requestMatchers("/api/images/upload").authenticated() // 画像アップロードは認証必要
+//                        .requestMatchers("/api/images/**").permitAll() // 画像取得・削除は誰でも可能
                         .anyRequest().permitAll() // その他のリクエストは認証が必要
                 );
         return http.build();

@@ -171,3 +171,4 @@ yarn-error.log*
 
 # デバッグ用テンプレートファイル
 src/main/resources/templates/DebugMarkdown.html
+/2026-01-05-caveat-the-messages-below-were-generated-by-the-u.txt
