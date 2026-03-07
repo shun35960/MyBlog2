@@ -50,6 +50,8 @@ dependencies {
     implementation "org.springframework.security:spring-security-core"
     implementation "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1"
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'  // これを追加
+    implementation 'com.auth0:java-jwt:4.4.0'
+    implementation 'com.auth0:jwks-rsa:0.22.1'
 
 
 }
