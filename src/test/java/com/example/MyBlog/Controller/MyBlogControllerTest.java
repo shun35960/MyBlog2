@@ -62,4 +62,26 @@ class MyBlogControllerTest {
                 .andExpect(model().attribute("articles", List.of()));
     }
 
+    @Test
+    void 認証済みユーザーが新規作成ページにアクセスできる() throws Exception {
+        mockMvc.perform(get("/Hello/Edit").with(user("admin")))
+                .andExpect(status().isOk())
+                .andExpect((view().name("Edit")))
+                .andExpect(model().attributeExists("article"));
+    }
+
+    void 認証済みユーザーが記事編集ページにアクセスできる() throws Exception {
+        Article article = new Article("id1", "title1", "content1", true, new Date());
+        when(myBlogService.findArticleById("id1")).thenReturn(article);
+
+        mockMvc.perform(get("/Hello/Edit/id1").with(user("admin")))
+                .andExpect(status().isOk())
+                .andExpect((view().name("Edit")))
+                .andExpect(model().attribute("article", article));
+
+        verify(myBlogService, times(1)).findArticleById("id1");
+
+    }
+
+
 }
