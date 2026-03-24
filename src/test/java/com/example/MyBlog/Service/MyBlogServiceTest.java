@@ -91,4 +91,55 @@ public class MyBlogServiceTest {
         assertEquals("Content 1", result.content());
         verify(myBlogRepository).save(article);
     }
+
+    @Test
+    void findArticleById_存在しないID_例外がスローされる() {
+        // Arrange
+        when(myBlogRepository.findById("notExist")).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class,
+                () -> myBlogService.findArticleById("notExist"));
+        verify(myBlogRepository).findById("notExist");
+    }
+
+    @Test
+    void findArticlePublishedTrue_記事が存在しない_空リストが返される() {
+        // Arrange
+        when(myBlogRepository.findByPublishedTrue()).thenReturn(List.of());
+
+        // Act
+        List<Article> result = myBlogService.findArticlePublishedTrue();
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(myBlogRepository).findByPublishedTrue();
+    }
+
+    @Test
+    void findArticlePublishedFalse_記事が存在しない_空リストが返される() {
+        // Arrange
+        when(myBlogRepository.findByPublishedFalse()).thenReturn(List.of());
+
+        // Act
+        List<Article> result = myBlogService.findArticlePublishedFalse();
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(myBlogRepository).findByPublishedFalse();
+    }
+
+    @Test
+    void deleteArticle_指定IDの記事が削除される() {
+        // Arrange
+        doNothing().when(myBlogRepository).deleteById("id1");
+
+        // Act
+        myBlogService.deleteArticle("id1");
+
+        // Assert
+        verify(myBlogRepository).deleteById("id1");
+    }
 }
