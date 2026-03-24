@@ -1,6 +1,7 @@
 package com.example.MyBlog.Controller;
 
 import com.example.MyBlog.Config.MarkdownConfig;
+import com.example.MyBlog.Config.SecurityConfig;
 import com.example.MyBlog.Entity.Article;
 import com.example.MyBlog.Service.MyBlogService;
 import org.junit.jupiter.api.Test;
@@ -21,8 +22,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @WebMvcTest(MyBlogController.class)
-@Import({SecurityAutoConfiguration.class, MarkdownConfig.class})
-class alterMyBlogControllerTest {
+@Import({SecurityConfig.class, MarkdownConfig.class})
+class AlterMyBlogControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
