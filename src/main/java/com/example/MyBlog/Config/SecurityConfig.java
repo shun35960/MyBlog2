@@ -27,24 +27,24 @@ public class SecurityConfig {
     @Bean
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .formLogin(login -> login
-                                .loginPage("/login")
-                                .loginProcessingUrl("/authenticate")
-                                .defaultSuccessUrl("/Hello")
-                                .failureUrl("/login?error")
-                        // .permitAll() を削除
-                ).logout(logout -> logout
-                                .logoutUrl("/logout")
-                                .invalidateHttpSession(true)
-                                .deleteCookies("JSESSIONID")
-                                .logoutSuccessUrl("/")
-                        // .permitAll() を削除
-                ).authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register", "/authenticate", "/", "/logout").permitAll()
-                        .requestMatchers("/Hello/**").authenticated()
-                        .anyRequest().permitAll()
-                );
+//        http
+//                .formLogin(login -> login
+//                                .loginPage("/login")
+//                                .loginProcessingUrl("/authenticate")
+//                                .defaultSuccessUrl("/Hello")
+//                                .failureUrl("/login?error")
+//                        // .permitAll() を削除
+//                ).logout(logout -> logout
+//                                .logoutUrl("/logout")
+//                                .invalidateHttpSession(true)
+//                                .deleteCookies("JSESSIONID")
+//                                .logoutSuccessUrl("/")
+//                        // .permitAll() を削除
+//                ).authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/login", "/register", "/authenticate", "/", "/logout").permitAll()
+//                        .requestMatchers("/Hello/**").authenticated()
+//                        .anyRequest().permitAll()
+//                );
         return http.build();
     }
 }
