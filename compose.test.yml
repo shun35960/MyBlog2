@@ -1,0 +1,35 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: myblog-test-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - myblog-test-mongodb-data:/data/db
+    networks:
+      - myblog-test-network
+
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: myblog-test-app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8081}:8080"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/myblog
+      SERVER_PORT: 8080
+      JAVA_OPTS: ${JAVA_OPTS:--Dfile.encoding=UTF-8 -Duser.timezone=Asia/Tokyo}
+    depends_on:
+      - mongodb
+    networks:
+      - myblog-test-network
+
+volumes:
+  myblog-test-mongodb-data:
+
+networks:
+  myblog-test-network:
+    driver: bridge
