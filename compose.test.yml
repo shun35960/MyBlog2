@@ -22,10 +22,13 @@ services:
       SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/myblog
       SERVER_PORT: 8080
       JAVA_OPTS: ${JAVA_OPTS:--Dfile.encoding=UTF-8 -Duser.timezone=Asia/Tokyo}
+    env_file:
+      - .env.test
     depends_on:
       - mongodb
     networks:
       - myblog-test-network
+
 
 volumes:
   myblog-test-mongodb-data:
@@ -33,3 +36,4 @@ volumes:
 networks:
   myblog-test-network:
     driver: bridge
+
