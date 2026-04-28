@@ -17,7 +17,7 @@ permissions:
 env:
   APP_NAME: myblog
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/docker-test
+  IMAGE_NAME: ${{ github.repository_owner }}/myblog2
 
 jobs:
   build:
