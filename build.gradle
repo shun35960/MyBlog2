@@ -24,11 +24,19 @@ repositories {
 }
 
 dependencies {
+    implementation(platform("org.springframework:spring-framework-bom:6.2.11"))
+    implementation(platform("org.springframework.security:spring-security-bom:6.5.9"))
+
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-core:10.1.53'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-el:10.1.53'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-websocket:10.1.53'
+    implementation 'org.thymeleaf:thymeleaf:3.1.4.RELEASE'
+    implementation 'org.thymeleaf:thymeleaf-spring6:3.1.4.RELEASE'
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
