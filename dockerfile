@@ -23,8 +23,9 @@ RUN ./gradlew clean bootJar --no-daemon
 FROM eclipse-temurin:23-jre-alpine
 WORKDIR /app
 
-# 必要なパッケージをインストール
-RUN apk add --no-cache fontconfig ttf-dejavu
+# ベースイメージに含まれる Alpine パッケージも更新してから追加パッケージを入れる
+RUN apk upgrade --no-cache \
+    && apk add --no-cache fontconfig ttf-dejavu
 
 # アプリケーションユーザーの作成
 RUN addgroup -g 1000 spring && adduser -u 1000 -G spring -s /bin/sh -D spring

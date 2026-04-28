@@ -30,6 +30,28 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
+    implementation 'org.springframework:spring-aop:6.2.11'
+    implementation 'org.springframework:spring-beans:6.2.11'
+    implementation 'org.springframework:spring-context:6.2.11'
+    implementation 'org.springframework:spring-core:6.2.11'
+    implementation 'org.springframework:spring-expression:6.2.11'
+    implementation 'org.springframework:spring-jcl:6.2.11'
+    implementation 'org.springframework:spring-tx:6.2.11'
+    implementation 'org.springframework:spring-web:6.2.11'
+    implementation 'org.springframework:spring-webmvc:6.2.11'
+
+    implementation 'org.springframework.security:spring-security-config:6.5.9'
+    implementation 'org.springframework.security:spring-security-core:6.5.9'
+    implementation 'org.springframework.security:spring-security-crypto:6.5.9'
+    implementation 'org.springframework.security:spring-security-web:6.5.9'
+
+    implementation 'org.apache.tomcat:tomcat-annotations-api:10.1.54'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-core:10.1.54'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-el:10.1.54'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-websocket:10.1.54'
+    implementation 'org.thymeleaf:thymeleaf:3.1.4.RELEASE'
+    implementation 'org.thymeleaf:thymeleaf-spring6:3.1.4.RELEASE'
+
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
