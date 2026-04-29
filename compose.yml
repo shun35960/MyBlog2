@@ -1,34 +1,19 @@
-version: '3.8'
-
 services:
   app:
-    build: .
-    container_name: myblog-app
+    build:
+      context: .
+      dockerfile: dockerfile
     restart: unless-stopped
     ports:
       - "${APP_PORT:-8080}:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
       SPRING_DATA_MONGODB_URI: ${MONGODB_URI}
       SERVER_PORT: 8080
-      JAVA_OPTS: ${JAVA_OPTS}
+      JAVA_OPTS: ${JAVA_OPTS:--Dfile.encoding=UTF-8 -Duser.timezone=Asia/Tokyo -XX:+UseG1GC -XX:MaxRAMPercentage=75}
     volumes:
-      - ./logs:/app/logs
-      - ./uploads:/app/uploads
-    networks:
-      - myblog-network
-
-  nginx:
-    image: nginx:alpine
-    container_name: myblog-nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - ./nginx/logs:/var/log/nginx
-    depends_on:
-      - app
+      - ./logs:/app/logs:Z
+      - ./uploads:/app/uploads:Z
     networks:
       - myblog-network
 

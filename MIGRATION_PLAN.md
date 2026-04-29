@@ -234,7 +234,7 @@ git checkout -b feature/podman-migration
 # 3. systemdサービス化（自動起動設定）
 # 4. Cloudflare Tunnel を localhost:8080 に向け直す
 # 5. Nginx停止・削除
-# 6. compose.yml / nginx/ を削除するPR
+# 6. compose.yml.bak / nginx/ を削除するPR
 ```
 
 ---

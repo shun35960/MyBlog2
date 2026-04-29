@@ -482,7 +482,7 @@ git checkout -b cleanup/remove-old-deploy
 
 # 削除対象
 git rm deploy.sh
-git rm compose.yml
+git rm compose.yml.bak
 git rm -r nginx/
 
 git commit -m "Remove old Docker Compose and Nginx deployment files"
