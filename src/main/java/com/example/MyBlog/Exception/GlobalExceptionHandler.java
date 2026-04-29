@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 /**
@@ -65,6 +66,21 @@ public class GlobalExceptionHandler {
         log.warn("404 Not Found: {}", ex.getRequestURL());
         model.addAttribute("errorTitle", "ページが見つかりません");
         model.addAttribute("errorMessage", "お探しのページは存在しないか、移動した可能性があります。");
+        return "error";
+    }
+
+    /**
+     * 静的リソースが見つからない場合を404として処理します
+     * @param ex NoResourceFoundException
+     * @param model モデル
+     * @return エラーページ
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleNoResourceFoundException(NoResourceFoundException ex, Model model) {
+        log.warn("Static resource not found: {}", ex.getResourcePath());
+        model.addAttribute("errorTitle", "リソースが見つかりません");
+        model.addAttribute("errorMessage", "要求された静的リソースは存在しません。");
         return "error";
     }
 
