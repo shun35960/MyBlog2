@@ -45,7 +45,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
         env:
-          MONGODB_URI: mongodb://localhost:27017/myblog
+          TEST_MONGODB_URI: mongodb://localhost:27017/myblog_test
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
