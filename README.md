@@ -162,6 +162,26 @@ docker compose down
 ./deploy.sh deploy
 ```
 
+### GHCR イメージを本番起動
+`.env` をプロジェクト直下、または `~/.env` に置いてから実行します。
+
+```bash
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/myblog
+SPRING_PROFILES_ACTIVE=prod
+JAVA_OPTS=-Dfile.encoding=UTF-8 -Duser.timezone=Asia/Tokyo -XX:+UseG1GC -XX:MaxRAMPercentage=75
+```
+
+```bash
+# ghcr.io から最新イメージを pull して起動
+./run-podman.sh run
+
+# 明示的に env ファイルを指定
+ENV_FILE=/home/shun/.env ./run-podman.sh run
+
+# 更新デプロイ
+./run-podman.sh restart
+```
+
 ## 🏗 アーキテクチャ
 
 ### パッケージ構成
