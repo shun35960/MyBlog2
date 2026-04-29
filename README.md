@@ -162,7 +162,7 @@ docker compose down
 ./deploy.sh deploy
 ```
 
-### GHCR イメージを本番起動
+### GHCR イメージを rootless Podman で本番起動
 `.env` をプロジェクト直下、または `~/.env` に置いてから実行します。
 
 ```bash
@@ -172,14 +172,21 @@ JAVA_OPTS=-Dfile.encoding=UTF-8 -Duser.timezone=Asia/Tokyo -XX:+UseG1GC -XX:MaxR
 ```
 
 ```bash
-# ghcr.io から最新イメージを pull して起動
-./run-podman.sh run
+# rootless user service を常駐化
+sudo loginctl enable-linger "$(whoami)"
+
+# ghcr.io から最新イメージを pull して Quadlet 経由で起動
+./install.sh
 
 # 明示的に env ファイルを指定
-ENV_FILE=/home/shun/.env ./run-podman.sh run
+ENV_FILE=/home/shun/.env ./install.sh
 
 # 更新デプロイ
-./run-podman.sh restart
+./update.sh
+
+# 状態確認
+systemctl --user status myblog-app.service
+podman ps --filter name=myblog-app
 ```
 
 ## 🏗 アーキテクチャ
@@ -246,7 +253,7 @@ src/main/java/com/example/MyBlog/
 
 ### CI/CDパイプライン
 
-GitHub Actionsによる自動デプロイメント:
+GitHub Actionsによるビルドとイメージ公開:
 
 1. **テストフェーズ**
    - JUnit単体テスト実行
@@ -256,10 +263,9 @@ GitHub Actionsによる自動デプロイメント:
    - TrivyによるDockerイメージの脆弱性スキャン
    - SARIF形式でレポート保存
 
-3. **デプロイフェーズ**
-   - セルフホストランナーで本番サーバーにデプロイ
-   - rsyncでファイル同期
-   - Docker Composeで起動
+3. **公開フェーズ**
+   - GHCRへコンテナイメージをpush
+   - 本番サーバーは rootless Podman の user service として pull / restart
 
 ## 🧪 テスト
 
@@ -308,7 +314,7 @@ OWASP HTML Sanitizer（サニタイゼーション）
 ### 環境変数管理
 
 - 機密情報は`.env`ファイルで管理（Gitで除外）
-- 本番環境ではDocker ComposeとGitHub Secretsで管理
+- 本番環境では rootless Podman の user service から読み込む
 - ハードコードされた認証情報なし
 
 ## 📝 今後の改善予定

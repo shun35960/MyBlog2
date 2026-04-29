@@ -3,6 +3,11 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/myblog"
+QUADLET_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/containers/systemd"
+GENERATED_ENV_FILE="$CONFIG_DIR/myblog-app.env"
+QUADLET_FILE="$QUADLET_DIR/myblog-app.container"
+SERVICE_NAME="myblog-app.service"
 DEFAULT_ENV_FILE="$ROOT_DIR/.env"
 FALLBACK_ENV_FILE="$HOME/.env"
 ENV_FILE="${ENV_FILE:-}"
@@ -102,6 +107,7 @@ resolved_value() {
 
 ensure_dirs() {
     mkdir -p "$ROOT_DIR/logs" "$ROOT_DIR/uploads"
+    mkdir -p "$CONFIG_DIR" "$QUADLET_DIR"
 }
 
 port_is_in_use() {
@@ -139,14 +145,80 @@ login_if_configured() {
     fi
 }
 
-remove_existing_container() {
-    podman rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true
+check_linger() {
+    local linger_state
+
+    if ! command_exists loginctl; then
+        return 0
+    fi
+
+    linger_state="$(loginctl show-user "$USER" --property=Linger --value 2>/dev/null || true)"
+    if [[ "$linger_state" != "yes" ]]; then
+        cat <<EOF
+WARNING: loginctl enable-linger is not enabled for $USER.
+The rootless service can stop when the user session is restarted or logged out.
+Run once with sudo:
+  sudo loginctl enable-linger $USER
+EOF
+    fi
+}
+
+write_generated_env_file() {
+    local mongodb_uri="$1"
+    local spring_profiles_active="$2"
+    local java_opts="$3"
+
+    cat >"$GENERATED_ENV_FILE" <<EOF
+SPRING_DATA_MONGODB_URI=$mongodb_uri
+SPRING_PROFILES_ACTIVE=$spring_profiles_active
+SERVER_PORT=8080
+JAVA_OPTS=$java_opts
+EOF
+    chmod 600 "$GENERATED_ENV_FILE"
+}
+
+write_quadlet_file() {
+    local app_port="$1"
+
+    cat >"$QUADLET_FILE" <<EOF
+[Unit]
+Description=MyBlog application container
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=$IMAGE_NAME
+ContainerName=$CONTAINER_NAME
+PublishPort=$app_port:8080
+EnvironmentFile=$GENERATED_ENV_FILE
+Volume=$ROOT_DIR/logs:/app/logs:Z,U
+Volume=$ROOT_DIR/uploads:/app/uploads:Z,U
+Pull=newer
+
+[Service]
+Restart=always
+TimeoutStopSec=70
+
+[Install]
+WantedBy=default.target
+EOF
+}
+
+restart_service() {
+    systemctl --user daemon-reload
+    systemctl --user start "$SERVICE_NAME"
+    systemctl --user restart "$SERVICE_NAME"
+}
+
+stop_existing_service() {
+    systemctl --user stop "$SERVICE_NAME" >/dev/null 2>&1 || true
 }
 
 main() {
     local app_port mongodb_uri spring_profiles_active java_opts
 
     require_command podman
+    require_command systemctl
     resolve_env_file
     require_env_key MONGODB_URI
     ensure_dirs
@@ -161,37 +233,30 @@ main() {
     echo "Container: $CONTAINER_NAME"
     echo "Host port: $app_port"
 
+    check_linger
     login_if_configured
 
     echo "Pulling image from ghcr..."
     podman pull "$IMAGE_NAME"
 
-    echo "Recreating container..."
-    remove_existing_container
+    stop_existing_service
+
     if port_is_in_use "$app_port"; then
         echo "Host port ${app_port} is already in use." >&2
         print_port_diagnostics "$app_port" >&2
         echo "Set APP_PORT in $ENV_FILE or run APP_PORT=18080 ./install.sh" >&2
         exit 1
     fi
-    if ! podman run -d \
-        --name "$CONTAINER_NAME" \
-        --restart unless-stopped \
-        -p "${app_port}:8080" \
-        --env-file "$ENV_FILE" \
-        -e SPRING_DATA_MONGODB_URI="$mongodb_uri" \
-        -e SPRING_PROFILES_ACTIVE="$spring_profiles_active" \
-        -e SERVER_PORT="8080" \
-        -e JAVA_OPTS="$java_opts" \
-        -v "$ROOT_DIR/logs:/app/logs:Z,U" \
-        -v "$ROOT_DIR/uploads:/app/uploads:Z,U" \
-        "$IMAGE_NAME"; then
-        echo "Failed to start container. If the port is already in use, set APP_PORT in $ENV_FILE or run APP_PORT=18080 ./install.sh" >&2
-        exit 1
-    fi
+
+    write_generated_env_file "$mongodb_uri" "$spring_profiles_active" "$java_opts"
+    write_quadlet_file "$app_port"
+
+    echo "Installing rootless Quadlet service..."
+    restart_service
 
     echo "=== Setup complete ==="
-    podman ps --filter "name=${CONTAINER_NAME}"
+    systemctl --user --no-pager --full status "$SERVICE_NAME" || true
+    podman ps --filter "name=${CONTAINER_NAME}" || true
 }
 
 if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
