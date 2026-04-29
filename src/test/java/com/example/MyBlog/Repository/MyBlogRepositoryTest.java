@@ -7,12 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.containers.MongoDBContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Date;
 import java.util.List;
@@ -29,18 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataMongoTest
 @AutoConfigureDataMongo
 @ActiveProfiles("test")
-@Testcontainers
 public class MyBlogRepositoryTest {
-    private static final String TEST_DATABASE_NAME = "myblog_test";
-
-    @Container
-    static final MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:7.0");
-
-    @DynamicPropertySource
-    static void configureMongoProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", () -> mongoDBContainer.getReplicaSetUrl(TEST_DATABASE_NAME));
-    }
-
     @Autowired
     private MyBlogRepository myBlogRepository;
     @Autowired
