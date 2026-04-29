@@ -6,10 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,9 +27,16 @@ import static org.junit.jupiter.api.Assertions.*;
 public class MyBlogRepositoryTest {
     @Autowired
     private MyBlogRepository myBlogRepository;
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     @BeforeEach
     void setUp() {
+        String databaseName = mongoTemplate.getDb().getName();
+        assertTrue(
+                databaseName.toLowerCase(Locale.ROOT).contains("test"),
+                "Unsafe MongoDB database for tests: " + databaseName
+        );
         // Clean up the repository before each test
         myBlogRepository.deleteAll();
     }
