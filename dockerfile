@@ -30,8 +30,19 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # アプリケーションユーザーの作成
-RUN groupadd --gid 1000 spring \
-    && useradd --uid 1000 --gid spring --shell /bin/bash --create-home spring
+# ベースイメージ側で UID/GID 1000 が既に使われていても継続できるようにする
+RUN existing_group="$(getent group 1000 | cut -d: -f1 || true)" \
+    && if [ -n "$existing_group" ] && [ "$existing_group" != "spring" ]; then \
+        groupmod -n spring "$existing_group"; \
+    elif [ -z "$existing_group" ]; then \
+        groupadd --gid 1000 spring; \
+    fi \
+    && existing_user="$(getent passwd 1000 | cut -d: -f1 || true)" \
+    && if [ -n "$existing_user" ] && [ "$existing_user" != "spring" ]; then \
+        usermod -l spring -d /home/spring -m -g spring -s /bin/bash "$existing_user"; \
+    elif [ -z "$existing_user" ]; then \
+        useradd --uid 1000 --gid spring --shell /bin/bash --create-home spring; \
+    fi
 
 # 必要なディレクトリを作成
 RUN mkdir -p /app/logs /app/uploads && chown -R spring:spring /app
