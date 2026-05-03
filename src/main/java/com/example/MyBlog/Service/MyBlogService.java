@@ -23,6 +23,8 @@ public interface MyBlogService {
     Article submitArticle(Article article);
     //記事の登録
 
+    Article updateArticle(String id, Article article);
+
     void deleteArticle(String id);
     //記事の削除
 }
