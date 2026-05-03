@@ -76,7 +76,7 @@ class MyBlogControllerTest {
     @Test
     void updateArticle() throws Exception {
         Article article = new Article("test", "testtitle", "testcontent", true, new Date());
-        when(myBlogService.submitArticle(any())).thenReturn(article);
+        when(myBlogService.updateArticle(any(), any())).thenReturn(article);
         mockMvc.perform(put("/Hello/Submit/test")
                         .with(user("admin").roles("ADMIN"))
                         .with(csrf())
