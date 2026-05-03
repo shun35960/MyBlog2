@@ -76,6 +76,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
+          pull: true
           load: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           cache-from: type=gha
@@ -96,6 +97,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
+          pull: true
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}

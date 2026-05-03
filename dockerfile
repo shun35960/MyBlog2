@@ -20,15 +20,18 @@ COPY src ./src
 RUN ./gradlew clean bootJar --no-daemon
 
 # 実行ステージ
-FROM eclipse-temurin:23-jre-alpine
+FROM eclipse-temurin:23-jre-noble
 WORKDIR /app
 
-# ベースイメージに含まれる Alpine パッケージも更新してから追加パッケージを入れる
-RUN apk upgrade --no-cache \
-    && apk add --no-cache fontconfig ttf-dejavu
+# ベースイメージのパッケージを更新してから必要なフォントを追加
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends fontconfig fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/*
 
 # アプリケーションユーザーの作成
-RUN addgroup -g 1000 spring && adduser -u 1000 -G spring -s /bin/sh -D spring
+RUN groupadd --gid 1000 spring \
+    && useradd --uid 1000 --gid spring --shell /bin/bash --create-home spring
 
 # 必要なディレクトリを作成
 RUN mkdir -p /app/logs /app/uploads && chown -R spring:spring /app
