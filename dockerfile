@@ -20,15 +20,29 @@ COPY src ./src
 RUN ./gradlew clean bootJar --no-daemon
 
 # 実行ステージ
-FROM eclipse-temurin:23-jre-alpine
+FROM eclipse-temurin:23-jre-noble
 WORKDIR /app
 
-# ベースイメージに含まれる Alpine パッケージも更新してから追加パッケージを入れる
-RUN apk upgrade --no-cache \
-    && apk add --no-cache fontconfig ttf-dejavu
+# ベースイメージのパッケージを更新してから必要なフォントを追加
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends fontconfig fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/*
 
 # アプリケーションユーザーの作成
-RUN addgroup -g 1000 spring && adduser -u 1000 -G spring -s /bin/sh -D spring
+# ベースイメージ側で UID/GID 1000 が既に使われていても継続できるようにする
+RUN existing_group="$(getent group 1000 | cut -d: -f1 || true)" \
+    && if [ -n "$existing_group" ] && [ "$existing_group" != "spring" ]; then \
+        groupmod -n spring "$existing_group"; \
+    elif [ -z "$existing_group" ]; then \
+        groupadd --gid 1000 spring; \
+    fi \
+    && existing_user="$(getent passwd 1000 | cut -d: -f1 || true)" \
+    && if [ -n "$existing_user" ] && [ "$existing_user" != "spring" ]; then \
+        usermod -l spring -d /home/spring -m -g spring -s /bin/bash "$existing_user"; \
+    elif [ -z "$existing_user" ]; then \
+        useradd --uid 1000 --gid spring --shell /bin/bash --create-home spring; \
+    fi
 
 # 必要なディレクトリを作成
 RUN mkdir -p /app/logs /app/uploads && chown -R spring:spring /app

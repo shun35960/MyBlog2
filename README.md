@@ -162,6 +162,29 @@ docker compose down
 ./deploy.sh deploy
 ```
 
+### Podman テスト起動
+`compose.test.yml` は自動では選ばれないため、`-f compose.test.yml` を省略せずに実行してください。
+
+```bash
+# テスト用 compose 定義で起動
+podman compose -f compose.test.yml up -d
+
+# app サービスを再ビルド
+podman compose -f compose.test.yml build --no-cache app
+
+# app コンテナを再作成して起動
+podman compose -f compose.test.yml up -d --force-recreate
+
+# 状態確認
+podman compose -f compose.test.yml ps
+
+# app ログ確認
+podman compose -f compose.test.yml logs -f app
+
+# 停止
+podman compose -f compose.test.yml down
+```
+
 ### GHCR イメージを rootless Podman で本番起動
 `.env` をプロジェクト直下、または `~/.env` に置いてから実行します。
 

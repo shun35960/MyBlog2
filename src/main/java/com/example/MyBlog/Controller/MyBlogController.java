@@ -75,14 +75,7 @@ public class MyBlogController {
 
     @PutMapping("/Submit/{id}")
     public String updateArticle(@PathVariable("id") String id, @Valid @ModelAttribute Article article, Model model) {
-        Article updatedArticle = new Article(
-                id, // IDはパスから取得
-                article.title(), // タイトルはフォームから取得
-                article.content(), // コンテンツはフォームから取得
-                article.published(), // 公開状態はフォームから取得
-                new Date() // 作成日時を現在の日時に更新
-        );// 作成日時を現在の日時に更新
-        Article savedArticle = myBlogService.submitArticle(updatedArticle);
+        Article savedArticle = myBlogService.updateArticle(id, article);
         model.addAttribute("savedArticle", savedArticle);
         model.addAttribute("Submit", "更新完了");
         log.info("Article updated: id={}, title={}, published={}", id, savedArticle.title(), savedArticle.published());

@@ -41,6 +41,20 @@ public class MyBlogServiceImpl implements MyBlogService {
     }
 
     @Override
+    public Article updateArticle(String id, Article article){
+        Article existingArticle = findArticleById(id);
+        Article updateArticle = new Article(
+                existingArticle.id(),
+                article.title(),
+                article.content(),
+                article.published(),
+                existingArticle.createdAt()
+
+        );
+        return myBlogRepository.save(updateArticle);
+    }
+
+    @Override
     public void deleteArticle(String id) {
         myBlogRepository.deleteById(id);
     }

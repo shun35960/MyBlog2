@@ -4,7 +4,6 @@ import com.example.MyBlog.Entity.Article;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
@@ -22,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * MyBlogRepositoryクラスのメソッドをテストする
  */
 @DataMongoTest
-@AutoConfigureDataMongo
 @ActiveProfiles("test")
 public class MyBlogRepositoryTest {
     @Autowired
