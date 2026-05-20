@@ -7,6 +7,8 @@ plugins {
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
+ext['tomcat.version'] = '10.1.55'
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(23)
