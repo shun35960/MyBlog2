@@ -53,6 +53,13 @@ public class IndexController {
         return "ViewDescription"; // ViewDescription.htmlを返す
     }
 
+    //~/Privacy-> プライバシーポリシーのページを返す
+    @GetMapping("/privacy")
+    public String privacy(Model model) {
+        model.addAttribute("Indextitle", "プライバシーポリシー");
+        return "Privacy"; // Privacy.htmlを返す
+    }
+
     @GetMapping("/ViewDescription/{id}")
     public String viewDescription(Model model, @PathVariable String id) {
         Article article = myBlogService.findArticleById(id);
