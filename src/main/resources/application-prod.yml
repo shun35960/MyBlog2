@@ -2,8 +2,9 @@ spring:
   data:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI}
-      # Atlas用の追加設定
-      auto-index-creation: true
+      # 本番ではアプリ起動時に index を作成しない。
+      # 必要な index は Atlas 管理者権限で事前作成する。
+      auto-index-creation: false
 
   servlet:
     multipart:
