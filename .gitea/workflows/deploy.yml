@@ -66,15 +66,21 @@ jobs:
           load: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ gitea.sha }}
 
+      - name: Install Trivy
+        # trivy-actionは内部でgithub.comをGiteaのトークンでcheckoutして失敗するため、
+        # インストールスクリプトでCLIを直接導入する
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.70.0
+
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
-        with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ gitea.sha }}
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+        run: |
+          trivy image \
+            --format table \
+            --exit-code 1 \
+            --ignore-unfixed \
+            --pkg-types os,library \
+            --severity CRITICAL,HIGH \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ gitea.sha }}
 
       - name: Push image
         if: github.event_name == 'push'
