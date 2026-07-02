@@ -8,6 +8,8 @@ group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
 ext['tomcat.version'] = '10.1.55'
+// CVE-2026-54512 / CVE-2026-54513 (jackson-databind 2.21.2) 対応
+ext['jackson-bom.version'] = '2.21.4'
 
 java {
     toolchain {
