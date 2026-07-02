@@ -15,11 +15,6 @@ jobs:
   build:
     name: Build & Test
     runs-on: ubuntu-latest
-    services:
-      mongodb:
-        image: mongo:7
-        ports:
-          - 27017:27017
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
@@ -36,8 +31,6 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build
-        env:
-          TEST_MONGODB_URI: mongodb://localhost:27017/myblog_test
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
