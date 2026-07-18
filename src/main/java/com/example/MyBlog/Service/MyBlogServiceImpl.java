@@ -36,6 +36,11 @@ public class MyBlogServiceImpl implements MyBlogService {
     }
 
     @Override
+    public List<Article> findPublishedArticlesBySeriesId(String seriesId) {
+        return myBlogRepository.findBySeriesIdAndPublishedTrueOrderByCreatedAtAsc(seriesId);
+    }
+
+    @Override
     public Article submitArticle(Article article) {
         return myBlogRepository.save(article);
     }
@@ -48,6 +53,7 @@ public class MyBlogServiceImpl implements MyBlogService {
                 article.title(),
                 article.content(),
                 article.published(),
+                article.seriesId(),
                 existingArticle.createdAt()
 
         );

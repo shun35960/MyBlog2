@@ -3,7 +3,9 @@ package com.example.MyBlog.Controller;
 import com.example.MyBlog.Config.MarkdownConfig;
 import com.example.MyBlog.Config.SecurityConfig;
 import com.example.MyBlog.Entity.Article;
+import com.example.MyBlog.Entity.Series;
 import com.example.MyBlog.Service.MyBlogService;
+import com.example.MyBlog.Service.SeriesService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -31,14 +33,17 @@ class IndexControllerTest {
     @MockitoBean
     MyBlogService myBlogService;
 
+    @MockitoBean
+    SeriesService seriesService;
+
     // --- index ---
 
     @Test
     void index_公開記事一覧が表示される() throws Exception {
         // Arrange
         List<Article> articles = List.of(
-                new Article("id1", "タイトル1", "内容1", true, new Date()),
-                new Article("id2", "タイトル2", "内容2", true, new Date())
+                new Article("id1", "タイトル1", "内容1", true, null, new Date()),
+                new Article("id2", "タイトル2", "内容2", true, null, new Date())
         );
         when(myBlogService.findArticlePublishedTrue()).thenReturn(articles);
 
@@ -69,7 +74,7 @@ class IndexControllerTest {
     @Test
     void about_記事が取得されてViewDescriptionが表示される() throws Exception {
         // Arrange
-        Article article = new Article("aboutArticleId", "About", "## 筆者紹介", true, new Date());
+        Article article = new Article("aboutArticleId", "About", "## 筆者紹介", true, null, new Date());
         when(myBlogService.findArticleById("aboutArticleId")).thenReturn(article);
 
         // Act & Assert
@@ -85,7 +90,7 @@ class IndexControllerTest {
     @Test
     void about_記事のcontentがnull_空文字でレンダリングされる() throws Exception {
         // Arrange
-        Article article = new Article("aboutArticleId", "About", null, true, new Date());
+        Article article = new Article("aboutArticleId", "About", null, true, null, new Date());
         when(myBlogService.findArticleById("aboutArticleId")).thenReturn(article);
 
         // Act & Assert
@@ -100,7 +105,7 @@ class IndexControllerTest {
     @Test
     void viewDescription_指定IDの記事が表示される() throws Exception {
         // Arrange
-        Article article = new Article("id1", "タイトル1", "## 見出し\n本文", true, new Date());
+        Article article = new Article("id1", "タイトル1", "## 見出し\n本文", true, null, new Date());
         when(myBlogService.findArticleById("id1")).thenReturn(article);
 
         // Act & Assert
@@ -116,7 +121,7 @@ class IndexControllerTest {
     @Test
     void viewDescription_記事のcontentがnull_空文字でレンダリングされる() throws Exception {
         // Arrange
-        Article article = new Article("id1", "タイトル1", null, true, new Date());
+        Article article = new Article("id1", "タイトル1", null, true, null, new Date());
         when(myBlogService.findArticleById("id1")).thenReturn(article);
 
         // Act & Assert
@@ -124,5 +129,41 @@ class IndexControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("ViewDescription"))
                 .andExpect(model().attributeExists("renderedHtmlContent"));
+    }
+
+    // --- viewSeriesList / viewSeriesDetail ---
+
+    @Test
+    void viewSeriesList_公開シリーズ一覧が表示される() throws Exception {
+        // Arrange
+        Series series = new Series("s1", "シリーズ1", "説明", new Date());
+        when(seriesService.findPublishedSeriesSummaries())
+                .thenReturn(List.of(new SeriesService.SeriesSummary(series, 2L)));
+
+        // Act & Assert
+        mockMvc.perform(get("/Series"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("ViewSeriesList"))
+                .andExpect(model().attribute("seriesSummaries", hasSize(1)));
+
+        verify(seriesService).findPublishedSeriesSummaries();
+    }
+
+    @Test
+    void viewSeriesDetail_公開記事が連結表示される() throws Exception {
+        // Arrange
+        Series series = new Series("s1", "シリーズ1", "## 説明", new Date());
+        Article article1 = new Article("a1", "第1回", "# 本文1", true, "s1", new Date());
+        Article article2 = new Article("a2", "第2回", "# 本文2", true, "s1", new Date());
+        when(seriesService.findSeriesById("s1")).thenReturn(series);
+        when(myBlogService.findPublishedArticlesBySeriesId("s1")).thenReturn(List.of(article1, article2));
+
+        // Act & Assert
+        mockMvc.perform(get("/Series/s1"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("ViewSeriesDetail"))
+                .andExpect(model().attribute("series", series))
+                .andExpect(model().attribute("articleViews", hasSize(2)))
+                .andExpect(model().attributeExists("renderedDescription"));
     }
 }

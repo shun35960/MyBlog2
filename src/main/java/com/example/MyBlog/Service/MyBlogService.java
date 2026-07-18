@@ -17,6 +17,9 @@ public interface MyBlogService {
     List<Article> findArticlePublishedFalse();
     //公開状態がfalseのものを取得
 
+    List<Article> findPublishedArticlesBySeriesId(String seriesId);
+    //指定シリーズに所属する公開記事を作成日時の昇順で取得
+
     //Article editArticle(Article article);
     //記事の編集
 

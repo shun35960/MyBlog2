@@ -10,6 +10,9 @@
 <body>
 <section layout:fragment="content">
     <p class="display-3 mb-4" th:text="${Indextitle}"></p>
+    <div class="action-buttons">
+        <a th:href="@{/Series}" class="btn">シリーズ一覧</a>
+    </div>
     <div class="row" th:if="${articles != null and !articles.empty}">
         <div th:each="article : ${articles}">
             <div class="col">
@@ -18,6 +21,10 @@
                     <div>
                         <a th:href="@{/ViewDescription/{id}(id=${article.id})}" class="card-link">詳細</a>
                         <span class="text-muted" th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+                        <a th:if="${article.seriesId != null and seriesTitles != null and seriesTitles.containsKey(article.seriesId)}"
+                           th:href="@{/Series/{id}(id=${article.seriesId})}"
+                           class="badge bg-secondary text-decoration-none"
+                           th:text="${seriesTitles[article.seriesId]}"></a>
                     </div>
                 </div>
             </div>

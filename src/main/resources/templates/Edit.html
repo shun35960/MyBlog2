@@ -24,6 +24,18 @@
             <textarea class="form-control" id="content" rows="30" th:field="*{content}" required></textarea>
         </div>
 
+        <!-- シリーズ選択セクション -->
+        <div class="form-group">
+            <label for="seriesId">所属シリーズ</label>
+            <select class="form-control" id="seriesId" th:field="*{seriesId}">
+                <option value="">なし</option>
+                <option th:each="series : ${seriesList}" th:value="${series.id}" th:text="${series.title}"></option>
+            </select>
+            <label for="newSeriesTitle" class="mt-2">新規シリーズを作成する場合はシリーズ名を入力（選択より優先されます）</label>
+            <input class="form-control" type="text" id="newSeriesTitle" name="newSeriesTitle"
+                   placeholder="新規シリーズ名" maxlength="200">
+        </div>
+
         <!-- 画像アップロードセクション -->
         <div class="form-group">
             <label>画像をアップロード</label>

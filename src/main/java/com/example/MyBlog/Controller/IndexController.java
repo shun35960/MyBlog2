@@ -1,7 +1,9 @@
 package com.example.MyBlog.Controller;
 
 import com.example.MyBlog.Entity.Article;
+import com.example.MyBlog.Entity.Series;
 import com.example.MyBlog.Service.MyBlogService;
+import com.example.MyBlog.Service.SeriesService;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import com.vladsch.flexmark.util.ast.Node;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * IndexControllerは、アプリケーションのインデックスページを表示するためのコントローラーです。
@@ -25,6 +29,7 @@ import java.util.List;
 public class IndexController {
 
     private final MyBlogService myBlogService;
+    private final SeriesService seriesService;
     private final Parser markdownParser;
     private final HtmlRenderer htmlRenderer;
     private final PolicyFactory htmlSanitizationPolicy;
@@ -37,8 +42,38 @@ public class IndexController {
     public String index(Model model) {
         List<Article> articleList = myBlogService.findArticlePublishedTrue();
         model.addAttribute("articles", articleList);
+        //シリーズバッジ表示用にシリーズID→シリーズ名のマップを渡す
+        Map<String, String> seriesTitles = seriesService.findAllSeries().stream()
+                .collect(Collectors.toMap(Series::id, Series::title));
+        model.addAttribute("seriesTitles", seriesTitles);
         model.addAttribute("Indextitle", "ようこそ");
         return "index"; // index.htmlを返す
+    }
+
+    //~/Series -> 未ログイン者向けのシリーズ一覧(管理機能なし)
+    @GetMapping("/Series")
+    public String viewSeriesList(Model model) {
+        model.addAttribute("seriesSummaries", seriesService.findPublishedSeriesSummaries());
+        model.addAttribute("SeriesListTitle", "シリーズ一覧");
+        return "ViewSeriesList"; // ViewSeriesList.htmlを返す
+    }
+
+    //~/Series/{id} -> 未ログイン者向けのシリーズ詳細(公開記事を作成日時順に連結表示・管理機能なし)
+    @GetMapping("/Series/{id}")
+    public String viewSeriesDetail(Model model, @PathVariable String id) {
+        Series series = seriesService.findSeriesById(id);
+        List<SeriesController.ArticleView> articleViews = myBlogService.findPublishedArticlesBySeriesId(id).stream()
+                .map(article -> new SeriesController.ArticleView(article, renderMarkdown(article.content())))
+                .toList();
+        model.addAttribute("series", series);
+        model.addAttribute("renderedDescription", renderMarkdown(series.description()));
+        model.addAttribute("articleViews", articleViews);
+        return "ViewSeriesDetail"; // ViewSeriesDetail.htmlを返す
+    }
+
+    private String renderMarkdown(String content) {
+        Node document = markdownParser.parse(content != null ? content : "");
+        return htmlSanitizationPolicy.sanitize(htmlRenderer.render(document));
     }
 
     //~/About-> 筆者紹介の記事を返す

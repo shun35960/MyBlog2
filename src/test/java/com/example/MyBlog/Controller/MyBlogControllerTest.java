@@ -4,6 +4,7 @@ import com.example.MyBlog.Config.MarkdownConfig;
 import com.example.MyBlog.Config.SecurityConfig;
 import com.example.MyBlog.Entity.Article;
 import com.example.MyBlog.Service.MyBlogService;
+import com.example.MyBlog.Service.SeriesService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -35,6 +36,9 @@ class MyBlogControllerTest {
     @MockitoBean
     MyBlogService myBlogService;
 
+    @MockitoBean
+    SeriesService seriesService;
+
     @Test
     void hello() throws Exception {
         mockMvc.perform(get("/Hello"))
@@ -51,7 +55,7 @@ class MyBlogControllerTest {
 
     @Test
     void editArticle()  throws Exception {
-        Article article = new Article("none", "testtitle", "testcontent", false, new Date());
+        Article article = new Article("none", "testtitle", "testcontent", false, null, new Date());
         when(myBlogService.findArticleById("none")).thenReturn(article);
 
         mockMvc.perform(get("/Hello/Edit/none"))
@@ -62,7 +66,7 @@ class MyBlogControllerTest {
 
     @Test
     void saveArticle() throws Exception {
-//        Article article = new Article("test", "testtitle", "testcontent", false, new Date());
+//        Article article = new Article("test", "testtitle", "testcontent", false, null, new Date());
 //        when(myBlogService.submitArticle(article)).thenReturn(article);
         mockMvc.perform(post("/Hello/Submit")
                         .with(user("admin").roles("ADMIN"))
@@ -75,7 +79,7 @@ class MyBlogControllerTest {
 
     @Test
     void updateArticle() throws Exception {
-        Article article = new Article("test", "testtitle", "testcontent", true, new Date());
+        Article article = new Article("test", "testtitle", "testcontent", true, null, new Date());
         when(myBlogService.updateArticle(any(), any())).thenReturn(article);
         mockMvc.perform(put("/Hello/Submit/test")
                         .with(user("admin").roles("ADMIN"))
@@ -88,7 +92,7 @@ class MyBlogControllerTest {
 
     @Test
     void showdescription() throws Exception {
-        Article article = new Article("test", "testtitle2", "testcontent2", false, new Date());
+        Article article = new Article("test", "testtitle2", "testcontent2", false, null, new Date());
         when(myBlogService.findArticleById("test")).thenReturn(article);
         mockMvc.perform(get("/Hello/Description/test"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -104,7 +108,7 @@ class MyBlogControllerTest {
 
     @Test
     void deleteArticle() throws Exception {
-        Article article = new Article("test", "testtitle", "testcontent", false, new Date());
+        Article article = new Article("test", "testtitle", "testcontent", false, null, new Date());
         mockMvc.perform(delete("/Hello/test")
                         .with(user("admin").roles("ADMIN"))
                         .with(csrf())

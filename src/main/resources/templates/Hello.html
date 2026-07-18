@@ -12,6 +12,7 @@
     <div class="action-buttons">
         <a th:href="@{/Hello/Edit}" class="btn">新規作成</a>
         <a th:href="@{/Hello/Draft}" class="btn">下書き一覧</a>
+        <a th:href="@{/Hello/Series}" class="btn">シリーズ一覧</a>
         <form th:action="@{/logout}" method="post" class="d-inline">
             <button type="submit" class="btn btn-danger">ログアウト</button>
         </form>
@@ -24,6 +25,10 @@
                     <div>
                         <a th:href="@{/Hello/Description/{id}(id=${article.id})}" class="card-link">詳細</a>
                         <span class="text-muted" th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+                        <a th:if="${article.seriesId != null and seriesTitles != null and seriesTitles.containsKey(article.seriesId)}"
+                           th:href="@{/Hello/Series/{id}(id=${article.seriesId})}"
+                           class="badge bg-secondary text-decoration-none"
+                           th:text="${seriesTitles[article.seriesId]}"></a>
                     </div>
                 </div>
             </div>
