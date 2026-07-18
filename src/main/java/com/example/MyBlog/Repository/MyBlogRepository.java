@@ -18,4 +18,10 @@ public interface MyBlogRepository extends MongoRepository<Article, String> {
     //公開状態がtrueのものを取得
     List<Article> findByPublishedFalse();
     //公開状態がfalseのものを取得
+    List<Article> findBySeriesIdAndPublishedTrueOrderByCreatedAtAsc(String seriesId);
+    //指定シリーズに所属する公開記事を作成日時の昇順で取得
+    List<Article> findBySeriesId(String seriesId);
+    //指定シリーズに所属する全記事を取得(シリーズ削除時の紐付け解除用)
+    long countBySeriesIdAndPublishedTrue(String seriesId);
+    //指定シリーズに所属する公開記事数を取得
 }

@@ -43,8 +43,8 @@ public class MyBlogRepositoryTest {
     @Test
     void getAllBlogs() {
         // Add test data
-        Article article1 = new Article("id1", "Title 1", "Content 1", true, new Date());
-        Article article2 = new Article("id2", "Title 2", "Content 2", false, new Date());
+        Article article1 = new Article("id1", "Title 1", "Content 1", true, null, new Date());
+        Article article2 = new Article("id2", "Title 2", "Content 2", false, null, new Date());
 
         myBlogRepository.save(article1);
         myBlogRepository.save(article2);
@@ -62,8 +62,8 @@ public class MyBlogRepositoryTest {
     @Test
     void findByPublishedTrue() {
         // Add test data
-        Article article1 = new Article("id1", "Title 1", "Content 1", true, new Date());
-        Article article2 = new Article("id2", "Title 2", "Content 2", false, new Date());
+        Article article1 = new Article("id1", "Title 1", "Content 1", true, null, new Date());
+        Article article2 = new Article("id2", "Title 2", "Content 2", false, null, new Date());
 
         myBlogRepository.save(article1);
         myBlogRepository.save(article2);
@@ -84,8 +84,8 @@ public class MyBlogRepositoryTest {
     @Test
     void findByPublishedFalse() {
         // Add test data
-        Article article1 = new Article("id1", "Title 1", "Content 1", true, new Date());
-        Article article2 = new Article("id2", "Title 2", "Content 2", false, new Date());
+        Article article1 = new Article("id1", "Title 1", "Content 1", true, null, new Date());
+        Article article2 = new Article("id2", "Title 2", "Content 2", false, null, new Date());
 
         myBlogRepository.save(article1);
         myBlogRepository.save(article2);

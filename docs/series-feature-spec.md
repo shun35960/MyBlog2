@@ -39,7 +39,9 @@ public record Article(
 ## リポジトリ
 
 - **`MyBlogRepository`(既存に追加)**:
-  `List<Article> findBySeriesIdAndPublishedTrueOrderByCreatedAtAsc(String seriesId);`
+  - `List<Article> findBySeriesIdAndPublishedTrueOrderByCreatedAtAsc(String seriesId);`(シリーズ詳細表示用)
+  - `List<Article> findBySeriesId(String seriesId);`(シリーズ削除時の紐付け解除用)
+  - `long countBySeriesIdAndPublishedTrue(String seriesId);`(シリーズ一覧の記事数表示用)
 - **`SeriesRepository`(新規・宣言のみ)**:
   `interface SeriesRepository extends MongoRepository<Series, String> { }`
   ※ Series ドキュメント自体の CRUD 用。Spring Data は 1 エンティティ = 1 リポジトリのため必要
@@ -48,9 +50,24 @@ public record Article(
 
 | URL | 内容 |
 |---|---|
-| `GET /Hello/Series` | シリーズ一覧(タイトル・記事数・最終更新) |
+| `GET /Hello/Series` | シリーズ一覧(タイトル・記事数・作成日時) |
 | `GET /Hello/Series/{id}` | シリーズ詳細:公開記事を createdAt 昇順で全文連結表示 |
+| `POST /Hello/Series/{id}` | シリーズ名・説明の更新(詳細ページ内の編集フォームから) |
+| `DELETE /Hello/Series/{id}` | シリーズの削除(所属記事の seriesId を null に戻す) |
 | 既存 `Edit` 画面 | 「所属シリーズ」セレクトボックス+新規シリーズ名の入力欄を追加 |
+
+※ シリーズ名・説明の管理(編集)はシリーズ詳細ページ内の折りたたみフォームで行う
+
+### 公開側(未ログイン向け・管理機能なし)
+
+| URL | 内容 |
+|---|---|
+| `GET /Series` | シリーズ一覧(`ViewSeriesList.html`) |
+| `GET /Series/{id}` | シリーズ詳細:公開記事を連結表示、記事リンクは `/ViewDescription/{id}` へ(`ViewSeriesDetail.html`) |
+
+- 既存の公開側の構成(`/` → `index.html`、`/ViewDescription/{id}`)に合わせた別ルート・別テンプレート方式
+- 編集フォーム・削除ボタンは表示しない
+- トップページ(`index.html`)にシリーズ一覧ボタンとシリーズバッジを表示
 
 ### シリーズ詳細ページ
 

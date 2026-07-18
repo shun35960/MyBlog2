@@ -27,12 +27,13 @@ public record Article(
         @NotBlank(message = "記事内容は必須です")
         String content, //記事の内容
         boolean published, //公開状態
+        String seriesId, //所属シリーズID(null = 未所属)
         @CreatedDate
         Date createdAt//作成日時
         ) {
     public static Article newArticle() {
         // 新しい記事を作成するための静的メソッド
-        return new Article(null, "", "", false, new Date());
-        //新規作成時は下書き(published=false)で作成
+        return new Article(null, "", "", false, null, new Date());
+        //新規作成時は下書き(published=false)・シリーズ未所属で作成
     }
 }
