@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>シリーズ一覧</title>
+</head>
+<body>
+<section layout:fragment="content">
+    <p class="display-3 mb-4" th:text="${SeriesListTitle}"></p>
+    <div class="action-buttons">
+        <a th:href="@{/}" class="btn">トップページへ戻る</a>
+    </div>
+    <div class="row" th:if="${seriesSummaries != null and !seriesSummaries.empty}">
+        <div th:each="summary : ${seriesSummaries}">
+            <div class="col">
+                <div class="card">
+                    <h5 class="card-title" th:text="${summary.series.title}">シリーズ名</h5>
+                    <div>
+                        <a th:href="@{/Series/{id}(id=${summary.series.id})}" class="card-link">読む</a>
+                        <span class="text-muted" th:text="|記事数: ${summary.publishedCount}|"></span>
+                        <span class="text-muted"
+                              th:text="${#dates.format(summary.series.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:unless="${seriesSummaries != null and !seriesSummaries.empty}">
+        <p>シリーズはありません。</p>
+    </div>
+</section>
+</body>
+</html>

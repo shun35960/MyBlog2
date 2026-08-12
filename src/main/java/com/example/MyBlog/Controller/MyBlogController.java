@@ -1,7 +1,9 @@
 package com.example.MyBlog.Controller;
 
 import com.example.MyBlog.Entity.Article;
+import com.example.MyBlog.Entity.Series;
 import com.example.MyBlog.Service.MyBlogService;
+import com.example.MyBlog.Service.SeriesService;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
@@ -17,6 +19,8 @@ import org.owasp.html.PolicyFactory;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * MyBlogControllerは、ブログアプリケーションのコントローラーです。
@@ -32,6 +36,7 @@ import java.util.List;
 public class MyBlogController {
 
     private final MyBlogService myBlogService;
+    private final SeriesService seriesService;
     private final Parser markdownParser;
     private final HtmlRenderer htmlRenderer;
     private final PolicyFactory htmlSanitizationPolicy;
@@ -43,6 +48,10 @@ public class MyBlogController {
         model.addAttribute("Hellotitle", "記事の一覧!");
         List<Article> articleList = myBlogService.findArticlePublishedTrue();
         model.addAttribute("articles", articleList);
+        //シリーズバッジ表示用にシリーズID→シリーズ名のマップを渡す
+        Map<String, String> seriesTitles = seriesService.findAllSeries().stream()
+                .collect(Collectors.toMap(Series::id, Series::title));
+        model.addAttribute("seriesTitles", seriesTitles);
         log.debug("Published articles found: {}", articleList.size());
         return "Hello";
     }
@@ -51,6 +60,7 @@ public class MyBlogController {
     @GetMapping("/Edit")
     public String edit(Model model) {
         model.addAttribute("article", Article.newArticle());
+        model.addAttribute("seriesList", seriesService.findAllSeries());
         //model.addAttribute("Edit", "入力項目を入力してください");
         return "Edit";
     }
@@ -59,14 +69,16 @@ public class MyBlogController {
     public String editArticle(@PathVariable("id") String id, Model model) {
         Article article = myBlogService.findArticleById(id);
         model.addAttribute("article", article);
+        model.addAttribute("seriesList", seriesService.findAllSeries());
         //model.addAttribute("Edit", "入力項目を入力してください");
         return "Edit";
     }
 
     //EditのSubmitをしたら確認画面に遷移
     @PostMapping("/Submit")
-    public String saveArticle(@PathVariable(value = "id", required = false) String id, @Valid @ModelAttribute Article article, Model model) {
-        Article submitArticle = myBlogService.submitArticle(article);
+    public String saveArticle(@PathVariable(value = "id", required = false) String id, @Valid @ModelAttribute Article article,
+                              @RequestParam(value = "newSeriesTitle", required = false) String newSeriesTitle, Model model) {
+        Article submitArticle = myBlogService.submitArticle(withResolvedSeries(article, newSeriesTitle));
         model.addAttribute("savedArticle", submitArticle);
         model.addAttribute("Submit", "登録完了");
         log.info("Article submitted: title={}, published={}", article.title(), article.published());
@@ -74,12 +86,28 @@ public class MyBlogController {
     }
 
     @PutMapping("/Submit/{id}")
-    public String updateArticle(@PathVariable("id") String id, @Valid @ModelAttribute Article article, Model model) {
-        Article savedArticle = myBlogService.updateArticle(id, article);
+    public String updateArticle(@PathVariable("id") String id, @Valid @ModelAttribute Article article,
+                                @RequestParam(value = "newSeriesTitle", required = false) String newSeriesTitle, Model model) {
+        Article savedArticle = myBlogService.updateArticle(id, withResolvedSeries(article, newSeriesTitle));
         model.addAttribute("savedArticle", savedArticle);
         model.addAttribute("Submit", "更新完了");
         log.info("Article updated: id={}, title={}, published={}", id, savedArticle.title(), savedArticle.published());
         return "redirect:/Hello";
+    }
+
+    /**
+     * フォーム入力からseriesIdを確定する。
+     * 新規シリーズ名が入力されていればシリーズを作成してそのIDを使い、
+     * セレクトボックス未選択(空文字)はnull(未所属)に正規化する。
+     */
+    private Article withResolvedSeries(Article article, String newSeriesTitle) {
+        String seriesId = article.seriesId();
+        if (newSeriesTitle != null && !newSeriesTitle.isBlank()) {
+            seriesId = seriesService.createSeries(newSeriesTitle.trim()).id();
+        } else if (seriesId != null && seriesId.isBlank()) {
+            seriesId = null;
+        }
+        return new Article(article.id(), article.title(), article.content(), article.published(), seriesId, article.createdAt());
     }
 
 
