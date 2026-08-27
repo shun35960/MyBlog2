@@ -290,6 +290,21 @@ GitHub Actionsによるビルドとイメージ公開:
    - GHCRへコンテナイメージをpush
    - 本番サーバーは rootless Podman の user service として pull / restart
 
+4. **Cloud Runデプロイフェーズ**（`master` への push、または手動実行）
+   - Workload Identity Federation でGCPに認証（JSONキー不要）
+   - `ghcr.io/<owner>/myblog2:<commit SHA>` をCloud Runサービスに反映
+   - セットアップ手順は [docs/cloud-run-deploy.md](docs/cloud-run-deploy.md) を参照
+
+`Actions → MyBlog CI/CD Pipeline → Run workflow` から手動デプロイも可能です。
+手動実行時はビルドとイメージpushを行わず、`image_tag` に指定した既存イメージを
+Cloud Runに反映するだけなので、ロールバック用途にも使えます。
+
+> **Note**
+> Cloud Runは外部レジストリの公開イメージを最大1時間キャッシュするため、
+> `:latest` ではなく不変のコミットSHAタグでデプロイしています。
+> また `gcloud run deploy --image` はイメージ以外の既存設定を引き継ぐため、
+> 環境変数やシークレットはCloud Runサービス側の設定がそのまま維持されます。
+
 ## 🧪 テスト
 
 ### テスト実行
