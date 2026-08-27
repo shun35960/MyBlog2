@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-MyBlog is a Japanese blog application built with Spring Boot 3.4.5 and Java 23. It supports Markdown content creation, user authentication, and has a Scrapbox-inspired design. The application is containerized and deployed using Docker Compose with Nginx as a reverse proxy.
+MyBlog is a Japanese blog application built with Spring Boot 4.1.1 and Java 25 (LTS). It supports Markdown content creation, user authentication, and has a Scrapbox-inspired design. The application is containerized and deployed using Docker Compose with Nginx as a reverse proxy.
 
 ## Development Commands
 
@@ -90,10 +90,10 @@ public record Article(String id, String title, String content, boolean published
 
 ## Technology Stack
 
-**Backend**: Java 23, Spring Boot 3.4.5, Spring Security, Spring Data MongoDB
+**Backend**: Java 25 (LTS), Spring Boot 4.1.1, Spring Security, Spring Data MongoDB
 **Frontend**: Thymeleaf, Bootstrap 5.3.0, Custom CSS (Scrapbox-inspired)
 **Database**: MongoDB (local dev) / MongoDB Atlas (production)
-**Build**: Gradle with Java 23 toolchain
+**Build**: Gradle 9.7.1 with Java 25 toolchain
 **Deployment**: Docker multi-stage builds, Docker Compose, Nginx reverse proxy
 **CI/CD**: GitHub Actions with self-hosted runner, Trivy security scanning
 
@@ -163,7 +163,7 @@ CI=true ./gradlew test
 - **Container**: G1GC enabled, 75% max RAM usage in Docker
 
 ### Code Style
-- **Modern Java**: Uses records, Java 23 features
+- **Modern Java**: Uses records, Java 25 features
 - **Dependency Injection**: Constructor injection with `@RequiredArgsConstructor` (Lombok)
 - **Error Handling**: Basic exception handling, could be enhanced with `@ExceptionHandler`
 - **Logging**: Debug level in development, structured logging in production

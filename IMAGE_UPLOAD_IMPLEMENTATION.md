@@ -153,7 +153,7 @@ gridFsTemplate.delete(query);
 
 ## 技術スタック
 
-- **バックエンド:** Java 23, Spring Boot 3.4.5, Spring Data MongoDB
+- **バックエンド:** Java 25, Spring Boot 4.1.1, Spring Data MongoDB
 - **データベース:** MongoDB (GridFS)
 - **フロントエンド:** Thymeleaf, Bootstrap 5.3.0, Vanilla JavaScript
 - **画像処理:** GridFS (MongoDB の分散ファイルストレージ)
