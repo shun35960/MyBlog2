@@ -17,8 +17,8 @@ Scrapboxにインスパイアされたデザインの日本語ブログアプリ
 ## 🛠 使用技術
 
 ### バックエンド
-- **Java 23** - 最新のJava機能を活用
-- **Spring Boot 3.4.5** - エンタープライズグレードのフレームワーク
+- **Java 25 (LTS)** - 最新のJava機能を活用
+- **Spring Boot 4.1.1** - エンタープライズグレードのフレームワーク
 - **Spring Security** - 認証・認可機能
 - **Spring Data MongoDB** - データアクセス層
 - **Lombok** - ボイラープレートコード削減
@@ -43,7 +43,7 @@ Scrapboxにインスパイアされたデザインの日本語ブログアプリ
 - **Trivy** - セキュリティスキャン
 
 ### 開発ツール
-- **Gradle 8.x** - ビルドツール
+- **Gradle 9.x** - ビルドツール
 - **Spring Boot DevTools** - 開発効率化
 - **JUnit 5** - テストフレームワーク
 - **Mockito** - モックフレームワーク
@@ -61,8 +61,8 @@ Scrapboxにインスパイアされたデザインの日本語ブログアプリ
 ## 📦 必要条件
 
 ### 開発環境
-- Java 23以上
-- Gradle 8.x
+- Java 25以上
+- Gradle 9.x
 - MongoDB 6.0以上（ローカル開発用）
 - IntelliJ IDEA（推奨）または他のJava IDE
 
