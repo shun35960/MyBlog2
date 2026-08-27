@@ -7,6 +7,14 @@ ghcr.io に push されたイメージをそのまま Cloud Run に反映しま�
 build (test) → publish (Trivy scan → ghcr.io push) → deploy (Cloud Run)
 ```
 
+加えて `workflow_dispatch`（手動実行）にも対応しています。手動実行では
+**ビルドと push は行わず**、既に ghcr.io に存在するイメージを Cloud Run に反映するだけです。
+ロールバックや、CI を通さずに任意のタグを再デプロイしたい場合に使います。
+
+```
+deploy (Cloud Run)   ← build / publish はスキップされる
+```
+
 デプロイするイメージは `ghcr.io/<owner>/myblog2:<commit SHA>` です。
 Cloud Run は ghcr.io などの外部レジストリの公開イメージを **最大 1 時間キャッシュする** ため、
 `:latest` ではなく不変のコミット SHA タグを指定しています。
@@ -155,9 +163,30 @@ echo "$SA_EMAIL"
 2. Actions で `build → publish → deploy` が順に成功することを確認
 3. ジョブサマリに表示される Cloud Run の URL を開いて反映を確認
 
+## 手動デプロイ（workflow_dispatch）
+
+1. GitHub の `Actions → MyBlog CI/CD Pipeline` を開く
+2. `Run workflow` を押す
+3. `image_tag` に反映したいイメージタグを入力する
+   - **空のまま**にすると、選択した ref の最新コミット SHA が使われます
+   - コミット SHA のほか、`master` や `latest` も指定できます
+     （ただし外部レジストリの公開イメージは Cloud Run 側で最大 1 時間キャッシュされるため、
+     可変タグでは反映が遅れることがあります。確実に反映したい場合はコミット SHA を使って下さい）
+4. `Run workflow` を実行
+
+手動実行では `build` / `publish` ジョブはスキップされ、`deploy` のみが動きます。
+指定したタグのイメージが ghcr.io に存在しない場合は、
+`Verify image exists in ghcr.io` ステップで停止します。
+
 ## ロールバック
 
-Cloud Run のリビジョンを戻すのが最短です。
+**方法 1: 手動デプロイで戻す（推奨）**
+
+上記の手動デプロイで、`image_tag` に戻したいコミットの SHA を指定します。
+
+**方法 2: Cloud Run のリビジョンを切り替える**
+
+イメージを pull し直さないため最速です。
 
 ```bash
 gcloud run services update-traffic "$SERVICE" \
@@ -165,7 +194,7 @@ gcloud run services update-traffic "$SERVICE" \
   --to-revisions=<戻したいリビジョン名>=100
 ```
 
-特定コミットのイメージを再デプロイする場合は以下です。
+**方法 3: gcloud で直接デプロイ**
 
 ```bash
 gcloud run deploy "$SERVICE" \
