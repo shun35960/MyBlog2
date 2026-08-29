@@ -1,5 +1,6 @@
 package com.example.MyBlog.Exception;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
@@ -92,8 +93,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleGlobalException(Exception ex, Model model) {
-        log.error("Unexpected error occurred", ex);
+    public String handleGlobalException(Exception ex, HttpServletRequest request, Model model) {
+        log.error("Unexpected error occurred: method={}, uri={}",
+                request.getMethod(), request.getRequestURI(), ex);
         model.addAttribute("errorTitle", "エラーが発生しました");
         model.addAttribute("errorMessage", "予期しないエラーが発生しました。管理者にお問い合わせください。");
         return "error";
