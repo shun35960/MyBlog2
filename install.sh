@@ -169,7 +169,7 @@ write_generated_env_file() {
     local java_opts="$3"
 
     cat >"$GENERATED_ENV_FILE" <<EOF
-SPRING_DATA_MONGODB_URI=$mongodb_uri
+SPRING_MONGODB_URI=$mongodb_uri
 SPRING_PROFILES_ACTIVE=$spring_profiles_active
 SERVER_PORT=8080
 JAVA_OPTS=$java_opts
