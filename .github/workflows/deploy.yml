@@ -5,14 +5,6 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-  # 手動デプロイ / ロールバック用。ビルドは行わず、
-  # 既に ghcr.io に存在するイメージを Cloud Run に反映する
-  workflow_dispatch:
-    inputs:
-      image_tag:
-        description: 'デプロイするイメージタグ（空ならこのワークフローを実行したコミットの SHA）'
-        required: false
-        type: string
 
 permissions:
   contents: read
@@ -31,8 +23,6 @@ jobs:
   build:
     name: Build & Test
     runs-on: ubuntu-latest
-    # 手動実行は既存イメージのデプロイのみを行うため、ビルドはスキップする
-    if: github.event_name != 'workflow_dispatch'
     services:
       mongodb:
         image: mongo:7
@@ -67,7 +57,6 @@ jobs:
     name: Scan & Push Image
     runs-on: ubuntu-latest
     needs: build
-    if: github.event_name != 'workflow_dispatch'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -115,101 +104,3 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           cache-from: type=gha
-
-  deploy:
-    name: Deploy to Cloud Run
-    runs-on: ubuntu-latest
-    needs: publish
-    # master への push（PR ではイメージが push されないためデプロイもしない）、
-    # または手動実行。手動実行では publish がスキップされるため !cancelled() が必要
-    if: |
-      !cancelled()
-      && (github.event_name == 'workflow_dispatch'
-          || (github.event_name == 'push'
-              && github.ref == 'refs/heads/master'
-              && needs.publish.result == 'success'))
-    permissions:
-      contents: read
-      # ghcr.io 上のイメージ存在確認に必要
-      packages: read
-      # Workload Identity Federation で OIDC トークンを取得するために必須
-      id-token: write
-    steps:
-      - name: Validate deployment settings
-        env:
-          GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
-          CLOUD_RUN_SERVICE: ${{ vars.CLOUD_RUN_SERVICE }}
-          CLOUD_RUN_REGION: ${{ vars.CLOUD_RUN_REGION }}
-          GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-        run: |
-          missing=()
-          for name in GCP_PROJECT_ID CLOUD_RUN_SERVICE CLOUD_RUN_REGION \
-                      GCP_WORKLOAD_IDENTITY_PROVIDER GCP_SERVICE_ACCOUNT; do
-            if [ -z "${!name}" ]; then
-              missing+=("$name")
-            fi
-          done
-          if [ ${#missing[@]} -ne 0 ]; then
-            echo "::error::Cloud Run デプロイ用の設定が未登録です: ${missing[*]}"
-            echo "::error::docs/cloud-run-deploy.md の手順に従って Variables / Secrets を登録してください。"
-            exit 1
-          fi
-
-      - name: Resolve image reference
-        id: image
-        env:
-          # push イベントでは空文字になる
-          INPUT_TAG: ${{ inputs.image_tag }}
-          FALLBACK_TAG: ${{ github.sha }}
-        run: |
-          tag="${INPUT_TAG:-$FALLBACK_TAG}"
-          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
-          echo "reference=${REGISTRY}/${IMAGE_NAME}:${tag}" >> "$GITHUB_OUTPUT"
-          echo "デプロイ対象: ${REGISTRY}/${IMAGE_NAME}:${tag}"
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v4
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Verify image exists in ghcr.io
-        env:
-          REFERENCE: ${{ steps.image.outputs.reference }}
-        run: |
-          if ! docker buildx imagetools inspect "$REFERENCE" > /dev/null 2>&1; then
-            echo "::error::イメージが見つかりません: ${REFERENCE}"
-            echo "::error::タグ名を確認するか、対象コミットが master に push 済みか確認してください。"
-            exit 1
-          fi
-
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v3
-        with:
-          project_id: ${{ vars.GCP_PROJECT_ID }}
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-
-      - name: Deploy to Cloud Run
-        id: deploy
-        uses: google-github-actions/deploy-cloudrun@v3
-        with:
-          project_id: ${{ vars.GCP_PROJECT_ID }}
-          service: ${{ vars.CLOUD_RUN_SERVICE }}
-          region: ${{ vars.CLOUD_RUN_REGION }}
-          # Cloud Run は ghcr.io などの外部レジストリの公開イメージを最大 1 時間キャッシュする。
-          # :latest では古いイメージが配信されうるため、既定では不変のコミット SHA タグを使う
-          image: ${{ steps.image.outputs.reference }}
-
-      - name: Summarize deployment
-        run: |
-          {
-            echo "### Cloud Run デプロイ完了"
-            echo ""
-            echo "- サービス: \`${{ vars.CLOUD_RUN_SERVICE }}\` (\`${{ vars.CLOUD_RUN_REGION }}\`)"
-            echo "- イメージ: \`${{ steps.image.outputs.reference }}\`"
-            echo "- 実行契機: \`${{ github.event_name }}\`"
-            echo "- URL: ${{ steps.deploy.outputs.url }}"
-          } >> "$GITHUB_STEP_SUMMARY"
