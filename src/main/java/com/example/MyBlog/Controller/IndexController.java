@@ -43,7 +43,9 @@ public class IndexController {
         List<Article> articleList = myBlogService.findArticlePublishedTrue();
         model.addAttribute("articles", articleList);
         //シリーズバッジ表示用にシリーズID→シリーズ名のマップを渡す
+        //Collectors.toMap は key/value が null だと NPE を投げるため、事前に除外する
         Map<String, String> seriesTitles = seriesService.findAllSeries().stream()
+                .filter(series -> series.id() != null && series.title() != null)
                 .collect(Collectors.toMap(Series::id, Series::title));
         model.addAttribute("seriesTitles", seriesTitles);
         model.addAttribute("Indextitle", "ようこそ");
