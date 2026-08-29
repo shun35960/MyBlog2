@@ -8,8 +8,11 @@
 </head>
 <body>
 <section layout:fragment="content">
-    <h1 th:text="${status} + ' ' + ${error}"></h1>
-    <p>申し訳ございません。ページを表示できませんでした</p>
+    <!-- GlobalExceptionHandler 経由では errorTitle / errorMessage が、
+         Spring Boot 既定の /error 経由では status / error が入る。両方に対応する -->
+    <h1 th:with="statusText=${status != null ? status + ' ' + error : 'エラーが発生しました'}"
+        th:text="${errorTitle} ?: ${statusText}">エラーが発生しました</h1>
+    <p th:text="${errorMessage} ?: '申し訳ございません。ページを表示できませんでした'">申し訳ございません。ページを表示できませんでした</p>
     <a th:href="@{/}" class="btn btn-primary mt-3">トップページに戻る</a>
 </section>
 </body>
