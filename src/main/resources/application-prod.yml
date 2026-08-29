@@ -1,7 +1,16 @@
 spring:
+  mongodb:
+    # Spring Boot 4.0.0 で spring.data.mongodb.uri は spring.mongodb.uri へ改名された
+    # (旧名は deprecation level=error のため、指定しても無視される)。
+    # 環境変数 SPRING_MONGODB_URI が設定されていればそちらが優先される
+    # (環境変数は application-prod.yml より優先度が高いため)。
+    # 下記は旧名 SPRING_DATA_MONGODB_URI しか持たない環境のための移行用フォールバック。
+    uri: ${SPRING_DATA_MONGODB_URI}
+    # 接続タイムアウトの類は接続文字列のオプションで指定する
+    # 例: ...mongodb.net/myblog?connectTimeoutMS=10000&socketTimeoutMS=10000
+
   data:
     mongodb:
-      uri: ${SPRING_DATA_MONGODB_URI}
       # 本番ではアプリ起動時に index を作成しない。
       # 必要な index は Atlas 管理者権限で事前作成する。
       auto-index-creation: false
@@ -27,8 +36,3 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-
-# MongoDB Atlas接続のタイムアウト設定
-spring.data.mongodb:
-  connection-timeout: 10000
-  socket-timeout: 10000
