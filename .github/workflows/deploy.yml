@@ -42,6 +42,15 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
 
+      # 書式違反はテストより先に落とす。build でも check 経由で実行されるが、
+      # 独立したステップにすることで失敗理由が一目で分かるようにしている
+      - name: Check code format
+        run: |
+          if ! ./gradlew spotlessCheck; then
+            echo "::error::コードの書式が揃っていません。ローカルで ./gradlew spotlessApply を実行してコミットして下さい。"
+            exit 1
+          fi
+
       - name: Build with Gradle
         run: ./gradlew build
         env:

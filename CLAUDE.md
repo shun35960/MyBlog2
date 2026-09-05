@@ -38,6 +38,23 @@ chmod +x gradlew
 ./gradlew test --tests "com.example.MyBlog.Service.MyBlogServiceTest"
 ```
 
+### Code Format
+Spotless でコードの書式を揃えている。違反があると `check`(`build`) と CI が失敗する。
+
+```bash
+# 書式違反を確認する
+./gradlew spotlessCheck
+
+# 書式違反を自動修正する
+./gradlew spotlessApply
+```
+
+適用しているルール（`build.gradle` の `spotless` ブロック）:
+- インデントは半角スペース 4 つ（タブを変換）
+- 行末の空白を除去、ファイル末尾に改行を付与
+- 不要な import を削除
+- import 順を `java` → `javax` → `jakarta` → サードパーティ → `com.example.MyBlog` に統一
+
 ### Docker Operations
 ```bash
 # Build and start all services

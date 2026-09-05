@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '4.1.1'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.diffplug.spotless' version '8.10.2'
 }
 
 group = 'com.example'
@@ -54,4 +55,24 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
     systemProperty 'spring.profiles.active', 'test'
+}
+
+// コードの書式を揃えるための設定。
+// 違反があると check(build) タスクが失敗する。./gradlew spotlessApply で自動修正できる。
+// google-java-format のような全体整形は行わず、書式の揺れだけを潰す軽量な構成にしている。
+spotless {
+    java {
+        target 'src/*/java/**/*.java'
+
+        // 空白まわりの揺れを潰す
+        leadingTabsToSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
+
+        // import の並びと不要 import。
+        // 既定の removeUnusedImports() は google-java-format を使い JDK 16 以降で
+        // --add-exports が必要になるため、JavaParser ベースの実装を明示する。
+        removeUnusedImports('cleanthat-javaparser-unnecessaryimport')
+        importOrder('java', 'javax', 'jakarta', '', 'com.example.MyBlog')
+    }
 }
