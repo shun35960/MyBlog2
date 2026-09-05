@@ -1,26 +1,25 @@
 package com.example.MyBlog.Controller;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import jakarta.validation.Valid;
+
+import com.vladsch.flexmark.html.HtmlRenderer;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.util.ast.Node;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.owasp.html.PolicyFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
 import com.example.MyBlog.Entity.Article;
 import com.example.MyBlog.Entity.Series;
 import com.example.MyBlog.Service.MyBlogService;
 import com.example.MyBlog.Service.SeriesService;
-import com.vladsch.flexmark.util.ast.Node;
-import com.vladsch.flexmark.html.HtmlRenderer;
-import com.vladsch.flexmark.parser.Parser;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-import org.owasp.html.PolicyFactory;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * MyBlogControllerは、ブログアプリケーションのコントローラーです。

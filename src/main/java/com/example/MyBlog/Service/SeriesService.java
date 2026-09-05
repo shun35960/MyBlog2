@@ -1,8 +1,8 @@
 package com.example.MyBlog.Service;
 
-import com.example.MyBlog.Entity.Series;
-
 import java.util.List;
+
+import com.example.MyBlog.Entity.Series;
 
 public interface SeriesService {
 

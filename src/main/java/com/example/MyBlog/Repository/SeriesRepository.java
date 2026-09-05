@@ -1,7 +1,8 @@
 package com.example.MyBlog.Repository;
 
-import com.example.MyBlog.Entity.Series;
 import org.springframework.data.mongodb.repository.MongoRepository;
+
+import com.example.MyBlog.Entity.Series;
 
 /**
  * SeriesRepositoryは、MongoDBを使用してSeriesエンティティに対するCRUD操作を提供します。

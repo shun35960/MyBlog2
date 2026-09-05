@@ -1,9 +1,7 @@
 package com.example.MyBlog.Controller;
 
-import com.example.MyBlog.Entity.Article;
-import com.example.MyBlog.Entity.Series;
-import com.example.MyBlog.Service.MyBlogService;
-import com.example.MyBlog.Service.SeriesService;
+import java.util.List;
+
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
@@ -14,7 +12,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import com.example.MyBlog.Entity.Article;
+import com.example.MyBlog.Entity.Series;
+import com.example.MyBlog.Service.MyBlogService;
+import com.example.MyBlog.Service.SeriesService;
 
 /**
  * SeriesControllerは、シリーズ(連載)機能のコントローラーです。

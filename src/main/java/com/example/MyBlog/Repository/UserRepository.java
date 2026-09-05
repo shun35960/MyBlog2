@@ -1,10 +1,10 @@
 package com.example.MyBlog.Repository;
 
-import com.example.MyBlog.Entity.Users;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.security.core.userdetails.User;
-
 import java.util.Optional;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+import com.example.MyBlog.Entity.Users;
 
 /**
  * UserRepositoryは、MongoDBを使用してユーザー情報を管理するリポジトリインターフェースです。

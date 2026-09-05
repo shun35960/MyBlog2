@@ -1,9 +1,10 @@
 package com.example.MyBlog.Repository;
 
-import com.example.MyBlog.Entity.Article;
+import java.util.List;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import java.util.List;
+import com.example.MyBlog.Entity.Article;
 
 /**
  * MyBlogRepositoryは、MongoDBを使用してArticleエンティティに対するCRUD操作を提供します。

@@ -1,8 +1,8 @@
 package com.example.MyBlog.Service;
 
-import com.example.MyBlog.Entity.Article;
-
 import java.util.List;
+
+import com.example.MyBlog.Entity.Article;
 
 public interface MyBlogService {
 //    List<Article> getAllArticle();

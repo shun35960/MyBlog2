@@ -1,12 +1,13 @@
 package com.example.MyBlog.Entity;
 
+import java.util.Date;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.Date;
 
 /**
  * Seriesは、複数の記事をまとめる連載シリーズを表すエンティティクラスです。

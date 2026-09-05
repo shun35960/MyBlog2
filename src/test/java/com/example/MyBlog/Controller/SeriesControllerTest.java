@@ -1,22 +1,5 @@
 package com.example.MyBlog.Controller;
 
-import com.example.MyBlog.Config.MarkdownConfig;
-import com.example.MyBlog.Config.SecurityConfig;
-import com.example.MyBlog.Entity.Article;
-import com.example.MyBlog.Entity.Series;
-import com.example.MyBlog.Service.MyBlogService;
-import com.example.MyBlog.Service.SeriesService;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import java.util.Date;
-import java.util.List;
-
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,6 +8,24 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+
+import java.util.Date;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import com.example.MyBlog.Config.MarkdownConfig;
+import com.example.MyBlog.Config.SecurityConfig;
+import com.example.MyBlog.Entity.Article;
+import com.example.MyBlog.Entity.Series;
+import com.example.MyBlog.Service.MyBlogService;
+import com.example.MyBlog.Service.SeriesService;
 
 @WebMvcTest(SeriesController.class)
 @Import({MarkdownConfig.class, SecurityConfig.class})

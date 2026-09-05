@@ -1,6 +1,11 @@
 package com.example.MyBlog.Repository;
 
-import com.example.MyBlog.Entity.Article;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,11 +13,7 @@ import org.springframework.boot.data.mongodb.test.autoconfigure.DataMongoTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-import static org.junit.jupiter.api.Assertions.*;
+import com.example.MyBlog.Entity.Article;
 
 /**
  * MyBlogRepositoryTest
