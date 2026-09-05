@@ -8,6 +8,14 @@ plugins {
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
+// Spring Boot 4.1.1 の BOM が管理する Tomcat 11.0.24 には CRITICAL の脆弱性があり、
+// Trivy スキャン(publish ジョブ)が失敗する。修正版の 11.0.25 へ上書きする。
+// - CVE-2026-65182 アクセス制御不備によるセキュリティ制約のバイパス
+// - CVE-2026-65905 DIGEST 認証のリプレイ攻撃による認証バイパス
+// - CVE-2026-68525 FORM 認証のバイパスによる不正なリソースアクセス
+// Boot の BOM が 11.0.25 以上を管理するようになったら、この行は削除してよい。
+ext['tomcat.version'] = '11.0.25'
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
