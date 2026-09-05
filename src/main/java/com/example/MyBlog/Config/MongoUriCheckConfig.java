@@ -1,11 +1,11 @@
 package com.example.MyBlog.Config;
 
+import java.util.Arrays;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.util.PlaceholderResolutionException;
-
-import java.util.Arrays;
 
 /**
  * MongoUriCheckConfigは、MongoDBの接続先が正しく渡されているかを

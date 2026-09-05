@@ -1,11 +1,12 @@
 package com.example.MyBlog.Controller;
 
-import com.example.MyBlog.Entity.Article;
-import com.example.MyBlog.Entity.Series;
-import com.example.MyBlog.Service.MyBlogService;
-import com.example.MyBlog.Service.SeriesService;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.util.ast.Node;
 import lombok.RequiredArgsConstructor;
 import org.owasp.html.PolicyFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,11 +14,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import com.vladsch.flexmark.util.ast.Node;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.example.MyBlog.Entity.Article;
+import com.example.MyBlog.Entity.Series;
+import com.example.MyBlog.Service.MyBlogService;
+import com.example.MyBlog.Service.SeriesService;
 
 /**
  * IndexControllerは、アプリケーションのインデックスページを表示するためのコントローラーです。

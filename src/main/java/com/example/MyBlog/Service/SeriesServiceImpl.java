@@ -1,13 +1,14 @@
 package com.example.MyBlog.Service;
 
+import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
 import com.example.MyBlog.Entity.Article;
 import com.example.MyBlog.Entity.Series;
 import com.example.MyBlog.Repository.MyBlogRepository;
 import com.example.MyBlog.Repository.SeriesRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * SeriesServiceImplは、SeriesServiceインターフェースの実装クラスです。

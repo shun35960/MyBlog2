@@ -1,8 +1,7 @@
 package com.example.MyBlog.Controller;
 
-import com.example.MyBlog.Entity.Users;
-import com.example.MyBlog.Repository.UserRepository;
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -11,6 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.example.MyBlog.Entity.Users;
+import com.example.MyBlog.Repository.UserRepository;
 
 /**
  * RegisterControllerは、ユーザー登録を処理するためのコントローラーです。
