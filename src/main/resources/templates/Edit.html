@@ -9,7 +9,8 @@
 </head>
 <body>
 <section layout:fragment="content">
-    <h2>入力項目を入力してください</h2>
+    <h1 class="display-3" th:text="${article.id != null} ? '記事を編集' : '記事を作成'">記事を作成</h1>
+    <p class="text-muted">入力項目を入力してください</p>
     <form class="edit-form"
           th:action="${article.id != null} ? @{/Hello/Submit/{id}(id=${article.id})} : @{/Hello/Submit}"
           th:object="${article}"
@@ -31,9 +32,10 @@
                 <option value="">なし</option>
                 <option th:each="series : ${seriesList}" th:value="${series.id}" th:text="${series.title}"></option>
             </select>
-            <label for="newSeriesTitle" class="mt-2">新規シリーズを作成する場合はシリーズ名を入力（選択より優先されます）</label>
+            <label for="newSeriesTitle" class="md-field-spacing">新規シリーズ名</label>
             <input class="form-control" type="text" id="newSeriesTitle" name="newSeriesTitle"
                    placeholder="新規シリーズ名" maxlength="200">
+            <p class="md-supporting-text">新規シリーズを作成する場合に入力してください（選択より優先されます）</p>
         </div>
 
         <!-- 画像アップロードセクション -->
@@ -43,10 +45,10 @@
                 <!-- ドラッグ&ドロップエリア -->
                 <div id="dropZone" class="drop-zone">
                     <p>ここにファイルをドラッグ&ドロップするか、</p>
-                    <button type="button" id="uploadButton" class="btn btn-outline-secondary">
+                    <button type="button" id="uploadButton" class="btn btn-outlined">
                         ファイルを選択
                     </button>
-                    <p class="text-muted small">対応形式: JPEG, PNG, GIF, WebP（最大100MB）</p>
+                    <p class="md-supporting-text">対応形式: JPEG, PNG, GIF, WebP（最大100MB）</p>
                 </div>
                 <!-- ファイル入力（非表示） -->
                 <input type="file" id="imageFile" accept="image/jpeg,image/png,image/gif,image/webp"
@@ -68,8 +70,8 @@
         </div>
 
         <div class="form-group">
-            <p>保存方法を選択</p>
-            <div>
+            <label>保存方法を選択</label>
+            <div class="md-radio-group">
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" id="publish" th:field="*{published}" th:value="true"
                            th:checked="${article.published}">
@@ -282,12 +284,12 @@
             // アップロード済み画像情報を表示
             function displayUploadedImage(fileId, altText, imageUrl) {
                 const imageInfo = document.createElement('div');
-                imageInfo.className = 'alert alert-success d-flex justify-content-between align-items-center';
+                imageInfo.className = 'alert alert-success md-uploaded-image';
                 imageInfo.innerHTML = `
                     <div>
                         <small><strong>アップロード済み:</strong> ${altText}</small>
                     </div>
-                    <button type="button" class="btn btn-sm btn-outline-danger delete-image-btn" data-file-id="${fileId}">
+                    <button type="button" class="btn btn-sm btn-danger delete-image-btn" data-file-id="${fileId}">
                         削除
                     </button>
                 `;
@@ -352,37 +354,6 @@
         });
     </script>
 
-    <style>
-        /* ドラッグ&ドロップエリアのスタイル */
-        .drop-zone {
-            border: 2px dashed #ccc;
-            border-radius: 8px;
-            padding: 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background-color: #f9f9f9;
-        }
-
-        .drop-zone:hover {
-            border-color: #0d6efd;
-            background-color: #f0f7ff;
-        }
-
-        .drop-zone.dragover {
-            border-color: #0d6efd;
-            background-color: #e7f1ff;
-            box-shadow: 0 0 10px rgba(13, 110, 253, 0.3);
-        }
-
-        .drop-zone p {
-            margin: 0.5rem 0;
-        }
-
-        .image-upload-section {
-            margin-top: 1rem;
-        }
-    </style>
 </section>
 </body>
 </html>

@@ -8,26 +8,26 @@
 </head>
 <body>
 <section layout:fragment="content">
-    <p class="display-3 mb-4" th:text="${SeriesListTitle}"></p>
+    <h1 class="display-3" th:text="${SeriesListTitle}"></h1>
     <div class="action-buttons">
-        <a th:href="@{/}" class="btn">トップページへ戻る</a>
+        <a th:href="@{/}" class="btn btn-tonal">トップページへ戻る</a>
     </div>
     <div class="row" th:if="${seriesSummaries != null and !seriesSummaries.empty}">
         <div th:each="summary : ${seriesSummaries}">
             <div class="col">
-                <div class="card">
-                    <h5 class="card-title" th:text="${summary.series.title}">シリーズ名</h5>
+                <article class="card">
+                    <h2 class="card-title" th:text="${summary.series.title}">シリーズ名</h2>
                     <div>
                         <a th:href="@{/Series/{id}(id=${summary.series.id})}" class="card-link">読む</a>
-                        <span class="text-muted" th:text="|記事数: ${summary.publishedCount}|"></span>
+                        <span class="md-chip" th:text="|記事数: ${summary.publishedCount}|"></span>
                         <span class="text-muted"
                               th:text="${#dates.format(summary.series.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
                     </div>
-                </div>
+                </article>
             </div>
         </div>
     </div>
-    <div th:unless="${seriesSummaries != null and !seriesSummaries.empty}">
+    <div class="md-empty-state" th:unless="${seriesSummaries != null and !seriesSummaries.empty}">
         <p>シリーズはありません。</p>
     </div>
 </section>

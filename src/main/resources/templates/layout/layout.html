@@ -6,10 +6,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f3edf7" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#211f26" media="(prefers-color-scheme: dark)">
     <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap">
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/css/scrapbox-style.css}">
+    <link rel="stylesheet" th:href="@{/css/material-style.css}">
     <title>Hello</title>
+    <!-- ダークテーマをレンダリング前に適用してちらつきを防ぐ -->
+    <script>
+        (function () {
+            try {
+                var stored = localStorage.getItem('theme');
+                var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (stored === 'dark' || (stored === null && prefersDark)) {
+                    document.documentElement.classList.add('theme-dark-pending');
+                }
+            } catch (e) {
+                /* localStorage が使えない環境ではライトテーマのままにする */
+            }
+        })();
+    </script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-7XX1D2BR7N"></script>
     <script>
@@ -27,17 +47,17 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
 <script th:src="@{/index.js}"></script>
-<header class="header">
-    <nav class="navbar">
-        <div class="container-fluid">
-            <div style="display: flex; align-items: center; gap: 24px; width: 100%;">
+<header class="header" id="appBar">
+    <nav class="navbar" aria-label="メインナビゲーション">
+        <div class="container">
+            <div class="md-top-app-bar">
                 <a class="navbar-brand" th:href="@{/}">トップページ</a>
                 <a class="nav-link" th:href="@{/about}">About</a>
-                <button id="darkModeToggle" class="dark-mode-toggle" aria-label="ダークモード切り替え"
-                        style="margin-left: auto;">
-                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                <button id="darkModeToggle" class="md-icon-button dark-mode-toggle md-spacer" type="button"
+                        aria-label="ダークモード切り替え">
+                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                         stroke-linejoin="round">
+                         stroke-linejoin="round" aria-hidden="true">
                         <circle cx="12" cy="12" r="5"></circle>
                         <line x1="12" y1="1" x2="12" y2="3"></line>
                         <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -48,9 +68,9 @@
                         <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
                         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
                     </svg>
-                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                         stroke-linejoin="round">
+                         stroke-linejoin="round" aria-hidden="true">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
                 </button>
@@ -58,13 +78,13 @@
         </div>
     </nav>
 </header>
-<div class="container">
+<main class="container">
     <section layout:fragment="content"></section>
-</div>
+</main>
 <footer class="footer">
-    <div class="container text-center">
-        <span class="me-3">© ベテランペーパードライバー</span>
-        <a th:href="@{/privacy}" class="text-muted text-decoration-none">プライバシーポリシー</a>
+    <div class="container">
+        <span>© ベテランペーパードライバー</span>
+        <a th:href="@{/privacy}">プライバシーポリシー</a>
     </div>
 </footer>
 </body>

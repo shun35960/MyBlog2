@@ -8,24 +8,26 @@
     <title>login</title>
 </head>
 <body>
-<h1>ログイン</h1>
 <section layout:fragment="content">
-    <form th:action="@{/authenticate}" method="post">
-        <div class="form-floating mt-3">
-            <input type="text" id="floatlngInput" name="username" class="form-control" placeholder="ユーザー名"
-                   required>
-            <label for="floatlngInput" class="form-label">ユーザー名</label>
-        </div>
-        <div class="form-floating mt-3">
-            <input type="password" id="floatingPassword" name="password" class="form-control" placeholder="パスワード"
-                   required>
-            <label for="floatingPassword" class="form-label">パスワード</label>
-        </div>
-        <p class="mt-3" th:text="${errormessage}"></p>
-        <div class="mt-3">
-            <button type="submit" class="btn btn-primary">ログイン</button>
-        </div>
-    </form>
+    <div class="md-form-surface md-auth-card">
+        <h1 class="md-headline-small">ログイン</h1>
+        <form th:action="@{/authenticate}" method="post">
+            <div class="form-floating">
+                <input type="text" id="floatlngInput" name="username" class="form-control" placeholder="ユーザー名"
+                       autocomplete="username" required>
+                <label for="floatlngInput">ユーザー名</label>
+            </div>
+            <div class="form-floating">
+                <input type="password" id="floatingPassword" name="password" class="form-control" placeholder="パスワード"
+                       autocomplete="current-password" required>
+                <label for="floatingPassword">パスワード</label>
+            </div>
+            <p class="md-error-text" th:if="${errormessage != null}" th:text="${errormessage}"></p>
+            <div class="action-buttons">
+                <button type="submit" class="btn btn-primary">ログイン</button>
+            </div>
+        </form>
+    </div>
 </section>
 </body>
 </html>
