@@ -1,57 +1,57 @@
 /* ==========================================================================
    MyBlog Material Design 3 (Material You) Design System
-   - ソースカラーはブルー (#0b57d0)、サーフェスは色味を持たないニュートラル
+   - 彩度を持たないモノトーン。強調は色ではなく明度差とエレベーションで付ける
    - ライト / ダーク (body.dark-mode) の両スキームを同一トークン名で切り替える
    ========================================================================== */
 
 :root {
   /* --- Color roles: Light scheme --- */
-  --md-primary: #0b57d0;
+  --md-primary: #1a1a1a;
   --md-on-primary: #ffffff;
-  --md-primary-container: #d3e3fd;
-  --md-on-primary-container: #041e49;
+  --md-primary-container: #e0e0e0;
+  --md-on-primary-container: #1a1a1a;
 
-  --md-secondary: #47617a;
+  --md-secondary: #4a4a4a;
   --md-on-secondary: #ffffff;
-  --md-secondary-container: #dbe7f6;
-  --md-on-secondary-container: #17293c;
+  --md-secondary-container: #ececec;
+  --md-on-secondary-container: #1f1f1f;
 
-  --md-tertiary: #00639b;
+  --md-tertiary: #5f5f5f;
   --md-on-tertiary: #ffffff;
-  --md-tertiary-container: #cee5ff;
-  --md-on-tertiary-container: #001d32;
+  --md-tertiary-container: #e6e6e6;
+  --md-on-tertiary-container: #1f1f1f;
 
-  --md-error: #ba1a1a;
+  /* 破壊的操作もモノトーンで表す。他のボタンより濃いグレー + アウトラインで区別する */
+  --md-error: #2a2a2a;
   --md-on-error: #ffffff;
-  --md-error-container: #ffdad6;
-  --md-on-error-container: #410002;
+  --md-error-container: #d6d6d6;
+  --md-on-error-container: #1a1a1a;
 
-  /* サーフェスはニュートラル(無彩色寄り)。ページ地は白 */
   --md-background: #ffffff;
-  --md-on-background: #1a1c1e;
+  --md-on-background: #1a1a1a;
   --md-surface: #ffffff;
-  --md-on-surface: #1a1c1e;
-  --md-surface-variant: #e1e2e8;
-  --md-on-surface-variant: #43474e;
+  --md-on-surface: #1a1a1a;
+  --md-surface-variant: #e4e4e4;
+  --md-on-surface-variant: #4a4a4a;
 
   --md-surface-container-lowest: #ffffff;
-  --md-surface-container-low: #f8f9fb;
-  --md-surface-container: #f1f3f6;
-  --md-surface-container-high: #ebeef2;
-  --md-surface-container-highest: #e4e8ed;
+  --md-surface-container-low: #f8f8f8;
+  --md-surface-container: #f2f2f2;
+  --md-surface-container-high: #ececec;
+  --md-surface-container-highest: #e6e6e6;
 
-  --md-outline: #73777f;
-  --md-outline-variant: #c3c7cf;
+  --md-outline: #767676;
+  --md-outline-variant: #c6c6c6;
 
-  --md-inverse-surface: #2f3033;
-  --md-inverse-on-surface: #f1f0f4;
-  --md-inverse-primary: #a8c7fa;
+  --md-inverse-surface: #303030;
+  --md-inverse-on-surface: #f2f2f2;
+  --md-inverse-primary: #e0e0e0;
   --md-scrim: 0, 0, 0;
 
   /* ステートレイヤー用の RGB 値 (rgba() 合成に使う) */
-  --md-primary-rgb: 11, 87, 208;
-  --md-on-surface-rgb: 26, 28, 30;
-  --md-error-rgb: 186, 26, 26;
+  --md-primary-rgb: 26, 26, 26;
+  --md-on-surface-rgb: 26, 26, 26;
+  --md-error-rgb: 42, 42, 42;
 
   /* --- Elevation --- */
   --md-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
@@ -86,49 +86,49 @@
 body.dark-mode,
 .theme-dark-pending body {
   /* --- Color roles: Dark scheme --- */
-  --md-primary: #a8c7fa;
-  --md-on-primary: #062e6f;
-  --md-primary-container: #0842a0;
-  --md-on-primary-container: #d3e3fd;
+  --md-primary: #e3e3e3;
+  --md-on-primary: #1a1a1a;
+  --md-primary-container: #4a4a4a;
+  --md-on-primary-container: #ececec;
 
-  --md-secondary: #bfc9db;
-  --md-on-secondary: #263544;
-  --md-secondary-container: #3c4c5c;
-  --md-on-secondary-container: #dbe7f6;
+  --md-secondary: #c6c6c6;
+  --md-on-secondary: #2a2a2a;
+  --md-secondary-container: #3a3a3a;
+  --md-on-secondary-container: #e6e6e6;
 
-  --md-tertiary: #93ccff;
-  --md-on-tertiary: #003353;
-  --md-tertiary-container: #004a77;
-  --md-on-tertiary-container: #cee5ff;
+  --md-tertiary: #b8b8b8;
+  --md-on-tertiary: #2f2f2f;
+  --md-tertiary-container: #454545;
+  --md-on-tertiary-container: #e6e6e6;
 
-  --md-error: #ffb4ab;
-  --md-on-error: #690005;
-  --md-error-container: #93000a;
-  --md-on-error-container: #ffdad6;
+  --md-error: #d6d6d6;
+  --md-on-error: #2a2a2a;
+  --md-error-container: #4f4f4f;
+  --md-on-error-container: #ececec;
 
-  --md-background: #131314;
-  --md-on-background: #e3e2e6;
-  --md-surface: #131314;
-  --md-on-surface: #e3e2e6;
-  --md-surface-variant: #43474e;
-  --md-on-surface-variant: #c3c7cf;
+  --md-background: #121212;
+  --md-on-background: #e6e6e6;
+  --md-surface: #121212;
+  --md-on-surface: #e6e6e6;
+  --md-surface-variant: #454545;
+  --md-on-surface-variant: #c6c6c6;
 
-  --md-surface-container-lowest: #0e0e0f;
-  --md-surface-container-low: #1b1b1c;
-  --md-surface-container: #1f1f20;
-  --md-surface-container-high: #282829;
-  --md-surface-container-highest: #333335;
+  --md-surface-container-lowest: #0d0d0d;
+  --md-surface-container-low: #1a1a1a;
+  --md-surface-container: #1e1e1e;
+  --md-surface-container-high: #282828;
+  --md-surface-container-highest: #333333;
 
-  --md-outline: #8d9199;
-  --md-outline-variant: #43474e;
+  --md-outline: #919191;
+  --md-outline-variant: #454545;
 
-  --md-inverse-surface: #e3e2e6;
-  --md-inverse-on-surface: #2f3033;
-  --md-inverse-primary: #0b57d0;
+  --md-inverse-surface: #e6e6e6;
+  --md-inverse-on-surface: #303030;
+  --md-inverse-primary: #1a1a1a;
 
-  --md-primary-rgb: 168, 199, 250;
-  --md-on-surface-rgb: 227, 226, 230;
-  --md-error-rgb: 255, 180, 171;
+  --md-primary-rgb: 227, 227, 227;
+  --md-on-surface-rgb: 230, 230, 230;
+  --md-error-rgb: 214, 214, 214;
 }
 
 /* ==========================================================================
@@ -586,7 +586,8 @@ body.dark-mode .dark-mode-toggle .moon-icon,
 .btn-outline-danger {
   background-color: var(--md-error-container);
   color: var(--md-on-error-container);
-  border: none;
+  border: 1px solid var(--md-outline);
+  padding: 9px 23px;
 }
 
 .btn-danger:hover,
@@ -1301,6 +1302,7 @@ details .edit-form {
 .md-error-text {
   margin: 8px 0 16px;
   font-size: 0.8125rem;
+  font-weight: 500;
   color: var(--md-error);
 }
 
