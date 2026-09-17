@@ -8,22 +8,21 @@
 </head>
 <body>
 <section layout:fragment="content">
-    <p class="display-3 mb-2" th:text="${series.title}">シリーズ名</p>
-    <div class="article-content mb-4" th:if="${renderedDescription != null and !renderedDescription.isEmpty()}"
+    <h1 class="display-3" th:text="${series.title}">シリーズ名</h1>
+    <div class="article-content" th:if="${renderedDescription != null and !renderedDescription.isEmpty()}"
          th:utext="${renderedDescription}"></div>
 
     <div class="action-buttons">
-        <a th:href="@{/Hello/Series}" class="btn">シリーズ一覧へ戻る</a>
+        <a th:href="@{/Hello/Series}" class="btn btn-tonal">シリーズ一覧へ戻る</a>
         <form th:action="@{/Hello/Series/{id}(id=${series.id})}"
               th:method="delete"
-              style="display:inline;"
               onsubmit="return confirm('シリーズを削除しますか？(記事は削除されません)')">
             <button type="submit" class="btn btn-danger">シリーズを削除</button>
         </form>
     </div>
 
     <!-- シリーズ名・説明の編集フォーム -->
-    <details class="mb-4">
+    <details>
         <summary>シリーズ情報を編集</summary>
         <form class="edit-form" th:action="@{/Hello/Series/{id}(id=${series.id})}" method="post">
             <div class="form-group">
@@ -43,8 +42,8 @@
 
     <!-- 所属する公開記事を作成日時順に連結表示 -->
     <div th:if="${articleViews != null and !articleViews.empty}">
-        <article class="mb-5" th:each="view : ${articleViews}">
-            <hr>
+        <article th:each="view : ${articleViews}">
+            <hr class="md-divider">
             <h2>
                 <a th:href="@{/Hello/Description/{id}(id=${view.article.id})}"
                    th:text="${view.article.title}">記事タイトル</a>
@@ -53,7 +52,7 @@
             <div class="article-content" th:utext="${view.html}"></div>
         </article>
     </div>
-    <div th:unless="${articleViews != null and !articleViews.empty}">
+    <div class="md-empty-state" th:unless="${articleViews != null and !articleViews.empty}">
         <p>このシリーズに公開記事はありません。</p>
     </div>
 </section>

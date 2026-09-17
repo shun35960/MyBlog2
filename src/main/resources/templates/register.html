@@ -1,32 +1,38 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html lang="ja"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
 <head>
     <title>Register</title>
 </head>
 <body>
-<div layout:fragment="content">
-    <h2>ユーザー登録</h2>
-    <form th:action="@{/register}" method="post">
-        <div>
-            <label>ユーザー名：</label>
-            <input type="text" name="username" required/>
-        </div>
-        <div>
-            <label>パスワード：</label>
-            <input type="password" name="password" required/>
-        </div>
-        <label>ロール：</label>
-        <select name="roles" required>
-            <option value="USER">ユーザー</option>
-            <option value="ADMIN">管理者</option>
-        </select>
-        <div>
-
-        </div>
-        <button type="submit">登録</button>
-    </form>
-</div>
+<section layout:fragment="content">
+    <div class="md-form-surface md-auth-card">
+        <h1 class="md-headline-small">ユーザー登録</h1>
+        <form th:action="@{/register}" method="post">
+            <div class="form-group">
+                <label for="registerUsername">ユーザー名</label>
+                <input class="form-control" type="text" id="registerUsername" name="username"
+                       autocomplete="username" required>
+            </div>
+            <div class="form-group">
+                <label for="registerPassword">パスワード</label>
+                <input class="form-control" type="password" id="registerPassword" name="password"
+                       autocomplete="new-password" required>
+            </div>
+            <div class="form-group">
+                <label for="registerRoles">ロール</label>
+                <select class="form-control" id="registerRoles" name="roles" required>
+                    <option value="USER">ユーザー</option>
+                    <option value="ADMIN">管理者</option>
+                </select>
+            </div>
+            <div class="action-buttons">
+                <button type="submit" class="btn btn-primary">登録</button>
+            </div>
+        </form>
+    </div>
+</section>
 </body>
 </html>

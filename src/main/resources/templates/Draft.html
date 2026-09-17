@@ -8,24 +8,24 @@
 </head>
 <body>
 <section layout:fragment="content">
-    <p class="display-3 mb-4" th:text="${Drafttitle}"></p>
+    <h1 class="display-3" th:text="${Drafttitle}"></h1>
     <div class="action-buttons">
-        <a th:href="@{/Hello/Edit}" class="btn">新規作成</a>
-        <a th:href="@{/Hello}" class="btn">公開記事一覧</a>
+        <a th:href="@{/Hello/Edit}" class="btn btn-primary">新規作成</a>
+        <a th:href="@{/Hello}" class="btn btn-tonal">公開記事一覧</a>
     </div>
     <div class="row" th:if="${drafts != null and !drafts.empty}">
         <div th:each="article : ${drafts}">
             <div class="col">
-                <div class="card">
-                    <h5 class="card-title" th:text="${article.title}">タイトル</h5>
+                <article class="card">
+                    <h2 class="card-title" th:text="${article.title}">タイトル</h2>
                     <div>
                         <a th:href="@{/Hello/Description/{id}(id=${article.id})}" class="card-link">詳細</a>
                     </div>
-                </div>
+                </article>
             </div>
         </div>
     </div>
-    <div th:unless="${drafts != null and !drafts.empty}">
+    <div class="md-empty-state" th:unless="${drafts != null and !drafts.empty}">
         <p>記事はありません。</p>
     </div>
 </section>

@@ -8,18 +8,18 @@
 </head>
 <body>
 <section layout:fragment="content">
-    <p class="display-3 mb-2" th:text="${series.title}">シリーズ名</p>
-    <div class="article-content mb-4" th:if="${renderedDescription != null and !renderedDescription.isEmpty()}"
+    <h1 class="display-3" th:text="${series.title}">シリーズ名</h1>
+    <div class="article-content" th:if="${renderedDescription != null and !renderedDescription.isEmpty()}"
          th:utext="${renderedDescription}"></div>
 
     <div class="action-buttons">
-        <a th:href="@{/Series}" class="btn">シリーズ一覧へ戻る</a>
+        <a th:href="@{/Series}" class="btn btn-tonal">シリーズ一覧へ戻る</a>
     </div>
 
     <!-- 所属する公開記事を作成日時順に連結表示 -->
     <div th:if="${articleViews != null and !articleViews.empty}">
-        <article class="mb-5" th:each="view : ${articleViews}">
-            <hr>
+        <article th:each="view : ${articleViews}">
+            <hr class="md-divider">
             <h2>
                 <a th:href="@{/ViewDescription/{id}(id=${view.article.id})}"
                    th:text="${view.article.title}">記事タイトル</a>
@@ -28,7 +28,7 @@
             <div class="article-content" th:utext="${view.html}"></div>
         </article>
     </div>
-    <div th:unless="${articleViews != null and !articleViews.empty}">
+    <div class="md-empty-state" th:unless="${articleViews != null and !articleViews.empty}">
         <p>このシリーズに公開記事はありません。</p>
     </div>
 </section>

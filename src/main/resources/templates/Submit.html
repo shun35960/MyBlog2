@@ -8,9 +8,14 @@
 </head>
 <body>
 <section layout:fragment="content">
-    <h1 th:text="${Submit}"></h1>
-    <p th:text="'記事のタイトル : ' + ${savedArticle.title}"></p>
-    <p th:text="'記事の内容 : ' + ${savedArticle.content}"></p>
+    <h1 class="display-3" th:text="${Submit}"></h1>
+    <div class="article-content">
+        <p th:text="'記事のタイトル : ' + ${savedArticle.title}"></p>
+        <p th:text="'記事の内容 : ' + ${savedArticle.content}"></p>
+    </div>
+    <div class="action-buttons">
+        <a th:href="@{/Hello}" class="btn btn-tonal">記事一覧へ戻る</a>
+    </div>
 </section>
 </body>
 </html>
