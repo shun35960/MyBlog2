@@ -46,20 +46,21 @@ find src/test -name "*<クラス名>*Test.java"
 ```java
 package com.example.MyBlog.Service;
 
-import com.example.MyBlog.Entity.Article;
-import com.example.MyBlog.Repository.MyBlogRepository;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import com.example.MyBlog.Entity.Article;
+import com.example.MyBlog.Repository.MyBlogRepository;
 
 @ExtendWith(MockitoExtension.class)
 class <ClassName>Test {
@@ -100,23 +101,24 @@ class <ClassName>Test {
 ```java
 package com.example.MyBlog.Controller;
 
-import com.example.MyBlog.Config.MarkdownConfig;
-import com.example.MyBlog.Config.SecurityConfig;
-import com.example.MyBlog.Entity.Article;
-import com.example.MyBlog.Service.MyBlogService;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.Date;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import com.example.MyBlog.Config.MarkdownConfig;
+import com.example.MyBlog.Config.SecurityConfig;
+import com.example.MyBlog.Entity.Article;
+import com.example.MyBlog.Service.MyBlogService;
 
 @WebMvcTest(<ControllerClass>.class)
 @Import({MarkdownConfig.class, SecurityConfig.class})
@@ -187,6 +189,6 @@ class <ControllerClass>Test {
 
 ## 注意事項
 
-- CI環境ではMongoDBが不要なテストのみ実行される（`build.gradle`のCI条件を確認）
+- テストは `test` プロファイルで埋め込み MongoDB を使うため、`@DataMongoTest` も含めて MongoDB を用意せずに実行できる
 - Securityのテストには `spring-security-test` の `csrf()` と `user()` を使用
 - Entityは `record` 型なので `new Article(id, title, content, published, date)` で生成
