@@ -133,16 +133,12 @@ public record Article(String id, String title, String content, boolean published
 ## Testing Strategy
 
 **Unit Tests**: Service layer testing with Mockito
-**CI Testing**: Excludes MongoDB-dependent tests in CI environment (see `build.gradle` CI conditions)
+**Test Database**: `test` プロファイル（`src/test/resources/application-test.properties`）で埋め込み MongoDB（flapdoodle）を使うため、ローカルでも CI でも MongoDB の用意は不要
 **Test Structure**: Mirror main package structure under `src/test/java`
 
 ### Running Tests
 ```bash
-# All tests (requires MongoDB)
 ./gradlew test
-
-# CI-safe tests only
-CI=true ./gradlew test
 ```
 
 ## Deployment Process
