@@ -1,0 +1,37 @@
+# 依存関係の更新 PR を Dependabot に自動作成させる。
+# バージョンは build.gradle などで固定したまま、新しい版が出たら PR が届くので
+# CI(テスト・Trivy)が通ることを確認してマージする。
+version: 2
+updates:
+  # Gradle の依存関係(Spring Boot プラグイン・ライブラリ)
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 10
+    # マイナー・パッチ更新は 1 本の PR にまとめる(メジャー更新は個別 PR)
+    groups:
+      gradle-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+    commit-message:
+      prefix: "build(deps)"
+
+  # GitHub Actions のアクション(actions/checkout など)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "ci(deps)"
