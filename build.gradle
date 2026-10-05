@@ -16,6 +16,18 @@ version = '0.0.1-SNAPSHOT'
 // Boot の BOM が 11.0.25 以上を管理するようになったら、この行は削除してよい。
 ext['tomcat.version'] = '11.0.25'
 
+// Spring Boot 4.1.1 の BOM が管理する Jackson (2.21.5 / 3.1.5) には HIGH の脆弱性があり、
+// Trivy スキャン(publish ジョブ)が失敗する。修正版へ上書きする。
+// - CVE-2026-89407 jackson-core: 正規表現のバックトラッキングによる DoS
+// - CVE-2026-89425 jackson-core: 不正トークンでの StringBuilder 無制限拡張による DoS
+// - CVE-2026-68497 jackson-databind: 数値パースの無制限処理による CPU DoS
+// - CVE-2026-91776 jackson-databind: TypeDeserializerBase のキャッシュ無制限拡張による DoS
+// - CVE-2026-91777 jackson-databind: 前方参照解決の二次計算量による DoS
+// Jackson 2 系は webauthn4j / java-jwt / jwks-rsa が、3 系は Spring Boot 本体が使う。
+// Boot の BOM が 2.21.7 / 3.1.7 以上を管理するようになったら、この 2 行は削除してよい。
+ext['jackson-2-bom.version'] = '2.21.7'
+ext['jackson-bom.version'] = '3.1.7'
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
