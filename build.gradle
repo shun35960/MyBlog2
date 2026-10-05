@@ -60,7 +60,7 @@ dependencies {
     testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring4x:4.33.0'
     implementation 'org.webjars:bootstrap:5.3.0'
     implementation 'org.webjars:webjars-locator-lite'
-    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.4.0'
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:4.0.1'
     implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
