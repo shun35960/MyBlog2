@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '4.1.1'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'com.diffplug.spotless' version '8.10.2'
+    id 'com.diffplug.spotless' version '8.10.3'
 }
 
 group = 'com.example'
@@ -58,18 +58,18 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-data-mongodb-test'
     testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring4x:4.33.0'
-    implementation 'org.webjars:bootstrap:5.3.0'
+    implementation 'org.webjars:bootstrap:5.3.8'
     implementation 'org.webjars:webjars-locator-lite'
     implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.4.0'
     implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    implementation "com.webauthn4j:webauthn4j-core:0.29.2.RELEASE"
+    implementation "com.webauthn4j:webauthn4j-core:0.31.11.RELEASE"
     implementation 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20220608.1'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-    implementation 'com.auth0:java-jwt:4.4.0'
-    implementation 'com.auth0:jwks-rsa:0.22.1'
+    implementation 'com.auth0:java-jwt:4.6.1'
+    implementation 'com.auth0:jwks-rsa:0.24.1'
 }
 
 tasks.named('test') {
