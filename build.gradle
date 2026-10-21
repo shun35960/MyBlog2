@@ -61,7 +61,13 @@ dependencies {
     implementation 'org.webjars:bootstrap:5.3.8'
     implementation 'org.webjars:webjars-locator-lite'
     implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:4.0.1'
-    implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
+    // flexmark-all は使わない変換モジュール(html2md / pdf など)まで含み、
+    // 脆弱な jsoup 1.15.4 (CVE-2026-75140) を持ち込むため、使うモジュールだけを指定する。
+    implementation 'com.vladsch.flexmark:flexmark:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-ext-autolink:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-ext-tables:0.64.8'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
