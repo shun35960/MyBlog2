@@ -1,25 +1,26 @@
 /* ==========================================================================
    MyBlog Material Design 3 (Material You) Design System
-   - 彩度を持たないモノトーン。強調は色ではなく明度差とエレベーションで付ける
+   - モノトーン基調に、差し色としてディープインディゴを1色だけ使う。
+     強調色は primary 系トークンに集約し、面の色はインディゴ寄りの寒色グレーで揃える
    - ライト / ダーク (body.dark-mode) の両スキームを同一トークン名で切り替える
    ========================================================================== */
 
 :root {
   /* --- Color roles: Light scheme --- */
-  --md-primary: #1a1a1a;
+  --md-primary: #303a9c;
   --md-on-primary: #ffffff;
-  --md-primary-container: #e0e0e0;
-  --md-on-primary-container: #1a1a1a;
+  --md-primary-container: #dfe3ff;
+  --md-on-primary-container: #131b54;
 
-  --md-secondary: #4a4a4a;
+  --md-secondary: #4d5066;
   --md-on-secondary: #ffffff;
-  --md-secondary-container: #ececec;
-  --md-on-secondary-container: #1f1f1f;
+  --md-secondary-container: #e2e3f0;
+  --md-on-secondary-container: #1b1c28;
 
-  --md-tertiary: #5f5f5f;
+  --md-tertiary: #5c5480;
   --md-on-tertiary: #ffffff;
-  --md-tertiary-container: #e6e6e6;
-  --md-on-tertiary-container: #1f1f1f;
+  --md-tertiary-container: #e3dfff;
+  --md-on-tertiary-container: #1d1740;
 
   /* 破壊的操作もモノトーンで表す。他のボタンより濃いグレー + アウトラインで区別する */
   --md-error: #2a2a2a;
@@ -27,30 +28,30 @@
   --md-error-container: #d6d6d6;
   --md-on-error-container: #1a1a1a;
 
-  --md-background: #ffffff;
-  --md-on-background: #1a1a1a;
-  --md-surface: #ffffff;
-  --md-on-surface: #1a1a1a;
-  --md-surface-variant: #e4e4e4;
-  --md-on-surface-variant: #4a4a4a;
+  --md-background: #fcfcfe;
+  --md-on-background: #1a1b24;
+  --md-surface: #fcfcfe;
+  --md-on-surface: #1a1b24;
+  --md-surface-variant: #e3e4ef;
+  --md-on-surface-variant: #45475a;
 
   --md-surface-container-lowest: #ffffff;
-  --md-surface-container-low: #f8f8f8;
-  --md-surface-container: #f2f2f2;
-  --md-surface-container-high: #ececec;
-  --md-surface-container-highest: #e6e6e6;
+  --md-surface-container-low: #f6f6fb;
+  --md-surface-container: #eff0f7;
+  --md-surface-container-high: #e7e8f2;
+  --md-surface-container-highest: #dddfe9;
 
-  --md-outline: #767676;
-  --md-outline-variant: #c6c6c6;
+  --md-outline: #76778a;
+  --md-outline-variant: #c6c7d6;
 
-  --md-inverse-surface: #303030;
-  --md-inverse-on-surface: #f2f2f2;
-  --md-inverse-primary: #e0e0e0;
+  --md-inverse-surface: #2a2c3a;
+  --md-inverse-on-surface: #f0f0fa;
+  --md-inverse-primary: #bcc3ff;
   --md-scrim: 0, 0, 0;
 
   /* ステートレイヤー用の RGB 値 (rgba() 合成に使う) */
-  --md-primary-rgb: 26, 26, 26;
-  --md-on-surface-rgb: 26, 26, 26;
+  --md-primary-rgb: 48, 58, 156;
+  --md-on-surface-rgb: 26, 27, 36;
   --md-error-rgb: 42, 42, 42;
 
   /* --- Elevation --- */
@@ -86,48 +87,48 @@
 body.dark-mode,
 .theme-dark-pending body {
   /* --- Color roles: Dark scheme --- */
-  --md-primary: #e3e3e3;
-  --md-on-primary: #1a1a1a;
-  --md-primary-container: #4a4a4a;
-  --md-on-primary-container: #ececec;
+  --md-primary: #bcc3ff;
+  --md-on-primary: #1d2560;
+  --md-primary-container: #333d85;
+  --md-on-primary-container: #dfe3ff;
 
-  --md-secondary: #c6c6c6;
-  --md-on-secondary: #2a2a2a;
-  --md-secondary-container: #3a3a3a;
-  --md-on-secondary-container: #e6e6e6;
+  --md-secondary: #c4c6d4;
+  --md-on-secondary: #2b2e3d;
+  --md-secondary-container: #434656;
+  --md-on-secondary-container: #e1e2ef;
 
-  --md-tertiary: #b8b8b8;
-  --md-on-tertiary: #2f2f2f;
-  --md-tertiary-container: #454545;
-  --md-on-tertiary-container: #e6e6e6;
+  --md-tertiary: #cdbcf0;
+  --md-on-tertiary: #352a55;
+  --md-tertiary-container: #4d4272;
+  --md-on-tertiary-container: #e7dfff;
 
   --md-error: #d6d6d6;
   --md-on-error: #2a2a2a;
   --md-error-container: #4f4f4f;
   --md-on-error-container: #ececec;
 
-  --md-background: #121212;
-  --md-on-background: #e6e6e6;
-  --md-surface: #121212;
-  --md-on-surface: #e6e6e6;
-  --md-surface-variant: #454545;
-  --md-on-surface-variant: #c6c6c6;
+  --md-background: #11131a;
+  --md-on-background: #e3e4ee;
+  --md-surface: #11131a;
+  --md-on-surface: #e3e4ee;
+  --md-surface-variant: #454858;
+  --md-on-surface-variant: #c5c7d6;
 
-  --md-surface-container-lowest: #0d0d0d;
-  --md-surface-container-low: #1a1a1a;
-  --md-surface-container: #1e1e1e;
-  --md-surface-container-high: #282828;
-  --md-surface-container-highest: #333333;
+  --md-surface-container-lowest: #0b0d13;
+  --md-surface-container-low: #171922;
+  --md-surface-container: #1b1e28;
+  --md-surface-container-high: #232633;
+  --md-surface-container-highest: #2e3142;
 
-  --md-outline: #919191;
-  --md-outline-variant: #454545;
+  --md-outline: #8f91a3;
+  --md-outline-variant: #454858;
 
-  --md-inverse-surface: #e6e6e6;
-  --md-inverse-on-surface: #303030;
-  --md-inverse-primary: #1a1a1a;
+  --md-inverse-surface: #e3e4ee;
+  --md-inverse-on-surface: #2a2c38;
+  --md-inverse-primary: #2e3a9c;
 
-  --md-primary-rgb: 227, 227, 227;
-  --md-on-surface-rgb: 230, 230, 230;
+  --md-primary-rgb: 188, 195, 255;
+  --md-on-surface-rgb: 227, 228, 238;
   --md-error-rgb: 214, 214, 214;
 }
 
@@ -192,6 +193,33 @@ section {
   margin: 40px 0 8px;
 }
 
+/* 見出し下のアクセントバー (差し色) */
+.display-3::after {
+  content: '';
+  display: block;
+  width: 64px;
+  height: 4px;
+  margin-top: 16px;
+  border-radius: var(--md-shape-full);
+  background-color: var(--md-primary);
+}
+
+/* トップページのヒーロー領域 (見出し + アクションを淡い面で受ける) */
+.hero {
+  background: linear-gradient(135deg, var(--md-primary-container), var(--md-surface-container-low) 70%);
+  border-radius: var(--md-shape-xl);
+  padding: 40px 32px 32px;
+  margin: 24px 0 32px;
+}
+
+.hero .display-3 {
+  margin-top: 0;
+}
+
+.hero .action-buttons {
+  margin-bottom: 0;
+}
+
 .md-headline-small,
 h1 {
   font-size: 1.75rem;
@@ -241,6 +269,11 @@ a {
 
 a:hover {
   text-decoration: underline;
+}
+
+::selection {
+  background-color: var(--md-primary-container);
+  color: var(--md-on-primary-container);
 }
 
 hr {
@@ -360,6 +393,15 @@ hr {
   padding: 8px 12px;
   border-radius: var(--md-shape-full);
   transition: background-color var(--md-duration-medium) var(--md-easing-standard);
+}
+
+.navbar-brand::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  flex: 0 0 auto;
+  border-radius: 3px;
+  background-color: var(--md-primary);
 }
 
 .navbar-brand:hover {
@@ -649,9 +691,31 @@ body.dark-mode .dark-mode-toggle .moon-icon,
   animation: md-fade-in-up var(--md-duration-long) var(--md-easing-standard) both;
 }
 
+/* ホバーで上端に差し色のバーを出す */
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: var(--md-primary);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--md-duration-medium) var(--md-easing-standard);
+}
+
 .card:hover {
   box-shadow: var(--md-elevation-2);
   background-color: var(--md-surface-container);
+}
+
+.card:hover::after {
+  transform: scaleX(1);
+}
+
+.card:hover .card-title {
+  color: var(--md-primary);
 }
 
 .card-title {
@@ -745,10 +809,10 @@ body.dark-mode .dark-mode-toggle .moon-icon,
   gap: 6px;
   height: 28px;
   padding: 0 12px;
-  border: 1px solid var(--md-outline-variant);
+  border: 1px solid transparent;
   border-radius: var(--md-shape-sm);
-  background-color: transparent !important;
-  color: var(--md-on-surface-variant) !important;
+  background-color: var(--md-primary-container) !important;
+  color: var(--md-on-primary-container) !important;
   font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: 0.031em;
@@ -761,8 +825,8 @@ body.dark-mode .dark-mode-toggle .moon-icon,
 
 a.badge:hover,
 a.md-chip:hover {
-  background-color: var(--md-secondary-container) !important;
-  color: var(--md-on-secondary-container) !important;
+  background-color: var(--md-primary) !important;
+  color: var(--md-on-primary) !important;
   border-color: transparent;
   text-decoration: none;
 }
@@ -804,7 +868,9 @@ a.md-chip:hover {
 .article-content h2 {
   font-size: 1.375rem;
   padding-bottom: 8px;
+  padding-left: 12px;
   border-bottom: 1px solid var(--md-outline-variant);
+  border-left: 4px solid var(--md-primary);
 }
 
 .article-content h3 {
