@@ -116,8 +116,8 @@ public record Article(String id, String title, String content, boolean published
 **Frontend**: Thymeleaf, Bootstrap 5.3.0, Custom CSS (Scrapbox-inspired)
 **Database**: MongoDB (local dev) / MongoDB Atlas (production)
 **Build**: Gradle 9.7.1 with Java 25 toolchain
-**Deployment**: Docker multi-stage builds, Docker Compose, Nginx reverse proxy
-**CI/CD**: GitHub Actions with self-hosted runner, Trivy security scanning
+**Deployment**: Docker multi-stage builds, Google Cloud Run
+**CI/CD**: GitHub Actions, Trivy security scanning, Cloud Run deployment
 
 ## Configuration Files
 
@@ -144,14 +144,17 @@ public record Article(String id, String title, String content, boolean published
 ## Deployment Process
 
 ### CI/CD Pipeline (`.github/workflows/deploy.yml`)
-1. **Test**: Run unit tests, generate reports
-2. **Security**: Trivy vulnerability scanning on Docker image
-3. **Deploy**: Self-hosted runner deploys to production server via `deploy.sh`
+1. **Build & Test**: Spotless の書式チェック、ビルド、テスト
+2. **Scan & Push Image**: Trivy で Docker イメージをスキャンし、ghcr.io と Artifact Registry へ push
+3. **Deploy to Cloud Run**: `master` への push 時のみ、スキャン済みイメージを digest 指定で Cloud Run にデプロイし、スモークテストを行う
 
 ### Production Deployment
-- **Target**: Self-hosted server at `192.168.10.106`
-- **Process**: Rsync to production directory → Docker Compose deployment
-- **Monitoring**: Application logs in `/app/logs/myblog.log`
+- **Target**: Google Cloud Run（独自ドメイン `p49e.com` をマッピング済み）
+- **Auth**: Workload Identity Federation（サービスアカウントキーは使わない）
+- **Config**: 環境変数・Secret 等は Cloud Run サービス側で管理。CI はイメージだけを更新する
+- **Setup**: GCP / GitHub 側の初期設定は `docs/cloudrun-setup.md` を参照
+- **Logs**: Cloud Logging（`gcloud run services logs read <service>`）
+- 旧セルフホスト環境（`deploy.sh`、Nginx、`compose.yml`）は Cloud Run 移行済みのため本番では使っていない
 
 ## Security Considerations
 
