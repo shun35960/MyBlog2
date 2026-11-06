@@ -18,6 +18,10 @@ env:
   APP_NAME: myblog
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository_owner }}/myblog2
+  # Cloud Run 関連の値は GitHub の Repository variables で設定する
+  # (設定手順は docs/cloudrun-setup.md を参照)
+  GCP_REGION: ${{ vars.GCP_REGION || 'asia-northeast1' }}
+  AR_IMAGE: ${{ vars.GCP_REGION || 'asia-northeast1' }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.GCP_AR_REPOSITORY || 'myblog' }}/myblog2
 
 jobs:
   build:
@@ -66,6 +70,13 @@ jobs:
     name: Scan & Push Image
     runs-on: ubuntu-latest
     needs: build
+    # ジョブ単位で permissions を指定するとワークフロー全体の指定は引き継がれないため、必要なものを列挙する
+    permissions:
+      contents: read
+      packages: write
+      id-token: write   # Workload Identity Federation で GCP の認証に使う
+    outputs:
+      digest: ${{ steps.push.outputs.digest }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -80,6 +91,23 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Authenticate to Google Cloud
+        id: gcp-auth
+        if: github.event_name == 'push'
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+          token_format: access_token
+
+      - name: Login to Artifact Registry
+        if: github.event_name == 'push'
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.GCP_REGION }}-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.gcp-auth.outputs.access_token }}
 
       - name: Build image (load to local for scan)
         uses: docker/build-push-action@v7
@@ -105,15 +133,78 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
 
-      - name: Push image
+      # Trivy が検査したイメージをそのまま push する（再ビルドするとベースイメージの
+      # タグが途中で更新された場合に未検査の digest が公開されてしまうため）
+      - name: Push scanned image
+        id: push
         if: github.event_name == 'push'
-        uses: docker/build-push-action@v7
+        env:
+          SRC: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          GHCR: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          for tag in \
+            "$GHCR:$GITHUB_SHA" "$GHCR:$REF_NAME" "$GHCR:latest" \
+            "$AR_IMAGE:$GITHUB_SHA" "$AR_IMAGE:latest"; do
+            [ "$tag" = "$SRC" ] || docker tag "$SRC" "$tag"
+            docker push "$tag"
+          done
+          # デプロイには Artifact Registry 上の digest を使う
+          digest=$(docker inspect --format '{{range .RepoDigests}}{{println .}}{{end}}' "$SRC" \
+            | grep "^${AR_IMAGE}@" | head -n1 | cut -d@ -f2)
+          if [ -z "$digest" ]; then
+            echo "::error::Artifact Registry 上の digest を取得できませんでした"
+            exit 1
+          fi
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          echo "pushed: ${AR_IMAGE}@${digest}"
+
+  deploy:
+    name: Deploy to Cloud Run
+    runs-on: ubuntu-latest
+    needs: publish
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    permissions:
+      contents: read
+      id-token: write
+    # 連続でマージされた場合も古いデプロイが新しいものを上書きしないよう、順番に実行する
+    concurrency:
+      group: cloudrun-deploy
+      cancel-in-progress: false
+    environment:
+      name: production
+      url: https://p49e.com
+    steps:
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
         with:
-          context: .
-          pull: true
-          push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          cache-from: type=gha
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+
+      # タグではなく digest で指定し、Trivy でスキャンしたものと同一のイメージをデプロイする。
+      # image 以外（環境変数・Secret・メモリ等）は既存サービスの設定がそのまま引き継がれる
+      - name: Deploy
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v3
+        with:
+          service: ${{ vars.CLOUD_RUN_SERVICE }}
+          region: ${{ env.GCP_REGION }}
+          image: ${{ env.AR_IMAGE }}@${{ needs.publish.outputs.digest }}
+
+      - name: Smoke test
+        run: |
+          # 新リビジョンの起動直後はコールドスタートで遅いことがあるため、数回まで再試行する
+          for url in "${{ steps.deploy.outputs.url }}/" "https://p49e.com/"; do
+            ok=""
+            for i in 1 2 3 4 5; do
+              status=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "$url" || true)
+              echo "$url -> $status (attempt $i)"
+              if [ "$status" = "200" ]; then ok=1; break; fi
+              sleep 10
+            done
+            if [ -z "$ok" ]; then
+              echo "::error::$url が 200 を返しませんでした。Cloud Run のログを確認して下さい。"
+              exit 1
+            fi
+          done
