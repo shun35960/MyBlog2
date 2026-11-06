@@ -133,22 +133,32 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
 
-      # スキャン時のビルドで作ったレイヤーをそのまま使うため、ここでは no-cache-filters を付けない
-      - name: Push image
+      # Trivy が検査したイメージをそのまま push する（再ビルドするとベースイメージの
+      # タグが途中で更新された場合に未検査の digest が公開されてしまうため）
+      - name: Push scanned image
         id: push
         if: github.event_name == 'push'
-        uses: docker/build-push-action@v7
-        with:
-          context: .
-          pull: true
-          push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            ${{ env.AR_IMAGE }}:${{ github.sha }}
-            ${{ env.AR_IMAGE }}:latest
-          cache-from: type=gha
+        env:
+          SRC: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          GHCR: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          for tag in \
+            "$GHCR:$GITHUB_SHA" "$GHCR:$REF_NAME" "$GHCR:latest" \
+            "$AR_IMAGE:$GITHUB_SHA" "$AR_IMAGE:latest"; do
+            [ "$tag" = "$SRC" ] || docker tag "$SRC" "$tag"
+            docker push "$tag"
+          done
+          # デプロイには Artifact Registry 上の digest を使う
+          digest=$(docker inspect --format '{{range .RepoDigests}}{{println .}}{{end}}' "$SRC" \
+            | grep "^${AR_IMAGE}@" | head -n1 | cut -d@ -f2)
+          if [ -z "$digest" ]; then
+            echo "::error::Artifact Registry 上の digest を取得できませんでした"
+            exit 1
+          fi
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          echo "pushed: ${AR_IMAGE}@${digest}"
 
   deploy:
     name: Deploy to Cloud Run
