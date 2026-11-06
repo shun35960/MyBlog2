@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-MyBlog is a Japanese blog application built with Spring Boot 4.1.1 and Java 25 (LTS). It supports Markdown content creation, user authentication, and has a Scrapbox-inspired design. The application is containerized and deployed using Docker Compose with Nginx as a reverse proxy.
+MyBlog is a Japanese blog application built with Spring Boot 4.1.1 and Java 25 (LTS). It supports Markdown content creation, user authentication, and has a Scrapbox-inspired design. The application is containerized and deployed to Google Cloud Run.
 
 ## Development Commands
 
@@ -55,19 +55,13 @@ Spotless でコードの書式を揃えている。違反があると `check`(`b
 - 不要な import を削除
 - import 順を `java` → `javax` → `jakarta` → サードパーティ → `com.example.MyBlog` に統一
 
-### Docker Operations
+### Local Container Test
+`compose.test.yml` でアプリとローカル MongoDB をまとめて起動できる（`.env.test` が必要）。
+
 ```bash
-# Build and start all services
-docker compose up -d
-
-# View logs
-docker compose logs -f app
-
-# Stop all services
-docker compose down
-
-# Full deployment using script
-./deploy.sh deploy
+podman compose -f compose.test.yml up -d      # docker compose でも可
+podman compose -f compose.test.yml logs -f app
+podman compose -f compose.test.yml down
 ```
 
 ### Database Connection
@@ -126,8 +120,8 @@ public record Article(String id, String title, String content, boolean published
 - `application-prod.yml`: Production settings (port 8080, INFO logging, file logging)
 
 ### Docker Configuration
-- `dockerfile`: Multi-stage build (builder + runtime with Alpine)
-- `compose.yml`: Application + Nginx setup with volume mounts
+- `dockerfile`: Multi-stage build (builder: `eclipse-temurin:25-jdk`, runtime: `eclipse-temurin:25-jre-noble` / Ubuntu 24.04)
+- `compose.test.yml`: ローカル動作確認用（app + MongoDB）
 - Environment variables: `MONGODB_URI`, `SPRING_PROFILES_ACTIVE`, `JAVA_OPTS`
 
 ## Testing Strategy
@@ -154,14 +148,13 @@ public record Article(String id, String title, String content, boolean published
 - **Config**: 環境変数・Secret 等は Cloud Run サービス側で管理。CI はイメージだけを更新する
 - **Setup**: GCP / GitHub 側の初期設定は `docs/cloudrun-setup.md` を参照
 - **Logs**: Cloud Logging（`gcloud run services logs read <service>`）
-- 旧セルフホスト環境（`deploy.sh`、Nginx、`compose.yml`）は Cloud Run 移行済みのため本番では使っていない
 
 ## Security Considerations
 
 **Input Sanitization**: OWASP HTML sanitizer for Markdown content
 **Authentication**: BCrypt password hashing, session management
 **XSS Protection**: HTML sanitization policy in controllers
-**Container Security**: Non-root user, Alpine Linux base image
+**Container Security**: Non-root user, Ubuntu 24.04 (eclipse-temurin) base image
 **Secrets**: Environment variables for sensitive data, no hardcoded credentials
 
 ## Development Notes
