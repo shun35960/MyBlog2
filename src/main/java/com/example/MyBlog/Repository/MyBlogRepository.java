@@ -1,6 +1,7 @@
 package com.example.MyBlog.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -17,6 +18,8 @@ public interface MyBlogRepository extends MongoRepository<Article, String> {
     // 例: List<Article> findByTitle(String title);
     List<Article> findByPublishedTrue();
     //公開状態がtrueのものを取得
+    Optional<Article> findByIdAndPublishedTrue(String id);
+    //指定IDの公開状態がtrueの記事を取得（公開経路用。下書き・公開取り消しは取得できない）
     List<Article> findByPublishedFalse();
     //公開状態がfalseのものを取得
     List<Article> findBySeriesIdAndPublishedTrueOrderByCreatedAtAsc(String seriesId);

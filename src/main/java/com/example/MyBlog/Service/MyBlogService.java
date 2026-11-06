@@ -11,6 +11,9 @@ public interface MyBlogService {
     Article findArticleById(String id);
     //idを指定して記事を表示
 
+    Article findPublishedArticleById(String id);
+    //idを指定して公開状態の記事だけを表示（公開経路用）
+
     List<Article> findArticlePublishedTrue();
     //公開状態がtrueのものを取得
 

@@ -100,7 +100,7 @@ public class IndexController {
 
     @GetMapping("/ViewDescription/{id}")
     public String viewDescription(Model model, @PathVariable String id) {
-        Article article = myBlogService.findArticleById(id);
+        Article article = myBlogService.findPublishedArticleById(id);
         Node document = markdownParser.parse(article.content() != null ? article.content() : "");
         String renderedHtmlContent = htmlRenderer.render(document);
         String sanitizedHtmlContent = htmlSanitizationPolicy.sanitize(renderedHtmlContent);

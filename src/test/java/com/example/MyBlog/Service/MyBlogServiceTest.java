@@ -49,6 +49,26 @@ public class MyBlogServiceTest {
     }
 
     @Test
+    void test_findPublishedArticleById_公開記事が返る() {
+        Article article = new Article("id1", "Title 1", "Content 1", true, null, new Date());
+        when(myBlogRepository.findByIdAndPublishedTrue("id1")).thenReturn(Optional.of(article));
+
+        Article result = myBlogService.findPublishedArticleById("id1");
+
+        assertNotNull(result);
+        assertEquals("id1", result.id());
+        verify(myBlogRepository).findByIdAndPublishedTrue("id1");
+    }
+
+    @Test
+    void test_findPublishedArticleById_下書きは例外がスローされる() {
+        when(myBlogRepository.findByIdAndPublishedTrue("draft1")).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class,
+                () -> myBlogService.findPublishedArticleById("draft1"));
+    }
+
+    @Test
     void test_findArticlePublishedTrue() {
         // Implement your test logic here
         Article article1 = new Article("id1", "Title 1", "Content 1", true, null, new Date());

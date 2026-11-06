@@ -107,7 +107,7 @@ class IndexControllerTest {
     void viewDescription_指定IDの記事が表示される() throws Exception {
         // Arrange
         Article article = new Article("id1", "タイトル1", "## 見出し\n本文", true, null, new Date());
-        when(myBlogService.findArticleById("id1")).thenReturn(article);
+        when(myBlogService.findPublishedArticleById("id1")).thenReturn(article);
 
         // Act & Assert
         mockMvc.perform(get("/ViewDescription/id1"))
@@ -116,14 +116,14 @@ class IndexControllerTest {
                 .andExpect(model().attribute("article", article))
                 .andExpect(model().attributeExists("renderedHtmlContent"));
 
-        verify(myBlogService).findArticleById("id1");
+        verify(myBlogService).findPublishedArticleById("id1");
     }
 
     @Test
     void viewDescription_記事のcontentがnull_空文字でレンダリングされる() throws Exception {
         // Arrange
         Article article = new Article("id1", "タイトル1", null, true, null, new Date());
-        when(myBlogService.findArticleById("id1")).thenReturn(article);
+        when(myBlogService.findPublishedArticleById("id1")).thenReturn(article);
 
         // Act & Assert
         mockMvc.perform(get("/ViewDescription/id1"))
