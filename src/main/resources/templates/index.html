@@ -9,9 +9,11 @@
 </head>
 <body>
 <section layout:fragment="content">
-    <h1 class="display-3" th:text="${Indextitle}"></h1>
-    <div class="action-buttons">
-        <a th:href="@{/Series}" class="btn btn-tonal">シリーズ一覧</a>
+    <div class="hero">
+        <h1 class="display-3" th:text="${Indextitle}"></h1>
+        <div class="action-buttons">
+            <a th:href="@{/Series}" class="btn btn-tonal">シリーズ一覧</a>
+        </div>
     </div>
     <div class="row" th:if="${articles != null and !articles.empty}">
         <div th:each="article : ${articles}">
