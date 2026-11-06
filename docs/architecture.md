@@ -6,9 +6,7 @@
 flowchart TB
     User([ブラウザ])
 
-    subgraph Server["本番サーバー 192.168.10.106 (Docker Compose)"]
-        Nginx["Nginx<br/>リバースプロキシ"]
-
+    subgraph Server["Google Cloud Run (asia-northeast1)"]
         subgraph App["app コンテナ (Spring Boot 4.1.1 / Java 25) :8080"]
             direction TB
             Security["Spring Security<br/>(BCrypt / フォームログイン)"]
@@ -38,20 +36,19 @@ flowchart TB
             MD["Flexmark → OWASP Sanitizer"]
         end
 
-        Logs[("./logs")]
-        Uploads[("./uploads")]
+        Logs[("Cloud Logging")]
     end
 
-    Mongo[("MongoDB Atlas<br/>Articles / Series / Users")]
+    Mongo[("MongoDB Atlas<br/>Articles / Series / Users / 画像(GridFS)")]
 
-    User -->|HTTPS| Nginx --> Security --> Controllers
+    User -->|"HTTPS (p49e.com)"| Security --> Controllers
     Controllers --> Services
     Controllers --> View
     S1 --> MD
     S1 --> R1
     S2 --> R2
     S4 --> R3
-    S3 --> Uploads
+    S3 --> Mongo
     R1 & R2 & R3 --> Mongo
     App -.-> Logs
 ```
@@ -63,6 +60,6 @@ flowchart LR
     Dev[git push] --> GA[GitHub Actions]
     GA --> T[Test<br/>flapdoodle 埋め込みMongo]
     T --> Trivy[Trivy<br/>イメージスキャン]
-    Trivy --> Runner[Self-hosted Runner]
-    Runner -->|rsync + deploy.sh| Compose[Docker Compose<br/>本番サーバー]
+    Trivy --> Push[GHCR / Artifact Registry<br/>検査済みイメージを push]
+    Push -->|digest 指定| Run[Cloud Run<br/>デプロイ + スモークテスト]
 ```

@@ -37,8 +37,8 @@ Scrapboxにインスパイアされたデザインの日本語ブログアプリ
 
 ### デプロイメント & インフラ
 - **Docker** - コンテナ化（マルチステージビルド）
-- **Docker Compose** - オーケストレーション
-- **Nginx** - リバースプロキシ
+- **Google Cloud Run** - 本番実行環境（独自ドメイン `p49e.com`）
+- **Artifact Registry** - コンテナイメージの保管
 - **GitHub Actions** - CI/CD パイプライン
 - **Trivy** - セキュリティスキャン
 
@@ -67,9 +67,8 @@ Scrapboxにインスパイアされたデザインの日本語ブログアプリ
 - IntelliJ IDEA（推奨）または他のJava IDE
 
 ### 本番環境
-- Docker & Docker Compose
+- Google Cloud Run（初期設定は [docs/cloudrun-setup.md](docs/cloudrun-setup.md)）
 - MongoDB Atlas アカウント（本番DB）
-- Nginxサーバー
 
 ## 🚀 セットアップ手順
 
@@ -147,21 +146,6 @@ chmod +x gradlew
 ./gradlew test --tests "com.example.MyBlog.Service.MyBlogServiceTest"
 ```
 
-### Docker関連
-```bash
-# すべてのサービスをビルド・起動
-docker compose up -d
-
-# ログを確認
-docker compose logs -f app
-
-# すべてのサービスを停止
-docker compose down
-
-# デプロイスクリプトの実行
-./deploy.sh deploy
-```
-
 ### Podman テスト起動
 `compose.test.yml` は自動では選ばれないため、`-f compose.test.yml` を省略せずに実行してください。
 
@@ -183,33 +167,6 @@ podman compose -f compose.test.yml logs -f app
 
 # 停止
 podman compose -f compose.test.yml down
-```
-
-### GHCR イメージを rootless Podman で本番起動
-`.env` をプロジェクト直下、または `~/.env` に置いてから実行します。
-
-```bash
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/myblog
-SPRING_PROFILES_ACTIVE=prod
-JAVA_OPTS=-Dfile.encoding=UTF-8 -Duser.timezone=Asia/Tokyo -XX:+UseG1GC -XX:MaxRAMPercentage=75
-```
-
-```bash
-# rootless user service を常駐化
-sudo loginctl enable-linger "$(whoami)"
-
-# ghcr.io から最新イメージを pull して Quadlet 経由で起動
-./install.sh
-
-# 明示的に env ファイルを指定
-ENV_FILE=/home/shun/.env ./install.sh
-
-# 更新デプロイ
-./update.sh
-
-# 状態確認
-systemctl --user status myblog-app.service
-podman ps --filter name=myblog-app
 ```
 
 ## 🏗 アーキテクチャ
@@ -276,19 +233,13 @@ src/main/java/com/example/MyBlog/
 
 ### CI/CDパイプライン
 
-GitHub Actionsによるビルドとイメージ公開:
+GitHub Actions（`.github/workflows/deploy.yml`）で `master` への push 時に自動デプロイする:
 
-1. **テストフェーズ**
-   - JUnit単体テスト実行
-   - テストレポート生成
+1. **Build & Test** - Spotless の書式チェック、ビルド、JUnit テスト
+2. **Scan & Push Image** - Trivy で脆弱性スキャンし、検査済みイメージを GHCR と Artifact Registry へ push
+3. **Deploy to Cloud Run** - 検査済みイメージを digest 指定でデプロイし、スモークテスト
 
-2. **セキュリティスキャン**
-   - TrivyによるDockerイメージの脆弱性スキャン
-   - SARIF形式でレポート保存
-
-3. **公開フェーズ**
-   - GHCRへコンテナイメージをpush
-   - 本番サーバーは rootless Podman の user service として pull / restart
+GCP 側の初期設定（Workload Identity Federation など）は [docs/cloudrun-setup.md](docs/cloudrun-setup.md) を参照。
 
 ## 🧪 テスト
 
@@ -319,7 +270,7 @@ CI=true ./gradlew test
 - **パスワードハッシュ化**: BCryptによる安全な保存
 - **XSS対策**: OWASP HTML Sanitizerによる入力サニタイゼーション
 - **認証・認可**: Spring Securityによる保護（`/Hello/**`エンドポイント）
-- **コンテナセキュリティ**: 非rootユーザー、Alpine Linuxベースイメージ
+- **コンテナセキュリティ**: 非rootユーザー、Ubuntu 24.04（eclipse-temurin）ベースイメージ
 - **脆弱性スキャン**: Trivyによる定期的なスキャン
 
 ### Markdown処理フロー
@@ -337,7 +288,7 @@ OWASP HTML Sanitizer（サニタイゼーション）
 ### 環境変数管理
 
 - 機密情報は`.env`ファイルで管理（Gitで除外）
-- 本番環境では rootless Podman の user service から読み込む
+- 本番環境では Cloud Run サービスの環境変数・Secret Manager で管理する
 - ハードコードされた認証情報なし
 
 ## 📝 今後の改善予定
