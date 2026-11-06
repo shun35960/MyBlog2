@@ -20,7 +20,7 @@ COPY src ./src
 RUN ./gradlew clean bootJar --no-daemon
 
 # 実行ステージ
-FROM eclipse-temurin:25-jre-noble
+FROM eclipse-temurin:25-jre-noble AS runtime
 WORKDIR /app
 
 # ベースイメージのパッケージを更新してから必要なフォントを追加
