@@ -27,6 +27,12 @@ public class MyBlogServiceImpl implements MyBlogService {
     }
 
     @Override
+    public Article findPublishedArticleById(String id) {
+        return myBlogRepository.findByIdAndPublishedTrue(id)
+                .orElseThrow(() -> new IllegalArgumentException("Article not found id =" + id));
+    }
+
+    @Override
     public List<Article> findArticlePublishedTrue() {
         return myBlogRepository.findByPublishedTrue();
     }

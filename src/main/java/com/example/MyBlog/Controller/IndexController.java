@@ -82,7 +82,7 @@ public class IndexController {
     //~/About-> 筆者紹介の記事を返す
     @GetMapping("/about")
     public String About(Model model) {
-        Article article = myBlogService.findArticleById(aboutArticleId);
+        Article article = myBlogService.findPublishedArticleById(aboutArticleId);
         Node document = markdownParser.parse(article.content() != null ? article.content() : "");
         String renderedHtmlContent = htmlRenderer.render(document);
         String sanitizedHtmlContent = htmlSanitizationPolicy.sanitize(renderedHtmlContent);
@@ -100,7 +100,7 @@ public class IndexController {
 
     @GetMapping("/ViewDescription/{id}")
     public String viewDescription(Model model, @PathVariable String id) {
-        Article article = myBlogService.findArticleById(id);
+        Article article = myBlogService.findPublishedArticleById(id);
         Node document = markdownParser.parse(article.content() != null ? article.content() : "");
         String renderedHtmlContent = htmlRenderer.render(document);
         String sanitizedHtmlContent = htmlSanitizationPolicy.sanitize(renderedHtmlContent);
