@@ -5,6 +5,9 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  # Dependabot の自動マージ(dependabot-auto-merge.yml)から起動するために用意している。
+  # GITHUB_TOKEN によるマージでは上の push イベントが発火しないため
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -85,7 +88,7 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - name: Login to GitHub Container Registry
-        if: github.event_name == 'push'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
@@ -94,7 +97,7 @@ jobs:
 
       - name: Authenticate to Google Cloud
         id: gcp-auth
-        if: github.event_name == 'push'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
@@ -102,7 +105,7 @@ jobs:
           token_format: access_token
 
       - name: Login to Artifact Registry
-        if: github.event_name == 'push'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         uses: docker/login-action@v4
         with:
           registry: ${{ env.GCP_REGION }}-docker.pkg.dev
@@ -137,7 +140,7 @@ jobs:
       # タグが途中で更新された場合に未検査の digest が公開されてしまうため）
       - name: Push scanned image
         id: push
-        if: github.event_name == 'push'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         env:
           SRC: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           GHCR: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
@@ -164,7 +167,7 @@ jobs:
     name: Deploy to Cloud Run
     runs-on: ubuntu-latest
     needs: publish
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
     permissions:
       contents: read
       id-token: write
