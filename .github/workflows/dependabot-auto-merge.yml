@@ -1,0 +1,103 @@
+name: Dependabot Auto-merge
+
+# Dependabot のパッチ/マイナー更新 PR を、CI チェックが全て終わって
+# 失敗が無いことを確認してから自動マージする。
+# メジャー更新と、更新種別を判定できない PR は対象外とし、
+# 従来どおり人の確認（火曜の定期チェックでの報告）に回す。
+on:
+  pull_request:
+    branches: [ master ]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write   # マージ後に CI/CD パイプラインを workflow_dispatch で起動するため
+
+concurrency:
+  group: dependabot-auto-merge-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  auto-merge:
+    name: Auto-merge Dependabot PR
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    timeout-minutes: 40
+    steps:
+      - name: Fetch Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Wait for CI checks
+        if: steps.metadata.outputs.update-type == 'version-update:semver-patch' || steps.metadata.outputs.update-type == 'version-update:semver-minor'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          OWN_CHECK: Auto-merge Dependabot PR
+          # 必ず成功していなければならないチェック（deploy.yml のジョブ名と揃える）。
+          # 後続ジョブのチェックは前段のジョブが終わってから登録されるため、
+          # 「未完了が 0 件」だけで判定すると Build & Test 完了直後の一瞬に
+          # Trivy スキャンを待たずマージしてしまう。名前を明示してそれを防ぐ。
+          REQUIRED_CHECKS: Build & Test,Scan & Push Image
+        run: |
+          set -euo pipefail
+          # 自分自身のチェックは待ち合わせ対象から除く。必須チェックが全て成功し、
+          # それ以外のチェックも全て完了していて、失敗が1つも無いことを確認する。
+          # 成功とスキップは OK、失敗とキャンセルは即座に対象外とする。
+          for i in $(seq 1 50); do
+            json=$(gh pr checks "$PR_URL" --json name,bucket 2>/dev/null) || true
+            echo "$json" | jq -e 'type == "array"' >/dev/null 2>&1 || json='[]'
+            pending=$(echo "$json" | jq --arg own "$OWN_CHECK" '[.[] | select(.name != $own) | select(.bucket == "pending")] | length')
+            failed=$(echo "$json" | jq --arg own "$OWN_CHECK" '[.[] | select(.name != $own) | select(.bucket == "fail" or .bucket == "cancel")] | length')
+            missing=$(echo "$json" | jq --arg req "$REQUIRED_CHECKS" '. as $all | [$req | split(",")[] | select(. as $r | ($all | map(select(.name == $r and .bucket == "pass")) | length) == 0)] | length')
+            echo "checks: pending=$pending failed=$failed required-not-passed=$missing (attempt $i)"
+            if [ "$failed" -gt 0 ]; then
+              echo "::error::失敗したチェックがあるため自動マージしません"
+              exit 1
+            fi
+            if [ "$missing" -eq 0 ] && [ "$pending" -eq 0 ]; then
+              echo "全チェックが完了し、失敗はありません"
+              exit 0
+            fi
+            sleep 30
+          done
+          echo "::error::チェックの完了待ちがタイムアウトしました"
+          exit 1
+
+      - name: Merge PR
+        id: merge
+        if: steps.metadata.outputs.update-type == 'version-update:semver-patch' || steps.metadata.outputs.update-type == 'version-update:semver-minor'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          state=$(gh pr view "$PR_URL" --json state --jq '.state')
+          if [ "$state" != "OPEN" ]; then
+            echo "PR は既に $state のため何もしません"
+            exit 0
+          fi
+          # 待っている間に Dependabot が rebase した場合、上で確認したチェックは
+          # このジョブが見るべきコミットのものではない。新しいコミットに対する
+          # 実行に任せて、ここでは何もしない。
+          head=$(gh pr view "$PR_URL" --json headRefOid --jq '.headRefOid')
+          if [ "$head" != "$HEAD_SHA" ]; then
+            echo "PR の先頭コミットが更新されたため、新しい実行に任せます"
+            exit 0
+          fi
+          # チェックの緑は上のステップで確認済み。通常マージで取り込む。
+          gh pr merge "$PR_URL" --merge --match-head-commit "$HEAD_SHA"
+          echo "merged=true" >> "$GITHUB_OUTPUT"
+
+      # GITHUB_TOKEN によるマージでは master への push イベントが発火せず、
+      # CI/CD パイプラインが動かない（＝本番にデプロイされない）。
+      # workflow_dispatch は GITHUB_TOKEN からでも起動できるので明示的に起動する。
+      - name: Trigger CI/CD pipeline on master
+        if: steps.merge.outputs.merged == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: gh workflow run deploy.yml --ref master
