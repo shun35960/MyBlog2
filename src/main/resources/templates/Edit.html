@@ -64,6 +64,9 @@
                     </div>
                 </div>
 
+                <!-- 画像削除などの結果通知 (role="status" でスクリーンリーダーにも読み上げる) -->
+                <p id="imageNotice" class="md-image-notice" role="status"></p>
+
                 <!-- アップロード済み画像リスト -->
                 <div id="uploadedImages" class="mt-3"></div>
             </div>
@@ -99,6 +102,7 @@
             const imageFile = document.getElementById('imageFile');
             const contentTextarea = document.getElementById('content');
             const uploadStatus = document.getElementById('uploadStatus');
+            const imageNotice = document.getElementById('imageNotice');
             const statusText = document.getElementById('statusText');
             const progressBar = document.getElementById('progressBar');
             const uploadedImages = document.getElementById('uploadedImages');
@@ -285,26 +289,34 @@
             function displayUploadedImage(fileId, altText, imageUrl) {
                 const imageInfo = document.createElement('div');
                 imageInfo.className = 'alert alert-success md-uploaded-image';
-                imageInfo.innerHTML = `
-                    <div>
-                        <small><strong>アップロード済み:</strong> ${altText}</small>
-                    </div>
-                    <button type="button" class="btn btn-sm btn-danger delete-image-btn" data-file-id="${fileId}">
-                        削除
-                    </button>
-                `;
 
-                uploadedImages.appendChild(imageInfo);
+                // ファイル名はユーザー入力なので HTML として解釈させず textContent で入れる
+                const label = document.createElement('strong');
+                label.textContent = 'アップロード済み:';
+                const caption = document.createElement('small');
+                caption.append(label, ' ', altText);
+                const captionWrapper = document.createElement('div');
+                captionWrapper.append(caption);
 
-                // 削除ボタンのイベントリスナー
-                imageInfo.querySelector('.delete-image-btn').addEventListener('click', () => {
+                const deleteButton = document.createElement('button');
+                deleteButton.type = 'button';
+                deleteButton.className = 'btn btn-sm btn-danger delete-image-btn';
+                deleteButton.dataset.fileId = fileId;
+                deleteButton.textContent = '削除';
+                deleteButton.addEventListener('click', () => {
                     deleteImage(fileId, imageInfo);
                 });
+
+                imageInfo.append(captionWrapper, deleteButton);
+                uploadedImages.appendChild(imageInfo);
             }
 
             // 画像削除処理
-            function deleteImage(fileId, element) {
-                if (!confirm('この画像を削除しますか？')) {
+            async function deleteImage(fileId, element) {
+                const confirmed = await confirmDialog('この画像を削除しますか？', {
+                    detail: 'MongoDB から画像を削除します。本文中の Markdown は自動では消えません。'
+                });
+                if (!confirmed) {
                     return;
                 }
 
@@ -326,8 +338,8 @@
                 .then(response => {
                     if (response.ok) {
                         element.remove();
-                        // textarea からもマークダウンを削除するよう促す
-                        alert('MongoDB から画像が削除されました。Markdown テキストは手動で削除してください。');
+                        // textarea からもマークダウンを削除するよう促す (alert() の代わりにページ内で知らせる)
+                        imageNotice.textContent = '画像を削除しました。本文中の Markdown は手動で削除してください。';
                     } else {
                         showError('画像の削除に失敗しました。');
                     }
