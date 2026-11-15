@@ -2,57 +2,64 @@
    MyBlog Material Design 3 (Material You) Design System
    - モノトーン基調に、差し色としてディープインディゴを1色だけ使う。
      強調色は primary 系トークンに集約し、面の色はインディゴ寄りの寒色グレーで揃える
-   - ライト / ダーク (body.dark-mode) の両スキームを同一トークン名で切り替える
+   - ライト / ダークの両スキームを light-dark() で同一トークン名に持たせる
    ========================================================================== */
 
 :root {
-  /* --- Color roles: Light scheme --- */
-  --md-primary: #303a9c;
-  --md-on-primary: #ffffff;
-  --md-primary-container: #dfe3ff;
-  --md-on-primary-container: #131b54;
+  /* 配色は <meta name="color-scheme"> に従う。既定 (light dark) はシステム設定、
+     トグルで上書きすると light / dark に固定される */
+  color-scheme: light dark;
 
-  --md-secondary: #4d5066;
-  --md-on-secondary: #ffffff;
-  --md-secondary-container: #e2e3f0;
-  --md-on-secondary-container: #1b1c28;
+  &:has(> head > meta[name="color-scheme"][content="light"]) {
+    color-scheme: light;
+  }
 
-  --md-tertiary: #5c5480;
-  --md-on-tertiary: #ffffff;
-  --md-tertiary-container: #e3dfff;
-  --md-on-tertiary-container: #1d1740;
+  &:has(> head > meta[name="color-scheme"][content="dark"]) {
+    color-scheme: dark;
+  }
+
+  /* --- Color roles: light-dark(ライト, ダーク) --- */
+  --md-primary: light-dark(#303a9c, #bcc3ff);
+  --md-on-primary: light-dark(#ffffff, #1d2560);
+  --md-primary-container: light-dark(#dfe3ff, #333d85);
+  --md-on-primary-container: light-dark(#131b54, #dfe3ff);
+
+  --md-secondary: light-dark(#4d5066, #c4c6d4);
+  --md-on-secondary: light-dark(#ffffff, #2b2e3d);
+  --md-secondary-container: light-dark(#e2e3f0, #434656);
+  --md-on-secondary-container: light-dark(#1b1c28, #e1e2ef);
+
+  --md-tertiary: light-dark(#5c5480, #cdbcf0);
+  --md-on-tertiary: light-dark(#ffffff, #352a55);
+  --md-tertiary-container: light-dark(#e3dfff, #4d4272);
+  --md-on-tertiary-container: light-dark(#1d1740, #e7dfff);
 
   /* 破壊的操作もモノトーンで表す。他のボタンより濃いグレー + アウトラインで区別する */
-  --md-error: #2a2a2a;
-  --md-on-error: #ffffff;
-  --md-error-container: #d6d6d6;
-  --md-on-error-container: #1a1a1a;
+  --md-error: light-dark(#2a2a2a, #d6d6d6);
+  --md-on-error: light-dark(#ffffff, #2a2a2a);
+  --md-error-container: light-dark(#d6d6d6, #4f4f4f);
+  --md-on-error-container: light-dark(#1a1a1a, #ececec);
 
-  --md-background: #fcfcfe;
-  --md-on-background: #1a1b24;
-  --md-surface: #fcfcfe;
-  --md-on-surface: #1a1b24;
-  --md-surface-variant: #e3e4ef;
-  --md-on-surface-variant: #45475a;
+  --md-background: light-dark(#fcfcfe, #11131a);
+  --md-on-background: light-dark(#1a1b24, #e3e4ee);
+  --md-surface: light-dark(#fcfcfe, #11131a);
+  --md-on-surface: light-dark(#1a1b24, #e3e4ee);
+  --md-surface-variant: light-dark(#e3e4ef, #454858);
+  --md-on-surface-variant: light-dark(#45475a, #c5c7d6);
 
-  --md-surface-container-lowest: #ffffff;
-  --md-surface-container-low: #f6f6fb;
-  --md-surface-container: #eff0f7;
-  --md-surface-container-high: #e7e8f2;
-  --md-surface-container-highest: #dddfe9;
+  --md-surface-container-lowest: light-dark(#ffffff, #0b0d13);
+  --md-surface-container-low: light-dark(#f6f6fb, #171922);
+  --md-surface-container: light-dark(#eff0f7, #1b1e28);
+  --md-surface-container-high: light-dark(#e7e8f2, #232633);
+  --md-surface-container-highest: light-dark(#dddfe9, #2e3142);
 
-  --md-outline: #76778a;
-  --md-outline-variant: #c6c7d6;
+  --md-outline: light-dark(#76778a, #8f91a3);
+  --md-outline-variant: light-dark(#c6c7d6, #454858);
 
-  --md-inverse-surface: #2a2c3a;
-  --md-inverse-on-surface: #f0f0fa;
-  --md-inverse-primary: #bcc3ff;
+  --md-inverse-surface: light-dark(#2a2c3a, #e3e4ee);
+  --md-inverse-on-surface: light-dark(#f0f0fa, #2a2c38);
+  --md-inverse-primary: light-dark(#bcc3ff, #2e3a9c);
   --md-scrim: 0, 0, 0;
-
-  /* ステートレイヤー用の RGB 値 (rgba() 合成に使う) */
-  --md-primary-rgb: 48, 58, 156;
-  --md-on-surface-rgb: 26, 27, 36;
-  --md-error-rgb: 42, 42, 42;
 
   /* --- Elevation --- */
   --md-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
@@ -80,56 +87,6 @@
   --md-font-plain: 'Roboto', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI',
     'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', sans-serif;
   --md-font-mono: 'Roboto Mono', 'SF Mono', Monaco, Consolas, 'Courier New', monospace;
-}
-
-/* head 内のインラインスクリプトが html に theme-dark-pending を付けることで
-   初回描画前からダークスキームを適用する (index.js が body.dark-mode に引き継ぐ) */
-body.dark-mode,
-.theme-dark-pending body {
-  /* --- Color roles: Dark scheme --- */
-  --md-primary: #bcc3ff;
-  --md-on-primary: #1d2560;
-  --md-primary-container: #333d85;
-  --md-on-primary-container: #dfe3ff;
-
-  --md-secondary: #c4c6d4;
-  --md-on-secondary: #2b2e3d;
-  --md-secondary-container: #434656;
-  --md-on-secondary-container: #e1e2ef;
-
-  --md-tertiary: #cdbcf0;
-  --md-on-tertiary: #352a55;
-  --md-tertiary-container: #4d4272;
-  --md-on-tertiary-container: #e7dfff;
-
-  --md-error: #d6d6d6;
-  --md-on-error: #2a2a2a;
-  --md-error-container: #4f4f4f;
-  --md-on-error-container: #ececec;
-
-  --md-background: #11131a;
-  --md-on-background: #e3e4ee;
-  --md-surface: #11131a;
-  --md-on-surface: #e3e4ee;
-  --md-surface-variant: #454858;
-  --md-on-surface-variant: #c5c7d6;
-
-  --md-surface-container-lowest: #0b0d13;
-  --md-surface-container-low: #171922;
-  --md-surface-container: #1b1e28;
-  --md-surface-container-high: #232633;
-  --md-surface-container-highest: #2e3142;
-
-  --md-outline: #8f91a3;
-  --md-outline-variant: #454858;
-
-  --md-inverse-surface: #e3e4ee;
-  --md-inverse-on-surface: #2a2c38;
-  --md-inverse-primary: #2e3a9c;
-
-  --md-primary-rgb: 188, 195, 255;
-  --md-on-surface-rgb: 227, 228, 238;
-  --md-error-rgb: 214, 214, 214;
 }
 
 /* ==========================================================================
@@ -407,7 +364,7 @@ hr {
 .navbar-brand:hover {
   text-decoration: none;
   color: var(--md-on-surface);
-  background-color: rgba(var(--md-on-surface-rgb), 0.08);
+  background-color: color-mix(in srgb, var(--md-on-surface) 8%, transparent);
 }
 
 .md-top-app-bar .nav-link {
@@ -427,7 +384,7 @@ hr {
 .md-top-app-bar .nav-link:hover {
   text-decoration: none;
   color: var(--md-on-surface);
-  background-color: rgba(var(--md-on-surface-rgb), 0.08);
+  background-color: color-mix(in srgb, var(--md-on-surface) 8%, transparent);
 }
 
 .md-top-app-bar .md-spacer {
@@ -457,13 +414,13 @@ hr {
 
 .md-icon-button:hover,
 .dark-mode-toggle:hover {
-  background-color: rgba(var(--md-on-surface-rgb), 0.08);
+  background-color: color-mix(in srgb, var(--md-on-surface) 8%, transparent);
   color: var(--md-on-surface);
 }
 
 .md-icon-button:active,
 .dark-mode-toggle:active {
-  background-color: rgba(var(--md-on-surface-rgb), 0.12);
+  background-color: color-mix(in srgb, var(--md-on-surface) 12%, transparent);
 }
 
 .dark-mode-toggle svg {
@@ -483,16 +440,43 @@ hr {
   transform: rotate(-90deg) scale(0.4);
 }
 
-body.dark-mode .dark-mode-toggle .sun-icon,
-.theme-dark-pending body .dark-mode-toggle .sun-icon {
+/* 表示中の配色 (システム設定 or 上書き) に応じてアイコンと読み上げ文言を切り替える。
+   ダーク表示になるのは「上書きが dark」または「上書きなしでシステムが dark」のとき */
+:root:has(> head > meta[name="color-scheme"][content="dark"]) .dark-mode-toggle .sun-icon {
   opacity: 0;
   transform: rotate(90deg) scale(0.4);
 }
 
-body.dark-mode .dark-mode-toggle .moon-icon,
-.theme-dark-pending body .dark-mode-toggle .moon-icon {
+:root:has(> head > meta[name="color-scheme"][content="dark"]) .dark-mode-toggle .moon-icon {
   opacity: 1;
   transform: rotate(0deg) scale(1);
+}
+
+:root:has(> head > meta[name="color-scheme"][content="dark"]) .if-light,
+:root:has(> head > meta[name="color-scheme"][content="light"]) .if-dark {
+  display: none !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(:has(> head > meta[name="color-scheme"][content="light"])) .dark-mode-toggle .sun-icon {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.4);
+  }
+
+  :root:not(:has(> head > meta[name="color-scheme"][content="light"])) .dark-mode-toggle .moon-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+
+  :root:not(:has(> head > meta[name="color-scheme"][content="light"])) .if-light {
+    display: none !important;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not(:has(> head > meta[name="color-scheme"][content="dark"])) .if-dark {
+    display: none !important;
+  }
 }
 
 /* ==========================================================================
@@ -556,8 +540,8 @@ body.dark-mode .dark-mode-toggle .moon-icon,
 
 .btn:disabled,
 .btn.disabled {
-  background-color: rgba(var(--md-on-surface-rgb), 0.12);
-  color: rgba(var(--md-on-surface-rgb), 0.38);
+  background-color: color-mix(in srgb, var(--md-on-surface) 12%, transparent);
+  color: color-mix(in srgb, var(--md-on-surface) 38%, transparent);
   box-shadow: none;
   cursor: not-allowed;
   pointer-events: none;
@@ -642,6 +626,61 @@ body.dark-mode .dark-mode-toggle .moon-icon,
   min-height: 32px;
   padding: 6px 16px;
   font-size: 0.8125rem;
+}
+
+/* ==========================================================================
+   Dialog (確認ダイアログ)
+   ========================================================================== */
+
+.md-dialog {
+  width: min(400px, calc(100vw - 32px));
+  padding: 24px;
+  border: none;
+  border-radius: var(--md-shape-xl);
+  background-color: var(--md-surface-container-high);
+  color: var(--md-on-surface);
+  box-shadow: var(--md-elevation-3);
+}
+
+/* ダイアログ内や背景をスクロールしたとき、裏のページがスクロールしないようにする */
+.md-dialog:modal {
+  overscroll-behavior: contain;
+}
+
+.md-dialog::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
+  background-color: rgba(var(--md-scrim), 0.32);
+}
+
+.md-dialog-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 2rem;
+  color: var(--md-on-surface);
+}
+
+.md-dialog-detail {
+  margin: 16px 0 0;
+  color: var(--md-on-surface-variant);
+}
+
+/* 編集画面の通知 (role="status")。読み上げのため要素は常に残し、空のときは余白だけ消す */
+.md-image-notice {
+  margin: 12px 0 0;
+  color: var(--md-on-surface-variant);
+}
+
+.md-image-notice:empty {
+  margin: 0;
+}
+
+.md-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
 }
 
 .action-buttons {
@@ -1152,11 +1191,11 @@ select {
 
 .form-check-input:focus {
   outline: none;
-  box-shadow: 0 0 0 8px rgba(var(--md-primary-rgb), 0.12);
+  box-shadow: 0 0 0 8px color-mix(in srgb, var(--md-primary) 12%, transparent);
 }
 
 .form-check-input:checked:focus {
-  box-shadow: inset 0 0 0 3px var(--md-surface), 0 0 0 8px rgba(var(--md-primary-rgb), 0.12);
+  box-shadow: inset 0 0 0 3px var(--md-surface), 0 0 0 8px color-mix(in srgb, var(--md-primary) 12%, transparent);
 }
 
 .form-check label,
@@ -1200,7 +1239,7 @@ select {
   height: 4px;
   overflow: hidden;
   border-radius: var(--md-shape-full);
-  background-color: rgba(var(--md-primary-rgb), 0.24);
+  background-color: color-mix(in srgb, var(--md-primary) 24%, transparent);
 }
 
 .progress-bar {
@@ -1255,7 +1294,7 @@ details[open] > summary::before {
 }
 
 details > summary:hover {
-  background-color: rgba(var(--md-on-surface-rgb), 0.08);
+  background-color: color-mix(in srgb, var(--md-on-surface) 8%, transparent);
 }
 
 details .edit-form {
@@ -1286,12 +1325,12 @@ details .edit-form {
 
 .drop-zone:hover {
   border-color: var(--md-primary);
-  background-color: rgba(var(--md-primary-rgb), 0.05);
+  background-color: color-mix(in srgb, var(--md-primary) 5%, transparent);
 }
 
 .drop-zone.dragover {
   border-color: var(--md-primary);
-  background-color: rgba(var(--md-primary-rgb), 0.12);
+  background-color: color-mix(in srgb, var(--md-primary) 12%, transparent);
 }
 
 .drop-zone p {

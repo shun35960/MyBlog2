@@ -6,6 +6,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 既定はシステム設定に従う。ユーザーが上書きした場合だけ light / dark を入れる -->
+    <meta name="color-scheme" content="light dark">
+    <!-- 保存済みの上書き設定を描画前に反映してちらつきを防ぐ (この処理だけに留める) -->
+    <script>
+        try {
+            var storedScheme = localStorage.getItem('theme');
+            if (storedScheme === 'light' || storedScheme === 'dark') {
+                document.querySelector('meta[name="color-scheme"]').content = storedScheme;
+            }
+        } catch (e) {
+            /* localStorage が使えない環境ではシステム設定に従う */
+        }
+    </script>
     <meta name="theme-color" content="#eff0f7" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#1b1e28" media="(prefers-color-scheme: dark)">
     <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
@@ -16,20 +29,6 @@
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/material-style.css}">
     <title>Hello</title>
-    <!-- ダークテーマをレンダリング前に適用してちらつきを防ぐ -->
-    <script>
-        (function () {
-            try {
-                var stored = localStorage.getItem('theme');
-                var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                if (stored === 'dark' || (stored === null && prefersDark)) {
-                    document.documentElement.classList.add('theme-dark-pending');
-                }
-            } catch (e) {
-                /* localStorage が使えない環境ではライトテーマのままにする */
-            }
-        })();
-    </script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-7XX1D2BR7N"></script>
     <script>
@@ -44,7 +43,6 @@
 
 </head>
 <body>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
 <script th:src="@{/index.js}"></script>
 <header class="header" id="appBar">
@@ -53,8 +51,10 @@
             <div class="md-top-app-bar">
                 <a class="navbar-brand" th:href="@{/}">トップページ</a>
                 <a class="nav-link" th:href="@{/about}">About</a>
-                <button id="darkModeToggle" class="md-icon-button dark-mode-toggle md-spacer" type="button"
-                        aria-label="ダークモード切り替え">
+                <button id="darkModeToggle" class="md-icon-button dark-mode-toggle md-spacer" type="button">
+                    <!-- 表示中の配色に応じて片方だけを CSS で残す (JS なしでもシステム設定の変化に追従する) -->
+                    <span class="visually-hidden if-light">ダークモードに切り替え</span>
+                    <span class="visually-hidden if-dark">ライトモードに切り替え</span>
                     <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                          stroke-linejoin="round" aria-hidden="true">
@@ -87,5 +87,18 @@
         <a th:href="@{/privacy}">プライバシーポリシー</a>
     </div>
 </footer>
+<!-- 削除などの確認ダイアログ (index.js の confirmDialog() から開く) -->
+<dialog id="confirmDialog" class="md-dialog" aria-labelledby="confirmDialogTitle"
+        aria-describedby="confirmDialogDetail">
+    <form method="dialog">
+        <h2 id="confirmDialogTitle" class="md-dialog-title">確認</h2>
+        <p id="confirmDialogDetail" class="md-dialog-detail" hidden></p>
+        <div class="md-dialog-actions">
+            <!-- 破壊的操作の確認なので、安全な「キャンセル」に初期フォーカスを置く -->
+            <button type="submit" value="cancel" class="btn btn-text" autofocus>キャンセル</button>
+            <button type="submit" value="confirm" class="btn btn-danger">削除</button>
+        </div>
+    </form>
+</dialog>
 </body>
 </html>

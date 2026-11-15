@@ -16,7 +16,8 @@
         <a th:href="@{/Hello/Series}" class="btn btn-tonal">シリーズ一覧へ戻る</a>
         <form th:action="@{/Hello/Series/{id}(id=${series.id})}"
               th:method="delete"
-              onsubmit="return confirm('シリーズを削除しますか？(記事は削除されません)')">
+              data-confirm="シリーズを削除しますか？"
+              data-confirm-detail="シリーズに含まれる記事は削除されません。">
             <button type="submit" class="btn btn-danger">シリーズを削除</button>
         </form>
     </div>

@@ -1,36 +1,102 @@
-// Material Design 3 のインタラクション (テーマ切り替え / App Bar / リップル)
-document.addEventListener('DOMContentLoaded', function () {
-    // ------------------------------------------------------------------
-    // テーマ (ライト / ダーク)
-    // head のインラインスクリプトが html.theme-dark-pending を付けているので、
-    // ここで body.dark-mode に引き継いで一元管理する
-    // ------------------------------------------------------------------
-    const root = document.documentElement;
-    const pending = root.classList.contains('theme-dark-pending');
-    root.classList.remove('theme-dark-pending');
+// Material Design 3 のインタラクション (テーマ切り替え / App Bar / リップル / 確認ダイアログ)
 
-    if (pending) {
-        document.body.classList.add('dark-mode');
+// ----------------------------------------------------------------------
+// 確認ダイアログ: window.confirm() の代わりに使う
+// レイアウトの <dialog id="confirmDialog"> をモーダルで開き、確定したかを Promise<boolean> で返す。
+// Esc キーやモバイルの戻る操作で閉じた場合はキャンセル扱いになる
+// ----------------------------------------------------------------------
+function confirmDialog(title, { detail = '', confirmLabel = '削除' } = {}) {
+    const dialog = document.getElementById('confirmDialog');
+    if (!dialog) {
+        return Promise.resolve(window.confirm(detail ? `${title}\n${detail}` : title));
     }
 
+    dialog.querySelector('#confirmDialogTitle').textContent = title;
+    const detailElement = dialog.querySelector('#confirmDialogDetail');
+    detailElement.textContent = detail;
+    detailElement.hidden = !detail;
+    dialog.querySelector('button[value="confirm"]').textContent = confirmLabel;
+
+    return new Promise((resolve) => {
+        dialog.addEventListener(
+            'close',
+            () => {
+                const confirmed = dialog.returnValue === 'confirm';
+                // Esc で閉じたときは returnValue が設定されないので、前回の値が残らないよう戻す
+                dialog.returnValue = '';
+                resolve(confirmed);
+            },
+            { once: true }
+        );
+        dialog.showModal();
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    // ------------------------------------------------------------------
+    // data-confirm 付きフォーム: 送信前に確認ダイアログを出す
+    //   data-confirm="見出し" data-confirm-detail="補足 (任意)"
+    // ------------------------------------------------------------------
+    document.addEventListener('submit', async (event) => {
+        const form = event.target;
+        if (!(form instanceof HTMLFormElement) || !form.dataset.confirm) {
+            return;
+        }
+        if (form.dataset.confirmed === 'true') {
+            delete form.dataset.confirmed;
+            return;
+        }
+
+        event.preventDefault();
+        const submitter = event.submitter;
+        const confirmed = await confirmDialog(form.dataset.confirm, { detail: form.dataset.confirmDetail || '' });
+        if (confirmed) {
+            form.dataset.confirmed = 'true';
+            form.requestSubmit(submitter);
+        }
+    });
+
+    // ------------------------------------------------------------------
+    // テーマ (ライト / ダーク)
+    // 配色は <meta name="color-scheme"> の content で決まる。
+    //   "light dark" = システム設定に従う (localStorage に値なし)
+    //   "light" / "dark" = ユーザーによる上書き (localStorage に保存)
+    // トグルは「システム設定」と「その反対」の 2 状態を行き来する
+    // ------------------------------------------------------------------
+    const THEME_KEY = 'theme';
+    const colorSchemeMeta = document.querySelector('meta[name="color-scheme"]');
+    const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+    const applyStoredScheme = (stored) => {
+        colorSchemeMeta.content = stored === 'light' || stored === 'dark' ? stored : 'light dark';
+    };
+
     const darkModeToggle = document.getElementById('darkModeToggle');
-    if (darkModeToggle) {
-        const syncToggleLabel = () => {
-            const isDark = document.body.classList.contains('dark-mode');
-            darkModeToggle.setAttribute('aria-pressed', String(isDark));
-            darkModeToggle.setAttribute('aria-label', isDark ? 'ライトモードに切り替え' : 'ダークモードに切り替え');
-        };
-
-        syncToggleLabel();
-
+    if (colorSchemeMeta && darkModeToggle) {
         darkModeToggle.addEventListener('click', function () {
-            const isDark = document.body.classList.toggle('dark-mode');
+            const systemScheme = systemDark.matches ? 'dark' : 'light';
+            const renderedScheme = colorSchemeMeta.content === 'light dark' ? systemScheme : colorSchemeMeta.content;
+            const targetScheme = renderedScheme === 'dark' ? 'light' : 'dark';
+
+            // システム設定と同じ配色に戻すときは上書きを解除する (値を保存すると以後のシステム変更に追従しなくなる)
+            const stored = targetScheme === systemScheme ? null : targetScheme;
+            applyStoredScheme(stored);
             try {
-                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                if (stored === null) {
+                    localStorage.removeItem(THEME_KEY);
+                } else {
+                    localStorage.setItem(THEME_KEY, stored);
+                }
             } catch (e) {
-                /* localStorage が使えない環境では保存をスキップする */
+                /* localStorage が使えない環境でも、このページの表示には反映する */
             }
-            syncToggleLabel();
+        });
+
+        // 別タブで切り替えた場合も揃える
+        window.addEventListener('storage', (event) => {
+            if (event.key === THEME_KEY || event.key === null) {
+                applyStoredScheme(event.newValue);
+            }
         });
     }
 
@@ -76,10 +142,4 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.row .card').forEach((card, index) => {
         card.style.animationDelay = Math.min(index * 40, 320) + 'ms';
     });
-
-    // Passkey functionality (jQuery)
-    if (typeof $ !== 'undefined') {
-        $('#createPasskey').on('click', () => createPasskey());
-        $('#authenticatePasskey').on('click', () => signInWithPasskey());
-    }
 });

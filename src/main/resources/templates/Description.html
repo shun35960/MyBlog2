@@ -18,7 +18,8 @@
         </form>
         <form th:action="@{/Hello/{id}(id=${description.id})}"
               th:method="delete"
-              onsubmit="return confirm('記事を削除しますか？')">
+              data-confirm="記事を削除しますか？"
+              data-confirm-detail="削除した記事は元に戻せません。">
             <button type="submit" class="btn btn-danger">記事を削除</button>
         </form>
     </div>
