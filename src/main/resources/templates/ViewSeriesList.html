@@ -4,31 +4,66 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
 <head>
-    <title>シリーズ一覧</title>
+    <title th:text="${SeriesListTitle}">シリーズ一覧</title>
 </head>
 <body>
 <section layout:fragment="content">
-    <h1 class="display-3" th:text="${SeriesListTitle}"></h1>
-    <div class="action-buttons">
-        <a th:href="@{/}" class="btn btn-tonal">トップページへ戻る</a>
-    </div>
-    <div class="row" th:if="${seriesSummaries != null and !seriesSummaries.empty}">
-        <div th:each="summary : ${seriesSummaries}">
-            <div class="col">
-                <article class="card">
-                    <h2 class="card-title" th:text="${summary.series.title}">シリーズ名</h2>
-                    <div>
-                        <a th:href="@{/Series/{id}(id=${summary.series.id})}" class="card-link">読む</a>
-                        <span class="md-chip" th:text="|記事数: ${summary.publishedCount}|"></span>
-                        <span class="text-muted"
-                              th:text="${#dates.format(summary.series.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
-                    </div>
-                </article>
-            </div>
+    <header class="page-header">
+        <nav class="breadcrumb-nav" aria-label="パンくずリスト">
+            <ol class="breadcrumb-list">
+                <li><a th:href="@{/}">トップ</a></li>
+                <li aria-current="page">シリーズ</li>
+            </ol>
+        </nav>
+        <h1 class="page-title" th:text="${SeriesListTitle}">シリーズ一覧</h1>
+        <div class="action-bar">
+            <a th:href="@{/}" class="btn btn-ghost">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="m12 19-7-7 7-7"></path>
+                    <path d="M19 12H5"></path>
+                </svg>
+                <span>記事一覧へ戻る</span>
+            </a>
         </div>
+    </header>
+
+    <div class="card-grid" th:if="${seriesSummaries != null and !seriesSummaries.empty}">
+        <article class="card" th:each="summary : ${seriesSummaries}">
+            <div class="card-meta">
+                <time class="meta-date"
+                      th:if="${summary.series.createdAt != null}"
+                      th:attr="datetime=${#dates.format(summary.series.createdAt, 'yyyy-MM-dd''T''HH:mm')}"
+                      th:text="${#dates.format(summary.series.createdAt, 'yyyy-MM-dd HH:mm')}"></time>
+                <span class="chip-static" th:text="|${summary.publishedCount} 記事|">0 記事</span>
+            </div>
+            <h2 class="card-title">
+                <a class="card-link"
+                   th:href="@{/Series/{id}(id=${summary.series.id})}"
+                   th:text="${summary.series.title}">シリーズ名</a>
+            </h2>
+            <footer class="card-footer">
+                <span class="card-read-hint" aria-hidden="true" style="margin-inline-start: auto;">
+                    <span>シリーズを読む</span>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14"></path>
+                        <path d="m12 5 7 7-7 7"></path>
+                    </svg>
+                </span>
+            </footer>
+        </article>
     </div>
-    <div class="md-empty-state" th:unless="${seriesSummaries != null and !seriesSummaries.empty}">
-        <p>シリーズはありません。</p>
+
+    <div class="empty-state" th:unless="${seriesSummaries != null and !seriesSummaries.empty}">
+        <span class="empty-state-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path>
+            </svg>
+        </span>
+        <p class="empty-state-title">シリーズはありません</p>
+        <p class="empty-state-text">連載シリーズが公開されると、ここに表示されます。</p>
     </div>
 </section>
 </body>

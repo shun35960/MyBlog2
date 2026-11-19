@@ -1,0 +1,2547 @@
+/* ==========================================================================
+   MyBlog — Editorial Luminous Craft Design System
+   - モダン Web 標準 (modern-web-guidance) 準拠
+   - ライト / ダーク両対応 (light-dark() + prefers-color-scheme フォールバック)
+   - OS テキストスケール (<meta name="text-scale">), Forced Colors Mode,
+     Reduced Motion, WCAG AA コントラスト比を全面サポート
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Design Tokens & Color Scheme
+   -------------------------------------------------------------------------- */
+
+:root {
+  /* 既定はシステム設定。トグルで <meta name="color-scheme"> が light / dark になった時だけ固定 */
+  color-scheme: light dark;
+
+  &:has(> head > meta[name="color-scheme"][content="light"]) {
+    color-scheme: light;
+  }
+
+  &:has(> head > meta[name="color-scheme"][content="dark"]) {
+    color-scheme: dark;
+  }
+
+  /* --- Raw color tokens (Light / Dark) --- */
+  --bg-page-light: #f6f7fb;
+  --bg-page-dark: #0b0e17;
+
+  --bg-surface-light: #ffffff;
+  --bg-surface-dark: #121726;
+
+  --bg-surface-subtle-light: #eef0f8;
+  --bg-surface-subtle-dark: #171d2f;
+
+  --bg-surface-elevated-light: #ffffff;
+  --bg-surface-elevated-dark: #1b2238;
+
+  --bg-glass-light: rgb(246 247 251 / 0.82);
+  --bg-glass-dark: rgb(11 14 23 / 0.82);
+
+  --ink-primary-light: #131722;
+  --ink-primary-dark: #eef1fa;
+
+  --ink-secondary-light: #495169;
+  --ink-secondary-dark: #a6b0cc;
+
+  --ink-muted-light: #576078;
+  --ink-muted-dark: #939eb9;
+
+  /* プライマリアクセント: 深く澄んだコバルトインディゴ / ルミナスペリウィンクル */
+  --accent-light: #3645c8;
+  --accent-dark: #93a6ff;
+
+  --accent-hover-light: #2936ad;
+  --accent-hover-dark: #aebdff;
+
+  --accent-on-light: #ffffff;
+  --accent-on-dark: #0b1026;
+
+  --accent-soft-light: #e5e9ff;
+  --accent-soft-dark: #232d57;
+
+  --accent-soft-ink-light: #1e2885;
+  --accent-soft-ink-dark: #dbe2ff;
+
+  /* 光彩の差し色 (シアン・ティール) */
+  --luminous-light: #0284c7;
+  --luminous-dark: #38bdf8;
+
+  /* 境界線 (入力欄などの非テキスト境界は背景とのコントラスト >= 3:1 を確保) */
+  --border-subtle-light: #dde1ef;
+  --border-subtle-dark: #252d45;
+
+  --border-strong-light: #6d758c;
+  --border-strong-dark: #6f7a99;
+
+  /* セマンティックカラー (破壊的操作・成功・警告) */
+  --danger-light: #b91c1c;
+  --danger-dark: #f87171;
+
+  --danger-on-light: #ffffff;
+  --danger-on-dark: #240709;
+
+  --danger-soft-light: #fee2e2;
+  --danger-soft-dark: #3b151a;
+
+  --danger-soft-ink-light: #8f1414;
+  --danger-soft-ink-dark: #fecaca;
+
+  --success-light: #15803d;
+  --success-dark: #4ade80;
+
+  --success-soft-light: #dcfce7;
+  --success-soft-dark: #103322;
+
+  --success-soft-ink-light: #14532d;
+  --success-soft-ink-dark: #bbf7d0;
+
+  /* コードブロック (ライトでは落ち着いたダークスレート、ダークでは深いナイトネイビー) */
+  --code-bg-light: #131826;
+  --code-bg-dark: #090c14;
+
+  --code-header-light: #1b2236;
+  --code-header-dark: #111626;
+
+  --code-ink-light: #e8edf8;
+  --code-ink-dark: #e6ebf7;
+
+  --code-muted-light: #9ca7c4;
+  --code-muted-dark: #8e9ab8;
+
+  --inline-code-bg-light: #eaedf7;
+  --inline-code-bg-dark: #1d243b;
+
+  --inline-code-ink-light: #24308f;
+  --inline-code-ink-dark: #b8c6ff;
+
+  /* スクロールバー (thumb と track のコントラスト >= 3:1) */
+  --scrollbar-track-light: #eef0f7;
+  --scrollbar-track-dark: #121726;
+  --scrollbar-thumb-light: #717991;
+  --scrollbar-thumb-dark: #6c7696;
+
+  /* 影 */
+  --shadow-sm-light: 0 1px 2px rgb(19 23 34 / 0.05), 0 1px 3px rgb(19 23 34 / 0.04);
+  --shadow-sm-dark: 0 1px 2px rgb(0 0 0 / 0.45), 0 1px 3px rgb(0 0 0 / 0.3);
+
+  --shadow-md-light: 0 8px 24px -6px rgb(19 23 34 / 0.08), 0 2px 6px -1px rgb(19 23 34 / 0.04);
+  --shadow-md-dark: 0 10px 28px -6px rgb(0 0 0 / 0.55), 0 2px 8px -1px rgb(0 0 0 / 0.35);
+
+  --shadow-lg-light: 0 20px 44px -12px rgb(19 23 34 / 0.16), 0 6px 16px -4px rgb(19 23 34 / 0.08);
+  --shadow-lg-dark: 0 24px 48px -12px rgb(0 0 0 / 0.7), 0 8px 20px -4px rgb(0 0 0 / 0.45);
+
+  /* --- Resolved semantic tokens (Fallback for browsers without light-dark()) --- */
+  --bg-page: var(--bg-page-light);
+  --bg-surface: var(--bg-surface-light);
+  --bg-surface-subtle: var(--bg-surface-subtle-light);
+  --bg-surface-elevated: var(--bg-surface-elevated-light);
+  --bg-glass: var(--bg-glass-light);
+  --ink-primary: var(--ink-primary-light);
+  --ink-secondary: var(--ink-secondary-light);
+  --ink-muted: var(--ink-muted-light);
+  --accent: var(--accent-light);
+  --accent-hover: var(--accent-hover-light);
+  --accent-on: var(--accent-on-light);
+  --accent-soft: var(--accent-soft-light);
+  --accent-soft-ink: var(--accent-soft-ink-light);
+  --luminous: var(--luminous-light);
+  --border-subtle: var(--border-subtle-light);
+  --border-strong: var(--border-strong-light);
+  --danger: var(--danger-light);
+  --danger-on: var(--danger-on-light);
+  --danger-soft: var(--danger-soft-light);
+  --danger-soft-ink: var(--danger-soft-ink-light);
+  --success: var(--success-light);
+  --success-soft: var(--success-soft-light);
+  --success-soft-ink: var(--success-soft-ink-light);
+  --code-bg: var(--code-bg-light);
+  --code-header: var(--code-header-light);
+  --code-ink: var(--code-ink-light);
+  --code-muted: var(--code-muted-light);
+  --inline-code-bg: var(--inline-code-bg-light);
+  --inline-code-ink: var(--inline-code-ink-light);
+  --scrollbar-track: var(--scrollbar-track-light);
+  --scrollbar-thumb: var(--scrollbar-thumb-light);
+  --shadow-sm: var(--shadow-sm-light);
+  --shadow-md: var(--shadow-md-light);
+  --shadow-lg: var(--shadow-lg-light);
+
+  @media (prefers-color-scheme: dark) {
+    --bg-page: var(--bg-page-dark);
+    --bg-surface: var(--bg-surface-dark);
+    --bg-surface-subtle: var(--bg-surface-subtle-dark);
+    --bg-surface-elevated: var(--bg-surface-elevated-dark);
+    --bg-glass: var(--bg-glass-dark);
+    --ink-primary: var(--ink-primary-dark);
+    --ink-secondary: var(--ink-secondary-dark);
+    --ink-muted: var(--ink-muted-dark);
+    --accent: var(--accent-dark);
+    --accent-hover: var(--accent-hover-dark);
+    --accent-on: var(--accent-on-dark);
+    --accent-soft: var(--accent-soft-dark);
+    --accent-soft-ink: var(--accent-soft-ink-dark);
+    --luminous: var(--luminous-dark);
+    --border-subtle: var(--border-subtle-dark);
+    --border-strong: var(--border-strong-dark);
+    --danger: var(--danger-dark);
+    --danger-on: var(--danger-on-dark);
+    --danger-soft: var(--danger-soft-dark);
+    --danger-soft-ink: var(--danger-soft-ink-dark);
+    --success: var(--success-dark);
+    --success-soft: var(--success-soft-dark);
+    --success-soft-ink: var(--success-soft-ink-dark);
+    --code-bg: var(--code-bg-dark);
+    --code-header: var(--code-header-dark);
+    --code-ink: var(--code-ink-dark);
+    --code-muted: var(--code-muted-dark);
+    --inline-code-bg: var(--inline-code-bg-dark);
+    --inline-code-ink: var(--inline-code-ink-dark);
+    --scrollbar-track: var(--scrollbar-track-dark);
+    --scrollbar-thumb: var(--scrollbar-thumb-dark);
+    --shadow-sm: var(--shadow-sm-dark);
+    --shadow-md: var(--shadow-md-dark);
+    --shadow-lg: var(--shadow-lg-dark);
+  }
+
+  /* light-dark() 対応ブラウザでは <meta name="color-scheme"> の上書きにも自動追従 */
+  @supports (color: light-dark(white, black)) {
+    --bg-page: light-dark(var(--bg-page-light), var(--bg-page-dark));
+    --bg-surface: light-dark(var(--bg-surface-light), var(--bg-surface-dark));
+    --bg-surface-subtle: light-dark(var(--bg-surface-subtle-light), var(--bg-surface-subtle-dark));
+    --bg-surface-elevated: light-dark(var(--bg-surface-elevated-light), var(--bg-surface-elevated-dark));
+    --bg-glass: light-dark(var(--bg-glass-light), var(--bg-glass-dark));
+    --ink-primary: light-dark(var(--ink-primary-light), var(--ink-primary-dark));
+    --ink-secondary: light-dark(var(--ink-secondary-light), var(--ink-secondary-dark));
+    --ink-muted: light-dark(var(--ink-muted-light), var(--ink-muted-dark));
+    --accent: light-dark(var(--accent-light), var(--accent-dark));
+    --accent-hover: light-dark(var(--accent-hover-light), var(--accent-hover-dark));
+    --accent-on: light-dark(var(--accent-on-light), var(--accent-on-dark));
+    --accent-soft: light-dark(var(--accent-soft-light), var(--accent-soft-dark));
+    --accent-soft-ink: light-dark(var(--accent-soft-ink-light), var(--accent-soft-ink-dark));
+    --luminous: light-dark(var(--luminous-light), var(--luminous-dark));
+    --border-subtle: light-dark(var(--border-subtle-light), var(--border-subtle-dark));
+    --border-strong: light-dark(var(--border-strong-light), var(--border-strong-dark));
+    --danger: light-dark(var(--danger-light), var(--danger-dark));
+    --danger-on: light-dark(var(--danger-on-light), var(--danger-on-dark));
+    --danger-soft: light-dark(var(--danger-soft-light), var(--danger-soft-dark));
+    --danger-soft-ink: light-dark(var(--danger-soft-ink-light), var(--danger-soft-ink-dark));
+    --success: light-dark(var(--success-light), var(--success-dark));
+    --success-soft: light-dark(var(--success-soft-light), var(--success-soft-dark));
+    --success-soft-ink: light-dark(var(--success-soft-ink-light), var(--success-soft-ink-dark));
+    --code-bg: light-dark(var(--code-bg-light), var(--code-bg-dark));
+    --code-header: light-dark(var(--code-header-light), var(--code-header-dark));
+    --code-ink: light-dark(var(--code-ink-light), var(--code-ink-dark));
+    --code-muted: light-dark(var(--code-muted-light), var(--code-muted-dark));
+    --inline-code-bg: light-dark(var(--inline-code-bg-light), var(--inline-code-bg-dark));
+    --inline-code-ink: light-dark(var(--inline-code-ink-light), var(--inline-code-ink-dark));
+    --scrollbar-track: light-dark(var(--scrollbar-track-light), var(--scrollbar-track-dark));
+    --scrollbar-thumb: light-dark(var(--scrollbar-thumb-light), var(--scrollbar-thumb-dark));
+  }
+
+  /* 影は light-dark() 非対応型なので、ライト/ダーク上書き時にも同期する */
+  &:has(> head > meta[name="color-scheme"][content="dark"]) {
+    --shadow-sm: var(--shadow-sm-dark);
+    --shadow-md: var(--shadow-md-dark);
+    --shadow-lg: var(--shadow-lg-dark);
+  }
+
+  &:has(> head > meta[name="color-scheme"][content="light"]) {
+    --shadow-sm: var(--shadow-sm-light);
+    --shadow-md: var(--shadow-md-light);
+    --shadow-lg: var(--shadow-lg-light);
+  }
+
+  /* --- Typography --- */
+  --font-sans: 'Plus Jakarta Sans', 'Noto Sans JP', system-ui, -apple-system, BlinkMacSystemFont,
+    'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, 'Noto Sans JP', monospace;
+
+  /* --- Radius --- */
+  --radius-xs: 0.375rem;
+  --radius-sm: 0.625rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+  --radius-full: 9999px;
+
+  /* --- Motion --- */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 140ms;
+  --dur-base: 220ms;
+  --dur-slow: 360ms;
+
+  /* --- Layout --- */
+  --header-height: 4rem;
+
+  /* ネイティブ UI 配色 (scrollbar-color は WebKit のフリッカー防止のため遷移させない) */
+  accent-color: var(--accent);
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  scrollbar-width: auto;
+}
+
+/* Legacy WebKit スクロールバーのフォールバック (標準プロパティと競合しないよう隔離) */
+@supports not (scrollbar-color: auto) {
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border: 3px solid var(--scrollbar-track);
+    border-radius: 9999px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   2. Cross-Document View Transitions (MPA ページ遷移を滑らかに)
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+
+  ::view-transition-old(root) {
+    animation: nb-vt-out 180ms var(--ease-out) both;
+  }
+
+  ::view-transition-new(root) {
+    animation: nb-vt-in 240ms var(--ease-out) both;
+  }
+}
+
+@keyframes nb-vt-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes nb-vt-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. Base & Typography
+   ※ :root / html には font-size を設定せず、OS のテキスト拡大設定を尊重する
+   -------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-height) + 1.5rem);
+}
+
+body {
+  margin: 0;
+  min-block-size: 100dvh;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-sans);
+  line-height: 1.7;
+  text-align: start;
+  color: var(--ink-primary);
+  background-color: var(--bg-page);
+  background-image:
+    radial-gradient(60rem 36rem at 12% -8%, color-mix(in oklab, var(--accent) 10%, transparent), transparent 65%),
+    radial-gradient(48rem 32rem at 92% 4%, color-mix(in oklab, var(--luminous) 8%, transparent), transparent 62%);
+  background-repeat: no-repeat;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--ink-primary);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+  text-wrap: balance;
+}
+
+p,
+blockquote,
+li {
+  text-wrap: pretty;
+}
+
+::selection {
+  background-color: var(--accent-soft);
+  color: var(--accent-soft-ink);
+}
+
+:focus-visible {
+  outline: 2.5px solid var(--accent);
+  outline-offset: 2px;
+}
+
+img,
+svg {
+  max-inline-size: 100%;
+}
+
+hr {
+  border: 0;
+  border-block-start: 1px solid var(--border-subtle);
+  margin-block: 2rem;
+}
+
+/* スキップリンク */
+.skip-link {
+  position: fixed;
+  inset-block-start: 0.75rem;
+  inset-inline-start: 0.75rem;
+  z-index: 1000;
+  padding: 0.625rem 1rem;
+  border-radius: var(--radius-full);
+  background-color: var(--accent);
+  color: var(--accent-on);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transform: translateY(-200%);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+  text-decoration: none;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* 視覚的に隠しつつアクセシビリティツリーには残す (フォーカス時は表示) */
+.visually-hidden:where(:not(:focus-within, :active)) {
+  position: absolute !important;
+  clip-path: inset(50%) !important;
+  overflow: hidden !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  white-space: nowrap !important;
+}
+
+/* --------------------------------------------------------------------------
+   4. Layout Containers
+   -------------------------------------------------------------------------- */
+
+.site-container {
+  inline-size: 100%;
+  max-inline-size: 70rem;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 3vw, 2rem);
+}
+
+.site-main {
+  flex: 1 0 auto;
+  padding-block: clamp(1.25rem, 3vw, 2.5rem) clamp(3rem, 6vw, 4.5rem);
+}
+
+.reading-container {
+  max-inline-size: 48rem;
+  margin-inline: auto;
+}
+
+.inline-form {
+  display: inline-flex;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   5. Reading Scroll Progress Indicator (Scroll-Driven Animation)
+   -------------------------------------------------------------------------- */
+
+.reading-progress {
+  position: fixed;
+  inset-block-start: var(--header-height);
+  inset-inline: 0;
+  z-index: 95;
+  block-size: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--luminous));
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    @keyframes nb-reading-progress {
+      from {
+        transform: scaleX(0);
+      }
+      to {
+        transform: scaleX(1);
+      }
+    }
+
+    .reading-progress {
+      animation: nb-reading-progress auto linear;
+      /* animation ショートハンドの後ろで宣言してリセットを防ぐ */
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reading-progress {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   6. Header & Site Navigation
+   -------------------------------------------------------------------------- */
+
+.site-header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 100;
+  view-transition-name: site-header;
+  background-color: var(--bg-glass);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border-block-end: 1px solid transparent;
+  transition: border-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out);
+}
+
+.site-header.is-scrolled {
+  border-block-end-color: var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+}
+
+.site-nav-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  min-block-size: var(--header-height);
+  padding-block: 0.5rem;
+}
+
+.site-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  color: var(--ink-primary);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  padding: 0.375rem 0.5rem 0.375rem 0.25rem;
+  border-radius: var(--radius-sm);
+  margin-inline-end: auto;
+  text-decoration: none;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.site-brand:hover {
+  color: var(--ink-primary);
+  text-decoration: none;
+  opacity: 0.88;
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  flex-shrink: 0;
+  border-radius: 0.55rem;
+  background: linear-gradient(135deg, var(--accent), var(--luminous));
+  color: #ffffff;
+  box-shadow: 0 4px 12px color-mix(in oklab, var(--accent) 30%, transparent);
+}
+
+.brand-text {
+  line-height: 1.2;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+}
+
+.site-nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-block-size: 2.25rem;
+  padding: 0.375rem 0.875rem;
+  border-radius: var(--radius-full);
+  color: var(--ink-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out);
+}
+
+.nav-link:hover {
+  color: var(--ink-primary);
+  background-color: var(--bg-surface-subtle);
+  text-decoration: none;
+}
+
+/* 現在ページ表示: 色だけに依存せず背景・太字・アクセントドットで示す (WCAG 1.4.1) */
+.nav-link[aria-current="page"] {
+  color: var(--accent-soft-ink);
+  background-color: var(--accent-soft);
+  font-weight: 700;
+}
+
+.nav-link[aria-current="page"]::before {
+  content: '';
+  inline-size: 0.4rem;
+  block-size: 0.4rem;
+  border-radius: var(--radius-full);
+  background-color: var(--accent);
+}
+
+/* テーマ切替アイコンボタン */
+.icon-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 2.5rem;
+  min-block-size: 2.5rem;
+  padding: 0.5rem;
+  flex-shrink: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  background-color: var(--bg-surface);
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.icon-button:hover {
+  color: var(--ink-primary);
+  border-color: var(--border-strong);
+  background-color: var(--bg-surface-subtle);
+}
+
+.icon-button:active {
+  transform: scale(0.95);
+}
+
+.theme-toggle svg {
+  position: absolute;
+  transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+}
+
+.theme-toggle .sun-icon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+.theme-toggle .moon-icon {
+  opacity: 0;
+  transform: rotate(-75deg) scale(0.5);
+}
+
+/* 表示中の配色に応じてアイコンと読み上げ文言を切り替え (JS 非依存) */
+:root:has(> head > meta[name="color-scheme"][content="dark"]) .theme-toggle .sun-icon {
+  opacity: 0;
+  transform: rotate(75deg) scale(0.5);
+}
+
+:root:has(> head > meta[name="color-scheme"][content="dark"]) .theme-toggle .moon-icon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+:root:has(> head > meta[name="color-scheme"][content="dark"]) .if-light,
+:root:has(> head > meta[name="color-scheme"][content="light"]) .if-dark {
+  display: none !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(:has(> head > meta[name="color-scheme"][content="light"])) .theme-toggle .sun-icon {
+    opacity: 0;
+    transform: rotate(75deg) scale(0.5);
+  }
+
+  :root:not(:has(> head > meta[name="color-scheme"][content="light"])) .theme-toggle .moon-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+
+  :root:not(:has(> head > meta[name="color-scheme"][content="light"])) .if-light {
+    display: none !important;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not(:has(> head > meta[name="color-scheme"][content="dark"])) .if-dark {
+    display: none !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   7. Admin Studio Sub-Navigation Bar
+   -------------------------------------------------------------------------- */
+
+.admin-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.25rem;
+  padding: 0.75rem 1rem;
+  margin-block-end: 1.75rem;
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-bar-left {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.625rem 1rem;
+}
+
+.admin-nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-block-size: 2.125rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full);
+  color: var(--ink-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.admin-nav-link:hover {
+  color: var(--ink-primary);
+  background-color: var(--bg-surface-subtle);
+  text-decoration: none;
+}
+
+.admin-nav-link[aria-current="page"] {
+  color: var(--accent-soft-ink);
+  background-color: var(--accent-soft);
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--accent) 28%, transparent);
+}
+
+.admin-bar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   8. Hero, Page Header, Breadcrumb & Status Pills
+   -------------------------------------------------------------------------- */
+
+.hero-banner {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.75rem, 4.5vw, 3.25rem) clamp(1.5rem, 4vw, 3rem);
+  margin-block-end: clamp(1.75rem, 4vw, 2.75rem);
+  border-radius: var(--radius-xl);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-md);
+}
+
+.hero-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(36rem 22rem at 96% 0%, color-mix(in oklab, var(--accent) 16%, transparent), transparent 65%),
+    radial-gradient(24rem 18rem at 82% 95%, color-mix(in oklab, var(--luminous) 14%, transparent), transparent 65%);
+  pointer-events: none;
+}
+
+.hero-banner::after {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  block-size: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--luminous) 60%, transparent);
+  pointer-events: none;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  max-inline-size: 42rem;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-block: 0 0.75rem;
+}
+
+.hero-eyebrow::before {
+  content: '';
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--accent), var(--luminous));
+}
+
+.page-title {
+  /* フルードタイポグラフィ (最大 <= 最小 * 2.5 で WCAG 1.4.4 準拠) */
+  font-size: clamp(1.75rem, 1.35rem + 1.8vw, 2.75rem);
+  line-height: 1.22;
+  letter-spacing: -0.025em;
+  margin-block: 0 0.75rem;
+  color: var(--ink-primary);
+  text-wrap: balance;
+}
+
+.hero-lead {
+  margin-block: 0 1.5rem;
+  font-size: clamp(0.95rem, 0.9rem + 0.25vw, 1.075rem);
+  color: var(--ink-secondary);
+  line-height: 1.75;
+}
+
+.page-header {
+  margin-block-end: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.page-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+}
+
+.breadcrumb-nav {
+  margin-block-end: 0.875rem;
+}
+
+.breadcrumb-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+.breadcrumb-list li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.breadcrumb-list li + li::before {
+  content: '/';
+  color: var(--border-strong);
+}
+
+.breadcrumb-list a {
+  color: var(--ink-secondary);
+}
+
+.breadcrumb-list a:hover {
+  color: var(--accent);
+}
+
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-block-start: 0.5rem;
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+}
+
+.meta-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-muted);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+  border: 1px solid transparent;
+}
+
+.status-dot {
+  inline-size: 0.45rem;
+  block-size: 0.45rem;
+  border-radius: var(--radius-full);
+  background-color: currentColor;
+  flex-shrink: 0;
+}
+
+.status-pill--admin {
+  background-color: var(--accent-soft);
+  color: var(--accent-soft-ink);
+  border-color: color-mix(in oklab, var(--accent) 25%, transparent);
+}
+
+.status-pill--published {
+  background-color: var(--success-soft);
+  color: var(--success-soft-ink);
+  border-color: color-mix(in oklab, var(--success) 28%, transparent);
+}
+
+.status-pill--draft {
+  background-color: var(--bg-surface-subtle);
+  color: var(--ink-secondary);
+  border-color: var(--border-subtle);
+}
+
+.section-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-block: 0 1.125rem;
+}
+
+.section-heading h2 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.section-count {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-muted);
+}
+
+/* --------------------------------------------------------------------------
+   9. Buttons & Action Bars
+   ※ 固定 height は設定せず、min-block-size + padding でテキスト拡大に追従
+   -------------------------------------------------------------------------- */
+
+.action-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-block: 1.25rem 0;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-block-size: 2.5rem;
+  padding: 0.55rem 1.25rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.btn:hover {
+  text-decoration: none;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.48;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-primary {
+  background-color: var(--accent);
+  color: var(--accent-on);
+  box-shadow: 0 4px 14px -4px color-mix(in oklab, var(--accent) 45%, transparent);
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+  color: var(--accent-on);
+  box-shadow: 0 6px 18px -4px color-mix(in oklab, var(--accent) 55%, transparent);
+}
+
+.btn-secondary {
+  background-color: var(--accent-soft);
+  color: var(--accent-soft-ink);
+  border-color: color-mix(in oklab, var(--accent) 20%, transparent);
+}
+
+.btn-secondary:hover {
+  background-color: color-mix(in oklab, var(--accent) 18%, var(--bg-surface));
+  color: var(--accent-soft-ink);
+  border-color: color-mix(in oklab, var(--accent) 36%, transparent);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--ink-secondary);
+  border-color: var(--border-subtle);
+}
+
+.btn-ghost:hover {
+  background-color: var(--bg-surface-subtle);
+  color: var(--ink-primary);
+  border-color: var(--border-strong);
+}
+
+.btn-danger {
+  background-color: var(--danger);
+  color: var(--danger-on);
+}
+
+.btn-danger:hover {
+  background-color: color-mix(in oklab, var(--danger) 88%, black);
+  color: var(--danger-on);
+}
+
+.btn-danger-soft {
+  background-color: var(--danger-soft);
+  color: var(--danger-soft-ink);
+  border-color: color-mix(in oklab, var(--danger) 30%, transparent);
+}
+
+.btn-danger-soft:hover {
+  background-color: var(--danger);
+  color: var(--danger-on);
+  border-color: var(--danger);
+}
+
+.btn-sm {
+  min-block-size: 2.125rem;
+  padding: 0.375rem 0.9rem;
+  font-size: 0.8125rem;
+}
+
+/* --------------------------------------------------------------------------
+   10. Cards & Chips (modern-web-guidance: card 準拠)
+   - カード全体クリックはタイトル内 a.card-link の ::after で実現
+   - 独立アクション (チップ・編集リンク等) は z-index: 1 で操作可能に保つ
+   -------------------------------------------------------------------------- */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: 1.125rem;
+}
+
+.card {
+  container-type: inline-size;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  min-block-size: 10.5rem;
+  padding: 1.375rem;
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out);
+  animation: nb-card-rise var(--dur-slow) var(--ease-out) both;
+  animation-delay: calc(var(--card-index, 0) * 35ms);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 1.25rem;
+  block-size: 2px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, var(--accent), var(--luminous));
+  opacity: 0;
+  transform: scaleX(0.3);
+  transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+  pointer-events: none;
+}
+
+.card:has(a.card-link:hover) {
+  transform: translateY(-2px);
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--border-subtle));
+  box-shadow: var(--shadow-md);
+}
+
+.card:has(a.card-link:hover)::before {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.card:has(a.card-link:hover) .card-link {
+  color: var(--accent);
+}
+
+.card:has(a.card-link:focus-visible) {
+  outline: 2.5px solid var(--accent);
+  outline-offset: 2px;
+  border-color: var(--accent);
+}
+
+.card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.card-title {
+  margin: 0;
+  font-size: clamp(1.05rem, 0.95rem + 1cqi, 1.2rem);
+  font-weight: 700;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  flex: 1 0 auto;
+}
+
+.card a.card-link {
+  color: var(--ink-primary);
+  text-decoration: none;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.card a.card-link:focus-visible {
+  /* フォーカスリングはカード全体に描画する */
+  outline: none;
+}
+
+.card a.card-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+/* カード内の独立アクション (シリーズリンク、管理画面の編集ボタン等) をオーバーレイの上に出す */
+.card:has(a.card-link) a:not(.card-link),
+.card:has(a.card-link) button,
+.card:has(a.card-link) input {
+  position: relative;
+  z-index: 1;
+}
+
+.card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 0.75rem;
+  margin-block-start: auto;
+  padding-block-start: 0.875rem;
+  border-block-start: 1px solid var(--border-subtle);
+}
+
+.card-read-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.card-read-hint svg {
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.card:has(a.card-link:hover) .card-read-hint svg {
+  transform: translateX(3px);
+}
+
+.card-actions-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+@container (max-width: 18rem) {
+  .card {
+    padding: 1.125rem;
+  }
+}
+
+/* クリック可能なシリーズチップ */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius-full);
+  background-color: var(--accent-soft);
+  color: var(--accent-soft-ink);
+  border: 1px solid color-mix(in oklab, var(--accent) 22%, transparent);
+  font-size: 0.775rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-decoration: none;
+  max-inline-size: 100%;
+  transition: background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.chip:hover {
+  background-color: var(--accent);
+  color: var(--accent-on);
+  border-color: var(--accent);
+  text-decoration: none;
+}
+
+/* 非インタラクティブな表示バッジ (記事数など) */
+.chip-static {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius-full);
+  background-color: var(--bg-surface-subtle);
+  color: var(--ink-secondary);
+  border: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.775rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+}
+
+@keyframes nb-card-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   11. Empty State & Generic Surfaces
+   -------------------------------------------------------------------------- */
+
+.surface-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: clamp(1.375rem, 3.5vw, 2.5rem);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.75rem;
+  padding: clamp(2.5rem, 6vw, 4rem) 1.5rem;
+  border-radius: var(--radius-xl);
+  background-color: var(--bg-surface);
+  border: 1px dashed var(--border-strong);
+  color: var(--ink-secondary);
+}
+
+.empty-state-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 3.25rem;
+  block-size: 3.25rem;
+  border-radius: var(--radius-lg);
+  background-color: var(--accent-soft);
+  color: var(--accent);
+}
+
+.empty-state-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.empty-state-text {
+  margin: 0;
+  max-inline-size: 34rem;
+  color: var(--ink-secondary);
+  white-space: pre-line;
+}
+
+/* --------------------------------------------------------------------------
+   12. Article Prose, Code Blocks (Copy Button) & Tables
+   -------------------------------------------------------------------------- */
+
+.article-surface {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: clamp(1.375rem, 4vw, 2.75rem);
+}
+
+.article-content {
+  color: var(--ink-primary);
+  font-size: 1rem;
+  line-height: 1.9;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+.article-content > :first-child {
+  margin-block-start: 0;
+}
+
+.article-content > :last-child {
+  margin-block-end: 0;
+}
+
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content h5,
+.article-content h6 {
+  margin-block: 2.25rem 0.875rem;
+  line-height: 1.35;
+}
+
+.article-content h1 {
+  font-size: 1.65rem;
+}
+
+.article-content h2 {
+  font-size: 1.375rem;
+  padding-block-end: 0.5rem;
+  padding-inline-start: 0.875rem;
+  border-inline-start: 3.5px solid var(--accent);
+  border-block-end: 1px solid var(--border-subtle);
+}
+
+.article-content h3 {
+  font-size: 1.15rem;
+}
+
+.article-content h4 {
+  font-size: 1.025rem;
+}
+
+.article-content p {
+  margin-block: 1.1rem;
+}
+
+.article-content ul,
+.article-content ol {
+  margin-block: 1.1rem;
+  padding-inline-start: 1.5rem;
+}
+
+.article-content li {
+  margin-block: 0.45rem;
+}
+
+.article-content li::marker {
+  color: var(--accent);
+}
+
+.article-content strong {
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.article-content mark {
+  background-color: var(--accent-soft);
+  color: var(--accent-soft-ink);
+  padding: 0.05em 0.3em;
+  border-radius: var(--radius-xs);
+}
+
+.article-content blockquote {
+  margin-block: 1.5rem;
+  margin-inline: 0;
+  padding: 1rem 1.25rem;
+  border-inline-start: 3.5px solid var(--accent);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  background-color: var(--bg-surface-subtle);
+  color: var(--ink-secondary);
+}
+
+.article-content blockquote > :first-child {
+  margin-block-start: 0;
+}
+
+.article-content blockquote > :last-child {
+  margin-block-end: 0;
+}
+
+.article-content a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: color-mix(in oklab, var(--accent) 45%, transparent);
+  text-underline-offset: 0.22em;
+  overflow-wrap: anywhere;
+}
+
+.article-content a:hover {
+  text-decoration-color: var(--accent);
+}
+
+.article-content img {
+  display: block;
+  max-inline-size: 100%;
+  block-size: auto;
+  margin-block: 1.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+}
+
+/* インラインコード */
+.article-content :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  padding: 0.15em 0.42em;
+  border-radius: var(--radius-xs);
+  background-color: var(--inline-code-bg);
+  color: var(--inline-code-ink);
+  overflow-wrap: anywhere;
+}
+
+/* コードブロック (JS による .code-block ラップ前後どちらでも美しく表示) */
+.article-content pre {
+  margin-block: 1.5rem;
+  padding: 1.15rem 1.25rem;
+  border-radius: var(--radius-md);
+  background-color: var(--code-bg);
+  color: var(--code-ink);
+  overflow-x: auto;
+  line-height: 1.65;
+  tab-size: 4;
+}
+
+.article-content pre code {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  white-space: pre;
+}
+
+.code-block {
+  margin-block: 1.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in oklab, var(--border-subtle) 65%, transparent);
+  background-color: var(--code-bg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.code-block pre {
+  margin: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 1.1rem 1.25rem;
+}
+
+.code-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.45rem 0.75rem 0.45rem 1rem;
+  background-color: var(--code-header);
+  border-block-end: 1px solid rgb(255 255 255 / 0.08);
+}
+
+.code-lang {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--code-muted);
+}
+
+/* コピーボタン (modern-web-guidance: copy-button 準拠) */
+.copy {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.copy-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 2rem;
+  min-block-size: 2rem;
+  padding: 0.35rem;
+  border-radius: var(--radius-xs);
+  border: 1px solid rgb(255 255 255 / 0.16);
+  background-color: rgb(255 255 255 / 0.06);
+  color: var(--code-ink);
+  cursor: pointer;
+  transition: opacity var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.copy-button:hover {
+  background-color: rgb(255 255 255 / 0.14);
+  border-color: rgb(255 255 255 / 0.32);
+}
+
+.copy-button .icon-check {
+  display: none;
+}
+
+.copy-button[data-copied] {
+  border-color: var(--success-dark);
+  color: var(--success-dark);
+}
+
+.copy-button[data-copied] .icon-copy {
+  display: none;
+}
+
+.copy-button[data-copied] .icon-check {
+  display: block;
+}
+
+.copy-button[data-failed] {
+  border-color: var(--danger-dark);
+  color: var(--danger-dark);
+}
+
+/* ライブリージョンは opacity で制御 (display:none や visibility:hidden は AT 読み上げを壊す) */
+.copy-tip {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--code-ink);
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.copy-tip:not(:empty) {
+  opacity: 1;
+}
+
+/* ホバー可能な環境では通常時控えめにし、ホバー・フォーカス・フィードバック時に明示 */
+@media (hover: hover) {
+  .copyable .copy-button {
+    opacity: 0.65;
+  }
+
+  .copyable:hover .copy-button,
+  .copyable:focus-within .copy-button,
+  .copyable .copy-button:focus-visible,
+  .copyable .copy-button[data-copied],
+  .copyable .copy-button[data-failed] {
+    opacity: 1;
+  }
+}
+
+/* テーブル (横スクロールラッパー対応) */
+.table-scroll {
+  overflow-x: auto;
+  margin-block: 1.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.table-scroll table {
+  margin-block: 0;
+}
+
+.article-content table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  margin-block: 1.5rem;
+  font-size: 0.925rem;
+}
+
+.article-content th,
+.article-content td {
+  padding: 0.75rem 1rem;
+  border-block-end: 1px solid var(--border-subtle);
+  text-align: start;
+}
+
+.article-content th {
+  font-weight: 700;
+  color: var(--ink-secondary);
+  background-color: var(--bg-surface-subtle);
+  text-wrap: balance;
+}
+
+.article-content tbody tr:last-child td {
+  border-block-end: none;
+}
+
+/* --------------------------------------------------------------------------
+   13. Series Detail TOC & Article Stack
+   -------------------------------------------------------------------------- */
+
+.series-toc {
+  padding: 1.25rem 1.5rem;
+  margin-block: 1.5rem 2rem;
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+}
+
+.series-toc-title {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+}
+
+.series-toc-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.series-toc-link {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.4rem 0.65rem;
+  border-radius: var(--radius-sm);
+  color: var(--ink-primary);
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.series-toc-link:hover {
+  background-color: var(--bg-surface-subtle);
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.series-toc-num {
+  font-family: var(--font-mono);
+  font-size: 0.775rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.series-entries {
+  display: grid;
+  gap: 2rem;
+}
+
+.series-article-entry {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: clamp(1.375rem, 4vw, 2.5rem);
+}
+
+.series-article-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding-block-end: 1.125rem;
+  margin-block-end: 1.5rem;
+  border-block-end: 1px solid var(--border-subtle);
+}
+
+.series-article-kicker {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--accent);
+  margin-block-end: 0.25rem;
+}
+
+.series-article-title {
+  margin: 0;
+  font-size: clamp(1.25rem, 1.05rem + 0.9vw, 1.6rem);
+  line-height: 1.35;
+}
+
+.series-article-title a {
+  color: var(--ink-primary);
+}
+
+.series-article-title a:hover {
+  color: var(--accent);
+}
+
+/* --------------------------------------------------------------------------
+   14. Forms, Validation (:user-invalid), Auto-Sizing & Editor Workspace
+   -------------------------------------------------------------------------- */
+
+.auth-card {
+  max-inline-size: 28rem;
+  margin-inline: auto;
+  margin-block: clamp(1.25rem, 4vw, 3rem);
+}
+
+.auth-header {
+  margin-block-end: 1.5rem;
+}
+
+.auth-title {
+  margin: 0 0 0.375rem;
+  font-size: 1.5rem;
+}
+
+.auth-subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--ink-secondary);
+}
+
+.field {
+  margin-block-end: 1.35rem;
+}
+
+.field:last-child {
+  margin-block-end: 0;
+}
+
+.field-label {
+  display: block;
+  margin-block-end: 0.4rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+/* ヒントは入力欄の上に置き、モバイルキーボードやオートコンプリートで隠れないようにする */
+.field-hint {
+  display: block;
+  margin-block: 0 0.45rem;
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  line-height: 1.5;
+}
+
+.field-control {
+  display: block;
+  inline-size: 100%;
+  padding: 0.72rem 0.95rem;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--ink-primary);
+  background-color: var(--bg-surface-subtle);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.field-control::placeholder {
+  color: var(--ink-muted);
+  opacity: 0.85;
+}
+
+.field-control:hover {
+  border-color: var(--ink-primary);
+}
+
+.field-control:focus {
+  outline: none;
+  background-color: var(--bg-surface);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent);
+}
+
+/* 操作後バリデーション (:user-invalid / :user-valid) */
+.field-control:user-invalid {
+  border-color: var(--danger);
+  background-color: color-mix(in oklab, var(--danger-soft) 35%, var(--bg-surface));
+}
+
+.field-control:user-valid {
+  border-color: var(--success);
+}
+
+.field-error {
+  display: none;
+  align-items: center;
+  gap: 0.4rem;
+  margin-block-start: 0.45rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--danger);
+}
+
+.field-error::before {
+  content: '!';
+  content: '!' / 'エラー: ';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.1rem;
+  block-size: 1.1rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background-color: var(--danger);
+  color: var(--danger-on);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.field-control:user-invalid + .field-error,
+.password-field:has(.field-control:user-invalid) + .field-error {
+  display: flex;
+}
+
+/* 自動サイズ調整 textarea (form-fields-automatically-fit-contents 準拠) */
+textarea.field-control {
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  resize: vertical;
+  field-sizing: content;
+  block-size: auto;
+}
+
+textarea.field-control--editor {
+  min-block-size: 24rem;
+  max-block-size: 72dvh;
+}
+
+textarea.field-control--compact {
+  min-block-size: 6.5rem;
+  max-block-size: 22rem;
+}
+
+select.field-control {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-inline-end: 2.5rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 1.15rem) calc(50% + 1px), calc(100% - 0.8rem) calc(50% + 1px);
+  background-size: 0.35rem 0.35rem;
+  background-repeat: no-repeat;
+}
+
+/* パスワード入力 + 表示切替ボタン */
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.password-field .field-control {
+  padding-inline-end: 4.5rem;
+}
+
+.password-toggle {
+  position: absolute;
+  inset-block: 0.3rem;
+  inset-inline-end: 0.3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 3.5rem;
+  padding-inline: 0.65rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-xs);
+  background-color: transparent;
+  color: var(--ink-secondary);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.password-toggle:hover {
+  background-color: var(--bg-surface);
+  color: var(--ink-primary);
+}
+
+/* 選択カード (公開 / 下書き) — card ガイド Choice cards パターン準拠 */
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.625rem;
+}
+
+.choice-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border-subtle);
+  background-color: var(--bg-surface-subtle);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out);
+}
+
+.choice-card:hover {
+  border-color: var(--border-strong);
+}
+
+.choice-card:has(> input:checked) {
+  border-color: var(--accent);
+  background-color: var(--accent-soft);
+}
+
+.choice-card:has(> input:focus-visible) {
+  outline: 2.5px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.choice-card input[type="radio"] {
+  margin-block-start: 0.2rem;
+  inline-size: 1.05rem;
+  block-size: 1.05rem;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.choice-card-title {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+  line-height: 1.3;
+}
+
+.choice-card-desc {
+  display: block;
+  font-size: 0.775rem;
+  color: var(--ink-secondary);
+  line-height: 1.4;
+  margin-block-start: 0.15rem;
+}
+
+/* 記事エディタ 2 カラムワークスペース */
+.editor-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(17.5rem, 21.5rem);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.editor-main,
+.editor-panel {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+}
+
+.editor-sidebar {
+  display: grid;
+  gap: 1.125rem;
+}
+
+.editor-panel-title {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.editor-submit-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-block-start: 1.25rem;
+  margin-block-start: 1.25rem;
+  border-block-start: 1px solid var(--border-subtle);
+}
+
+/* 画像ドロップゾーン */
+.drop-zone {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-surface-subtle);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out);
+}
+
+.drop-zone:hover,
+.drop-zone.dragover {
+  border-color: var(--accent);
+  background-color: color-mix(in oklab, var(--accent-soft) 65%, var(--bg-surface));
+}
+
+.drop-zone-text {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  color: var(--ink-secondary);
+}
+
+.drop-zone-meta {
+  margin: 0.65rem 0 0;
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+}
+
+.upload-status {
+  margin-block-start: 0.875rem;
+}
+
+.progress {
+  block-size: 0.375rem;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background-color: var(--bg-surface-subtle);
+  margin-block-start: 0.4rem;
+}
+
+.progress-bar {
+  block-size: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--luminous));
+  border-radius: var(--radius-full);
+  transition: width var(--dur-fast) var(--ease-out);
+}
+
+.image-notice {
+  margin-block: 0.75rem 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink-secondary);
+}
+
+.image-notice:empty {
+  margin: 0;
+}
+
+.uploaded-images {
+  display: grid;
+  gap: 0.625rem;
+  margin-block-start: 0.875rem;
+}
+
+.uploaded-images:empty {
+  margin-block-start: 0;
+}
+
+.uploaded-image-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-md);
+  background-color: var(--success-soft);
+  color: var(--success-soft-ink);
+  border: 1px solid color-mix(in oklab, var(--success) 28%, transparent);
+  font-size: 0.8125rem;
+}
+
+.uploaded-image-meta {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+/* --------------------------------------------------------------------------
+   15. Alerts (色だけに頼らずアイコン・テキストを併用)
+   -------------------------------------------------------------------------- */
+
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 0.875rem 1rem;
+  margin-block-end: 1.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.alert-icon {
+  flex-shrink: 0;
+  margin-block-start: 0.1rem;
+}
+
+.alert-error {
+  background-color: var(--danger-soft);
+  color: var(--danger-soft-ink);
+  border-color: color-mix(in oklab, var(--danger) 30%, transparent);
+}
+
+.alert-success {
+  background-color: var(--success-soft);
+  color: var(--success-soft-ink);
+  border-color: color-mix(in oklab, var(--success) 30%, transparent);
+}
+
+.alert-info {
+  background-color: var(--accent-soft);
+  color: var(--accent-soft-ink);
+  border-color: color-mix(in oklab, var(--accent) 26%, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   16. Accordion (<details> + ::details-content スムーズ開閉)
+   modern-web-guidance: accordion 準拠
+   -------------------------------------------------------------------------- */
+
+.accordion-panel {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  margin-block: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.accordion-panel > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 1rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+  cursor: pointer;
+  border-radius: var(--radius-lg);
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.accordion-panel > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* マーカーはラベル直前に配置して視線走査しやすくする */
+.accordion-panel > summary::before {
+  content: '';
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  flex-shrink: 0;
+  border-inline-end: 2px solid var(--accent);
+  border-block-end: 2px solid var(--accent);
+  rotate: -45deg;
+  translate: 0 -1px;
+}
+
+.accordion-panel[open] > summary::before {
+  rotate: 45deg;
+}
+
+.accordion-panel > summary:hover {
+  background-color: var(--bg-surface-subtle);
+}
+
+.accordion-body {
+  padding: 0 1.25rem 1.25rem;
+  border-block-start: 1px solid var(--border-subtle);
+  padding-block-start: 1.25rem;
+}
+
+.accordion-panel::details-content {
+  interpolate-size: allow-keywords;
+  overflow: clip;
+  contain: layout;
+}
+
+.accordion-panel:not([open])::details-content {
+  block-size: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .accordion-panel > summary::before {
+    transition: rotate var(--dur-base) var(--ease-out);
+  }
+
+  .accordion-panel::details-content {
+    transition-property: block-size, content-visibility, display;
+    transition-duration: 280ms;
+    transition-timing-function: var(--ease-out);
+    transition-behavior: allow-discrete;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   17. Modal Confirmation Dialog (<dialog>)
+   modern-web-guidance: dialog & animate-to-from-top-layer 準拠
+   -------------------------------------------------------------------------- */
+
+.nb-dialog {
+  inline-size: min(25rem, calc(100dvw - 2rem));
+  padding: 1.5rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  background-color: var(--bg-surface-elevated);
+  color: var(--ink-primary);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transition-property: opacity, transform, display, overlay;
+  transition-duration: 220ms;
+  transition-timing-function: var(--ease-out);
+  transition-behavior: allow-discrete;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .nb-dialog {
+    transform: translateY(8px) scale(0.96);
+  }
+}
+
+.nb-dialog[open]:where(:not([data-closing])) {
+  opacity: 1;
+
+  @starting-style {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    transform: translateY(0) scale(1);
+
+    @starting-style {
+      transform: translateY(8px) scale(0.96);
+    }
+  }
+}
+
+/* モーダル背面のページスクロール連鎖を防止 */
+.nb-dialog:modal {
+  overscroll-behavior: contain;
+}
+
+.nb-dialog::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
+  background-color: rgb(6 10 22 / 0);
+  backdrop-filter: blur(0px);
+  transition-property: background-color, backdrop-filter, display, overlay;
+  transition-duration: 220ms;
+  transition-timing-function: var(--ease-out);
+  transition-behavior: allow-discrete;
+}
+
+.nb-dialog[open]:where(:not([data-closing]))::backdrop {
+  background-color: rgb(6 10 22 / 0.52);
+  backdrop-filter: blur(4px);
+
+  @starting-style {
+    background-color: rgb(6 10 22 / 0);
+    backdrop-filter: blur(0px);
+  }
+}
+
+.nb-dialog-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.nb-dialog-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 2.35rem;
+  block-size: 2.35rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background-color: var(--danger-soft);
+  color: var(--danger-soft-ink);
+}
+
+.nb-dialog-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.nb-dialog-detail {
+  margin: 0.875rem 0 0;
+  font-size: 0.925rem;
+  color: var(--ink-secondary);
+}
+
+.nb-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.625rem;
+  margin-block-start: 1.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   18. Footer
+   -------------------------------------------------------------------------- */
+
+.site-footer {
+  flex-shrink: 0;
+  border-block-start: 1px solid var(--border-subtle);
+  background-color: color-mix(in oklab, var(--bg-surface) 75%, var(--bg-page));
+  padding-block: 1.75rem;
+}
+
+.footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+}
+
+.footer-brand {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+.footer-copy {
+  font-weight: 600;
+  color: var(--ink-secondary);
+}
+
+.footer-tagline {
+  font-family: var(--font-mono);
+  font-size: 0.775rem;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+  font-size: 0.85rem;
+}
+
+.footer-links a {
+  color: var(--ink-secondary);
+}
+
+.footer-links a:hover {
+  color: var(--accent);
+}
+
+/* --------------------------------------------------------------------------
+   19. Responsive Breakpoints (em ベースでテキスト拡大時にも安全にリフロー)
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 58em) {
+  .editor-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 40em) {
+  .brand-text {
+    font-size: 0.925rem;
+  }
+
+  .nav-link {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.85rem;
+  }
+
+  .choice-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-sep,
+  .footer-tagline {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   20. Accessibility: Reduced Motion & Forced Colors Mode
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .nb-dialog {
+    transition-duration: 100ms !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .site-header,
+  .admin-bar,
+  .hero-banner,
+  .card,
+  .article-surface,
+  .series-toc,
+  .series-article-entry,
+  .surface-card,
+  .editor-main,
+  .editor-panel,
+  .accordion-panel,
+  .nb-dialog,
+  .code-block,
+  .alert {
+    border: 1px solid CanvasText;
+    box-shadow: none;
+  }
+
+  .nav-link[aria-current="page"],
+  .admin-nav-link[aria-current="page"] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  .choice-card:has(> input:checked) {
+    outline: 2px solid Highlight;
+  }
+
+  .btn,
+  .icon-button,
+  .chip,
+  .chip-static {
+    border: 1px solid ButtonText;
+  }
+
+  .reading-progress {
+    background: Highlight;
+  }
+}

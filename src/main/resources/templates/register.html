@@ -4,32 +4,72 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
 <head>
-    <title>Register</title>
+    <title>ユーザー登録</title>
 </head>
 <body>
 <section layout:fragment="content">
-    <div class="md-form-surface md-auth-card">
-        <h1 class="md-headline-small">ユーザー登録</h1>
+    <div class="surface-card auth-card">
+        <header class="auth-header">
+            <h1 class="auth-title">ユーザー登録</h1>
+            <p class="auth-subtitle">管理スタジオを利用する新しいアカウントを作成します。</p>
+        </header>
+
         <form th:action="@{/register}" method="post">
-            <div class="form-group">
-                <label for="registerUsername">ユーザー名</label>
-                <input class="form-control" type="text" id="registerUsername" name="username"
-                       autocomplete="username" required>
+            <div class="field">
+                <label class="field-label" for="registerUsername">ユーザー名</label>
+                <span id="registerUsernameHint" class="field-hint">3〜50文字で入力してください</span>
+                <input type="text"
+                       id="registerUsername"
+                       name="username"
+                       class="field-control"
+                       minlength="3"
+                       maxlength="50"
+                       autocomplete="username"
+                       spellcheck="false"
+                       autocorrect="off"
+                       autocapitalize="none"
+                       enterkeyhint="next"
+                       aria-describedby="registerUsernameHint"
+                       required
+                       data-error="registerUsernameError">
+                <p id="registerUsernameError" class="field-error">ユーザー名は3〜50文字で入力してください</p>
             </div>
-            <div class="form-group">
-                <label for="registerPassword">パスワード</label>
-                <input class="form-control" type="password" id="registerPassword" name="password"
-                       autocomplete="new-password" required>
+
+            <div class="field">
+                <label class="field-label" for="registerPassword">パスワード</label>
+                <span id="registerPasswordHint" class="field-hint">8文字以上で入力してください</span>
+                <div class="password-field">
+                    <input type="password"
+                           id="registerPassword"
+                           name="password"
+                           class="field-control"
+                           minlength="8"
+                           autocomplete="new-password"
+                           enterkeyhint="done"
+                           aria-describedby="registerPasswordHint"
+                           required
+                           data-error="registerPasswordError">
+                    <button type="button"
+                            class="password-toggle"
+                            data-toggle-password="registerPassword"
+                            aria-pressed="false"
+                            aria-label="パスワードを表示">
+                        <span data-toggle-label>表示</span>
+                    </button>
+                </div>
+                <p id="registerPasswordError" class="field-error">パスワードは8文字以上で入力してください</p>
             </div>
-            <div class="form-group">
-                <label for="registerRoles">ロール</label>
-                <select class="form-control" id="registerRoles" name="roles" required>
-                    <option value="USER">ユーザー</option>
-                    <option value="ADMIN">管理者</option>
+
+            <div class="field">
+                <label class="field-label" for="registerRoles">ロール</label>
+                <select id="registerRoles" name="roles" class="field-control" required>
+                    <option value="USER">USER</option>
+                    <option value="ADMIN">ADMIN</option>
                 </select>
             </div>
-            <div class="action-buttons">
-                <button type="submit" class="btn btn-primary">登録</button>
+
+            <div class="action-bar">
+                <button type="submit" class="btn btn-primary" style="inline-size: 100%;">アカウントを作成</button>
             </div>
         </form>
     </div>

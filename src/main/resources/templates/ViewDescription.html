@@ -5,15 +5,44 @@
       layout:decorate="~{layout/layout}">
 <head>
     <!-- Google tag / AdSense は layout.html の head で読み込む -->
-    <title th:text="${article.title}"></title>
+    <title th:text="${article.title}">記事</title>
 </head>
 <body>
 <section layout:fragment="content">
-    <h1 class="display-3" th:text="${article.title}">記事タイトル</h1>
-    <p class="text-muted" th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></p>
-    <div class="article-content" th:utext="${renderedHtmlContent}"></div>
-    <div class="action-buttons">
-        <a th:href="@{/}" class="btn btn-tonal">トップページへ戻る</a>
+    <div class="reading-progress" aria-hidden="true"></div>
+
+    <div class="reading-container">
+        <header class="page-header">
+            <nav class="breadcrumb-nav" aria-label="パンくずリスト">
+                <ol class="breadcrumb-list">
+                    <li><a th:href="@{/}">トップ</a></li>
+                    <li aria-current="page">記事</li>
+                </ol>
+            </nav>
+            <h1 class="page-title" th:text="${article.title}">記事タイトル</h1>
+            <div class="meta-row" th:if="${article.createdAt != null}">
+                <time class="meta-date"
+                      th:if="${article.createdAt != null}"
+                      th:attr="datetime=${#dates.format(article.createdAt, 'yyyy-MM-dd''T''HH:mm')}"
+                      th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></time>
+            </div>
+        </header>
+
+        <article class="article-surface">
+            <div class="article-content" th:utext="${renderedHtmlContent}"></div>
+        </article>
+
+        <div class="action-bar">
+            <a th:href="@{/}" class="btn btn-ghost">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="m12 19-7-7 7-7"></path>
+                    <path d="M19 12H5"></path>
+                </svg>
+                <span>トップへ戻る</span>
+            </a>
+            <a th:href="@{/Series}" class="btn btn-secondary">シリーズ一覧を見る</a>
+        </div>
     </div>
 </section>
 </body>

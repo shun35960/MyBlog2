@@ -4,38 +4,66 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
 <head>
-    <title>Hello</title>
+    <title th:text="${Hellotitle}">記事管理</title>
 </head>
 <body>
 <section layout:fragment="content">
-    <h1 class="display-3" th:text="${Hellotitle}"></h1>
-    <div class="action-buttons">
-        <a th:href="@{/Hello/Edit}" class="btn btn-primary">新規作成</a>
-        <a th:href="@{/Hello/Draft}" class="btn btn-tonal">下書き一覧</a>
-        <a th:href="@{/Hello/Series}" class="btn btn-tonal">シリーズ一覧</a>
-        <form th:action="@{/logout}" method="post">
-            <button type="submit" class="btn btn-outlined">ログアウト</button>
-        </form>
-    </div>
-    <div class="row" th:if="${articles != null and !articles.empty}">
-        <div th:each="article : ${articles}">
-            <div class="col">
-                <article class="card">
-                    <h2 class="card-title" th:text="${article.title}">タイトル</h2>
-                    <div>
-                        <a th:href="@{/Hello/Description/{id}(id=${article.id})}" class="card-link">詳細</a>
-                        <span class="text-muted" th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
-                        <a th:if="${article.seriesId != null and seriesTitles != null and seriesTitles.containsKey(article.seriesId)}"
-                           th:href="@{/Hello/Series/{id}(id=${article.seriesId})}"
-                           class="md-chip"
-                           th:text="${seriesTitles[article.seriesId]}"></a>
-                    </div>
-                </article>
-            </div>
+    <div th:replace="~{layout/layout :: adminBar('articles')}"></div>
+
+    <header class="page-header">
+        <div class="page-header-row">
+            <h1 class="page-title" th:text="${Hellotitle}">記事の一覧</h1>
+            <span class="chip-static" th:if="${articles != null}"
+                  th:text="|公開 ${#lists.size(articles)} 件|"></span>
         </div>
+    </header>
+
+    <div class="card-grid" th:if="${articles != null and !articles.empty}">
+        <article class="card" th:each="article : ${articles}">
+            <div class="card-meta">
+                <time class="meta-date"
+                      th:if="${article.createdAt != null}"
+                      th:attr="datetime=${#dates.format(article.createdAt, 'yyyy-MM-dd''T''HH:mm')}"
+                      th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></time>
+                <span class="status-pill status-pill--published">
+                    <span class="status-dot" aria-hidden="true"></span>
+                    <span>公開中</span>
+                </span>
+            </div>
+
+            <h2 class="card-title">
+                <a class="card-link"
+                   th:href="@{/Hello/Description/{id}(id=${article.id})}"
+                   th:text="${article.title}">タイトル</a>
+            </h2>
+
+            <footer class="card-footer">
+                <a th:if="${article.seriesId != null and seriesTitles != null and seriesTitles.containsKey(article.seriesId)}"
+                   th:href="@{/Hello/Series/{id}(id=${article.seriesId})}"
+                   class="chip"
+                   th:text="${seriesTitles[article.seriesId]}"></a>
+                <span th:unless="${article.seriesId != null and seriesTitles != null and seriesTitles.containsKey(article.seriesId)}"
+                      class="card-read-hint" aria-hidden="true">詳細を見る →</span>
+                <div class="card-actions-group">
+                    <a class="btn btn-ghost btn-sm" th:href="@{/Hello/Edit/{id}(id=${article.id})}">編集</a>
+                </div>
+            </footer>
+        </article>
     </div>
-    <div class="md-empty-state" th:unless="${articles != null and !articles.empty}">
-        <p>記事はありません。</p>
+
+    <div class="empty-state" th:unless="${articles != null and !articles.empty}">
+        <span class="empty-state-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="12" y1="18" x2="12" y2="12"></line>
+                <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
+        </span>
+        <h2 class="empty-state-title">公開記事はありません</h2>
+        <p class="empty-state-text">新しい記事を作成して公開すると、ここに一覧表示されます。</p>
+        <a class="btn btn-primary" th:href="@{/Hello/Edit}">新規作成</a>
     </div>
 </section>
 </body>

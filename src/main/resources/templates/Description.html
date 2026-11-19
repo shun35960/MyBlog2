@@ -4,27 +4,60 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
 <head>
-    <title th:text="${description.title}"></title>
+    <title th:text="${description.title}">記事詳細</title>
 </head>
 <body>
 <section layout:fragment="content">
-    <h1 class="display-3" th:text="${description.title}">記事タイトル</h1>
-    <p class="text-muted" th:text="${#dates.format(description.createdAt, 'yyyy-MM-dd HH:mm')}"></p>
+    <div class="reading-progress" aria-hidden="true"></div>
+    <div th:replace="~{layout/layout :: adminBar('')}"></div>
 
-    <div class="action-buttons">
-        <a th:href="@{/Hello}" class="btn btn-tonal">記事一覧へ戻る</a>
-        <form th:action="@{/Hello/Edit/{id}(id=${description.id})}">
-            <button type="submit" class="btn btn-primary">記事を編集</button>
-        </form>
-        <form th:action="@{/Hello/{id}(id=${description.id})}"
-              th:method="delete"
-              data-confirm="記事を削除しますか？"
-              data-confirm-detail="削除した記事は元に戻せません。">
-            <button type="submit" class="btn btn-danger">記事を削除</button>
-        </form>
+    <div class="reading-container">
+        <header class="page-header">
+            <nav class="breadcrumb-nav" aria-label="パンくずリスト">
+                <ol class="breadcrumb-list">
+                    <li><span>管理</span></li>
+                    <li><a th:href="@{/Hello}">記事一覧</a></li>
+                    <li aria-current="page">記事詳細</li>
+                </ol>
+            </nav>
+
+            <h1 class="page-title" th:text="${description.title}">記事タイトル</h1>
+
+            <div class="meta-row">
+                <time class="meta-date"
+                      th:if="${description.createdAt != null}"
+                      th:attr="datetime=${#dates.format(description.createdAt, 'yyyy-MM-dd''T''HH:mm')}"
+                      th:text="${#dates.format(description.createdAt, 'yyyy-MM-dd HH:mm')}"></time>
+                <span th:if="${description.published}" class="status-pill status-pill--published">
+                    <span class="status-dot" aria-hidden="true"></span>
+                    <span>公開中</span>
+                </span>
+                <span th:unless="${description.published}" class="status-pill status-pill--draft">
+                    <span class="status-dot" aria-hidden="true"></span>
+                    <span>下書き</span>
+                </span>
+                <a th:if="${description.published}"
+                   th:href="@{/ViewDescription/{id}(id=${description.id})}"
+                   class="chip">公開ページを見る</a>
+            </div>
+
+            <div class="action-bar">
+                <a class="btn btn-primary" th:href="@{/Hello/Edit/{id}(id=${description.id})}">記事を編集</a>
+                <form th:action="@{/Hello/{id}(id=${description.id})}"
+                      th:method="delete"
+                      class="inline-form"
+                      data-confirm="記事を削除しますか？"
+                      data-confirm-detail="削除した記事は元に戻せません。">
+                    <button type="submit" class="btn btn-danger-soft">記事を削除</button>
+                </form>
+                <a class="btn btn-ghost" th:href="@{/Hello}">一覧へ戻る</a>
+            </div>
+        </header>
+
+        <article class="article-surface">
+            <div class="article-content" th:utext="${renderedHtmlContent}"></div>
+        </article>
     </div>
-
-    <div class="article-content" th:utext="${renderedHtmlContent}"></div>
 </section>
 </body>
 </html>

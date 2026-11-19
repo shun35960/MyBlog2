@@ -6,9 +6,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- OS レベルのテキスト拡大設定 (Dynamic Type / Font Size) を尊重する -->
+    <meta name="text-scale" content="scale">
     <!-- 既定はシステム設定に従う。ユーザーが上書きした場合だけ light / dark を入れる -->
     <meta name="color-scheme" content="light dark">
-    <!-- 保存済みの上書き設定を描画前に反映してちらつきを防ぐ (この処理だけに留める) -->
+    <!-- 保存済みの上書き設定を描画前に反映してちらつきを防ぐ (FOUC 防止のみ) -->
     <script>
         try {
             var storedScheme = localStorage.getItem('theme');
@@ -19,16 +21,15 @@
             /* localStorage が使えない環境ではシステム設定に従う */
         }
     </script>
-    <meta name="theme-color" content="#eff0f7" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#1b1e28" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f7f8fc" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0b0e17" media="(prefers-color-scheme: dark)">
     <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap">
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/css/material-style.css}">
-    <title>Hello</title>
+          href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Sans+JP:wght@400;500;700&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title layout:title-pattern="$CONTENT_TITLE — ベテランペーパードライバー">ベテランペーパードライバー</title>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-7XX1D2BR7N"></script>
     <script>
@@ -40,65 +41,139 @@
     </script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1118296000139363"
             crossorigin="anonymous"></script>
-
 </head>
 <body>
-<script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
-<script th:src="@{/index.js}"></script>
-<header class="header" id="appBar">
-    <nav class="navbar" aria-label="メインナビゲーション">
-        <div class="container">
-            <div class="md-top-app-bar">
-                <a class="navbar-brand" th:href="@{/}">トップページ</a>
-                <a class="nav-link" th:href="@{/about}">About</a>
-                <button id="darkModeToggle" class="md-icon-button dark-mode-toggle md-spacer" type="button">
-                    <!-- 表示中の配色に応じて片方だけを CSS で残す (JS なしでもシステム設定の変化に追従する) -->
-                    <span class="visually-hidden if-light">ダークモードに切り替え</span>
-                    <span class="visually-hidden if-dark">ライトモードに切り替え</span>
-                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                         stroke-linejoin="round" aria-hidden="true">
-                        <circle cx="12" cy="12" r="5"></circle>
-                        <line x1="12" y1="1" x2="12" y2="3"></line>
-                        <line x1="12" y1="21" x2="12" y2="23"></line>
-                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                        <line x1="1" y1="12" x2="3" y2="12"></line>
-                        <line x1="21" y1="12" x2="23" y2="12"></line>
-                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                    </svg>
-                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                         stroke-linejoin="round" aria-hidden="true">
-                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                    </svg>
-                </button>
-            </div>
+<a class="skip-link" href="#mainContent">本文へスキップ</a>
+
+<header class="site-header" id="appBar">
+    <div class="site-container site-nav-inner">
+        <a class="site-brand" th:href="@{/}">
+            <span class="brand-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 19V5l14 14V5"></path>
+                </svg>
+            </span>
+            <span class="brand-text">ベテランペーパードライバー</span>
+        </a>
+
+        <nav class="site-nav" aria-label="メインナビゲーション">
+            <ul class="site-nav-links">
+                <li><a class="nav-link" th:href="@{/}" data-nav-match="home">記事</a></li>
+                <li><a class="nav-link" th:href="@{/Series}" data-nav-match="series">シリーズ</a></li>
+                <li><a class="nav-link" th:href="@{/about}" data-nav-match="about">About</a></li>
+            </ul>
+        </nav>
+
+        <button id="darkModeToggle" class="icon-button theme-toggle" type="button">
+            <!-- 表示中の配色に応じて片方だけを CSS で残す (JS なしでもシステム設定に追従する) -->
+            <span class="visually-hidden if-light">ダークモードに切り替え</span>
+            <span class="visually-hidden if-dark">ライトモードに切り替え</span>
+            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                 stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="4"></circle>
+                <path d="M12 2v2"></path>
+                <path d="M12 20v2"></path>
+                <path d="m4.93 4.93 1.41 1.41"></path>
+                <path d="m17.66 17.66 1.41 1.41"></path>
+                <path d="M2 12h2"></path>
+                <path d="M20 12h2"></path>
+                <path d="m6.34 17.66-1.41 1.41"></path>
+                <path d="m19.07 4.93-1.41 1.41"></path>
+            </svg>
+            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                 stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+            </svg>
+        </button>
+    </div>
+</header>
+
+<!-- 管理画面用の共通サブナビゲーション (各管理テンプレートから th:replace で挿入) -->
+<th:block th:if="false">
+    <nav th:fragment="adminBar(active)" class="admin-bar" aria-label="管理メニュー">
+        <div class="admin-bar-left">
+            <span class="status-pill status-pill--admin">
+                <span class="status-dot" aria-hidden="true"></span>
+                <span>管理スタジオ</span>
+            </span>
+            <ul class="admin-nav-links">
+                <li>
+                    <a class="admin-nav-link" th:href="@{/Hello}"
+                       th:attr="aria-current=${active == 'articles'} ? 'page' : null">公開記事</a>
+                </li>
+                <li>
+                    <a class="admin-nav-link" th:href="@{/Hello/Draft}"
+                       th:attr="aria-current=${active == 'drafts'} ? 'page' : null">下書き</a>
+                </li>
+                <li>
+                    <a class="admin-nav-link" th:href="@{/Hello/Series}"
+                       th:attr="aria-current=${active == 'series'} ? 'page' : null">シリーズ</a>
+                </li>
+            </ul>
+        </div>
+        <div class="admin-bar-actions">
+            <a class="btn btn-primary btn-sm" th:href="@{/Hello/Edit}"
+               th:attr="aria-current=${active == 'edit'} ? 'page' : null">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 5v14"></path>
+                    <path d="M5 12h14"></path>
+                </svg>
+                <span>新規作成</span>
+            </a>
+            <form th:action="@{/logout}" method="post" class="inline-form">
+                <button type="submit" class="btn btn-ghost btn-sm">ログアウト</button>
+            </form>
         </div>
     </nav>
-</header>
-<main class="container">
+</th:block>
+
+<main id="mainContent" class="site-main site-container">
     <section layout:fragment="content"></section>
 </main>
-<footer class="footer">
-    <div class="container">
-        <span>© ベテランペーパードライバー</span>
-        <a th:href="@{/privacy}">プライバシーポリシー</a>
+
+<footer class="site-footer">
+    <div class="site-container footer-inner">
+        <div class="footer-brand">
+            <span class="footer-copy">© ベテランペーパードライバー</span>
+            <span class="footer-sep" aria-hidden="true">·</span>
+            <span class="footer-tagline">Notes on engineering &amp; everyday craft</span>
+        </div>
+        <div class="footer-links">
+            <a th:href="@{/}">記事</a>
+            <a th:href="@{/Series}">シリーズ</a>
+            <a th:href="@{/about}">About</a>
+            <a th:href="@{/privacy}">プライバシーポリシー</a>
+        </div>
     </div>
 </footer>
+
 <!-- 削除などの確認ダイアログ (index.js の confirmDialog() から開く) -->
-<dialog id="confirmDialog" class="md-dialog" aria-labelledby="confirmDialogTitle"
-        aria-describedby="confirmDialogDetail">
-    <form method="dialog">
-        <h2 id="confirmDialogTitle" class="md-dialog-title">確認</h2>
-        <p id="confirmDialogDetail" class="md-dialog-detail" hidden></p>
-        <div class="md-dialog-actions">
+<dialog id="confirmDialog" class="nb-dialog" closedby="any"
+        aria-labelledby="confirmDialogTitle" aria-describedby="confirmDialogDetail">
+    <form method="dialog" class="nb-dialog-form">
+        <div class="nb-dialog-head">
+            <span class="nb-dialog-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 9v4"></path>
+                    <path d="M12 17h.01"></path>
+                    <path d="m10.29 3.86-8.48 14.7A2 2 0 0 0 3.53 21.5h16.94a2 2 0 0 0 1.72-2.94l-8.48-14.7a2 2 0 0 0-3.42 0Z"></path>
+                </svg>
+            </span>
+            <h2 id="confirmDialogTitle" class="nb-dialog-title">確認</h2>
+        </div>
+        <p id="confirmDialogDetail" class="nb-dialog-detail" hidden></p>
+        <div class="nb-dialog-actions">
             <!-- 破壊的操作の確認なので、安全な「キャンセル」に初期フォーカスを置く -->
-            <button type="submit" value="cancel" class="btn btn-text" autofocus>キャンセル</button>
+            <button type="submit" value="cancel" class="btn btn-ghost" autofocus>キャンセル</button>
             <button type="submit" value="confirm" class="btn btn-danger">削除</button>
         </div>
     </form>
 </dialog>
+
+<script th:src="@{/index.js}" defer></script>
 </body>
 </html>

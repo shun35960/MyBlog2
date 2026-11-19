@@ -3,119 +3,182 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
-
 <head>
-    <title>編集</title>
+    <title th:text="${article.id != null} ? '記事を編集' : '記事を作成'">記事を編集</title>
 </head>
 <body>
 <section layout:fragment="content">
-    <h1 class="display-3" th:text="${article.id != null} ? '記事を編集' : '記事を作成'">記事を作成</h1>
-    <p class="text-muted">入力項目を入力してください</p>
-    <form class="edit-form"
-          th:action="${article.id != null} ? @{/Hello/Submit/{id}(id=${article.id})} : @{/Hello/Submit}"
+    <div th:replace="~{layout/layout :: adminBar('edit')}"></div>
+
+    <header class="page-header">
+        <nav class="breadcrumb-nav" aria-label="パンくずリスト">
+            <ol class="breadcrumb-list">
+                <li><span>管理</span></li>
+                <li><a th:href="@{/Hello}">記事一覧</a></li>
+                <li aria-current="page" th:text="${article.id != null} ? '記事を編集' : '記事を作成'">記事を作成</li>
+            </ol>
+        </nav>
+        <h1 class="page-title" th:text="${article.id != null} ? '記事を編集' : '記事を作成'">記事を作成</h1>
+    </header>
+
+    <form th:action="${article.id != null} ? @{/Hello/Submit/{id}(id=${article.id})} : @{/Hello/Submit}"
           th:object="${article}"
           th:method="${article.id != null} ? put : post">
-        <div class="form-group">
-            <label for="title">記事のタイトル</label>
-            <input class="form-control" type="text" id="title" th:field="*{title}" required>
-        </div>
-
-        <div class="form-group">
-            <label for="content">記事の内容</label>
-            <textarea class="form-control" id="content" rows="30" th:field="*{content}" required></textarea>
-        </div>
-
-        <!-- シリーズ選択セクション -->
-        <div class="form-group">
-            <label for="seriesId">所属シリーズ</label>
-            <select class="form-control" id="seriesId" th:field="*{seriesId}">
-                <option value="">なし</option>
-                <option th:each="series : ${seriesList}" th:value="${series.id}" th:text="${series.title}"></option>
-            </select>
-            <label for="newSeriesTitle" class="md-field-spacing">新規シリーズ名</label>
-            <input class="form-control" type="text" id="newSeriesTitle" name="newSeriesTitle"
-                   placeholder="新規シリーズ名" maxlength="200">
-            <p class="md-supporting-text">新規シリーズを作成する場合に入力してください（選択より優先されます）</p>
-        </div>
-
-        <!-- 画像アップロードセクション -->
-        <div class="form-group">
-            <label>画像をアップロード</label>
-            <div class="image-upload-section">
-                <!-- ドラッグ&ドロップエリア -->
-                <div id="dropZone" class="drop-zone">
-                    <p>ここにファイルをドラッグ&ドロップするか、</p>
-                    <button type="button" id="uploadButton" class="btn btn-outlined">
-                        ファイルを選択
-                    </button>
-                    <p class="md-supporting-text">対応形式: JPEG, PNG, GIF, WebP（最大100MB）</p>
+        <div class="editor-layout">
+            <div class="editor-main">
+                <div class="field">
+                    <label for="title" class="field-label">記事のタイトル</label>
+                    <span id="titleHint" class="field-hint">最大200文字</span>
+                    <input type="text"
+                           id="title"
+                           th:field="*{title}"
+                           class="field-control"
+                           maxlength="200"
+                           required
+                           aria-describedby="titleHint"
+                           data-error="titleError"
+                           placeholder="記事のタイトルを入力">
+                    <p id="titleError" class="field-error">タイトルを入力してください</p>
                 </div>
-                <!-- ファイル入力（非表示） -->
-                <input type="file" id="imageFile" accept="image/jpeg,image/png,image/gif,image/webp"
-                       style="display: none;">
 
-                <!-- アップロード進行状況 -->
-                <div id="uploadStatus" style="display: none;" class="mt-3">
-                    <div class="alert alert-info">
-                        <span id="statusText">アップロード中...</span>
-                        <div class="progress mt-2">
-                            <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
-                        </div>
+                <div class="field">
+                    <label for="content" class="field-label">本文（Markdown）</label>
+                    <span id="contentHint" class="field-hint">GFM（テーブル・打ち消し線・コードブロック）対応</span>
+                    <textarea id="content"
+                              th:field="*{content}"
+                              class="field-control field-control--editor"
+                              rows="18"
+                              required
+                              aria-describedby="contentHint"
+                              data-error="contentError"
+                              placeholder="Markdown で記事を書く..."></textarea>
+                    <p id="contentError" class="field-error">本文を入力してください</p>
+                </div>
+
+                <div class="editor-submit-bar">
+                    <a class="btn btn-ghost" th:href="@{/Hello}">一覧へ戻る</a>
+                    <button type="submit" class="btn btn-primary"
+                            th:text="${article.id != null} ? '更新する' : '登録する'">登録する</button>
+                </div>
+            </div>
+
+            <aside class="editor-sidebar" aria-label="記事設定">
+                <!-- 公開設定パネル -->
+                <div class="editor-panel">
+                    <h2 id="publishSettingTitle" class="editor-panel-title">公開設定</h2>
+                    <div class="choice-grid" role="radiogroup" aria-labelledby="publishSettingTitle">
+                        <label class="choice-card" for="publish">
+                            <input type="radio" id="publish" th:field="*{published}" th:value="true">
+                            <span>
+                                <span class="choice-card-title">公開</span>
+                                <span class="choice-card-desc">ブログに表示</span>
+                            </span>
+                        </label>
+                        <label class="choice-card" for="draft">
+                            <input type="radio" id="draft" th:field="*{published}" th:value="false">
+                            <span>
+                                <span class="choice-card-title">下書き</span>
+                                <span class="choice-card-desc">管理画面のみ</span>
+                            </span>
+                        </label>
                     </div>
                 </div>
 
-                <!-- 画像削除などの結果通知 (role="status" でスクリーンリーダーにも読み上げる) -->
-                <p id="imageNotice" class="md-image-notice" role="status"></p>
-
-                <!-- アップロード済み画像リスト -->
-                <div id="uploadedImages" class="mt-3"></div>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label>保存方法を選択</label>
-            <div class="md-radio-group">
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" id="publish" th:field="*{published}" th:value="true"
-                           th:checked="${article.published}">
-                    <label for="publish">公開</label>
+                <!-- シリーズパネル -->
+                <div class="editor-panel">
+                    <h2 class="editor-panel-title">シリーズ</h2>
+                    <div class="field">
+                        <label for="seriesId" class="field-label">所属シリーズ</label>
+                        <select id="seriesId" th:field="*{seriesId}" class="field-control">
+                            <option value="">なし</option>
+                            <option th:each="series : ${seriesList}"
+                                    th:value="${series.id}"
+                                    th:text="${series.title}"></option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="newSeriesTitle" class="field-label">新規シリーズ名</label>
+                        <span id="newSeriesHint" class="field-hint">入力すると新しいシリーズを作成して割り当てます</span>
+                        <input type="text"
+                               id="newSeriesTitle"
+                               name="newSeriesTitle"
+                               maxlength="200"
+                               class="field-control"
+                               aria-describedby="newSeriesHint"
+                               placeholder="新規シリーズ名">
+                    </div>
                 </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" id="draft" th:field="*{published}" th:value="false"
-                           th:checked="${article.published}">
-                    <label for="draft">下書き保存</label>
+
+                <!-- 画像アップロードパネル -->
+                <div class="editor-panel">
+                    <h2 class="editor-panel-title">画像アップロード</h2>
+                    <div id="dropZone" class="drop-zone">
+                        <p class="drop-zone-text">ここに画像をドラッグ&amp;ドロップ</p>
+                        <button type="button" class="btn btn-secondary btn-sm" id="uploadButton">
+                            ファイルを選択
+                        </button>
+                        <input type="file"
+                               id="imageFile"
+                               accept="image/jpeg,image/png,image/gif,image/webp"
+                               class="visually-hidden">
+                        <p class="drop-zone-meta">JPEG / PNG / GIF / WebP・最大 100MB</p>
+                    </div>
+
+                    <div id="uploadStatus" class="upload-status" style="display: none;" aria-live="polite">
+                        <div id="statusText" class="field-hint"></div>
+                        <div class="progress">
+                            <div id="progressBar" class="progress-bar" role="progressbar"
+                                 aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
+                                 style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <div id="uploadError" class="alert alert-error upload-status" role="alert" hidden
+                         style="display: none;"></div>
+
+                    <p id="imageNotice" class="image-notice" role="status"></p>
+
+                    <div id="uploadedImages" class="uploaded-images"></div>
                 </div>
-            </div>
-        </div>
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary" th:text="${article.id != null} ? '更新' : '登録'">登録
-            </button>
+            </aside>
         </div>
     </form>
 
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // DOM 要素の取得
             const dropZone = document.getElementById('dropZone');
             const uploadButton = document.getElementById('uploadButton');
             const imageFile = document.getElementById('imageFile');
             const contentTextarea = document.getElementById('content');
             const uploadStatus = document.getElementById('uploadStatus');
+            const uploadError = document.getElementById('uploadError');
             const imageNotice = document.getElementById('imageNotice');
             const statusText = document.getElementById('statusText');
             const progressBar = document.getElementById('progressBar');
             const uploadedImages = document.getElementById('uploadedImages');
 
-            // nullチェック
+            // null チェック
             if (!uploadButton || !imageFile || !dropZone) {
                 console.error('Required DOM elements not found');
                 return;
             }
 
+            let statusHideTimer = null;
+            let errorHideTimer = null;
+
             // ファイル選択ボタンのイベントリスナー
             uploadButton.addEventListener('click', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
+                imageFile.click();
+            });
+
+            // ドロップゾーン自体のクリックでもファイル選択を開く
+            dropZone.addEventListener('click', (e) => {
+                if (e.target === imageFile || e.target === uploadButton || uploadButton.contains(e.target)) {
+                    return;
+                }
                 imageFile.click();
             });
 
@@ -152,6 +215,8 @@
 
             // ファイル選択時の処理
             function handleFileSelect(file) {
+                clearError();
+
                 // ファイルの検証
                 if (!file) {
                     showError('ファイルが選択されていません');
@@ -162,13 +227,15 @@
                 const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
                 if (!allowedTypes.includes(file.type)) {
                     showError('対応していないファイル形式です。JPEG, PNG, GIF, WebP のみアップロード可能です。');
+                    imageFile.value = '';
                     return;
                 }
 
-                // ファイルサイズの検証（100MB以下）
-                const maxSize = 100 * 1024 * 1024; // 100MB
+                // ファイルサイズの検証（100MB 以下）
+                const maxSize = 100 * 1024 * 1024;
                 if (file.size > maxSize) {
                     showError('ファイルサイズが大きすぎます。最大100MBのファイルのみアップロード可能です。');
+                    imageFile.value = '';
                     return;
                 }
 
@@ -181,10 +248,14 @@
                 const formData = new FormData();
                 formData.append('file', file);
 
+                clearTimeout(statusHideTimer);
+                clearError();
+
                 // アップロード状態を表示
                 uploadStatus.style.display = 'block';
                 statusText.textContent = 'アップロード中...';
                 progressBar.style.width = '0%';
+                progressBar.setAttribute('aria-valuenow', '0');
 
                 // XMLHttpRequest で POST リクエスト送信
                 const xhr = new XMLHttpRequest();
@@ -194,6 +265,7 @@
                     if (e.lengthComputable) {
                         const percentComplete = (e.loaded / e.total) * 100;
                         progressBar.style.width = percentComplete + '%';
+                        progressBar.setAttribute('aria-valuenow', String(Math.round(percentComplete)));
                     }
                 });
 
@@ -207,9 +279,10 @@
                                 insertImageMarkdown(response.fileId, file.name);
                                 statusText.textContent = 'アップロード完了しました！';
                                 progressBar.style.width = '100%';
+                                progressBar.setAttribute('aria-valuenow', '100');
 
-                                // 3秒後にステータスを非表示
-                                setTimeout(() => {
+                                // 3 秒後にステータスを非表示
+                                statusHideTimer = setTimeout(() => {
                                     uploadStatus.style.display = 'none';
                                 }, 3000);
 
@@ -247,7 +320,7 @@
                     showError('アップロードがキャンセルされました。');
                 });
 
-                // CSRFトークンを取得
+                // CSRF トークンを取得
                 const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
                 const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
 
@@ -262,7 +335,7 @@
             // Markdown 形式で画像を textarea に挿入
             function insertImageMarkdown(fileId, fileName) {
                 const imageUrl = `/api/images/${fileId}`;
-                const altText = fileName.replace(/\.[^.]+$/, ''); // ファイル拡張子を除去
+                const altText = fileName.replace(/\.[^.]+$/, '');
                 const markdown = `![${altText}](${imageUrl})\n`;
 
                 // textarea の現在のカーソル位置を取得
@@ -288,19 +361,18 @@
             // アップロード済み画像情報を表示
             function displayUploadedImage(fileId, altText, imageUrl) {
                 const imageInfo = document.createElement('div');
-                imageInfo.className = 'alert alert-success md-uploaded-image';
+                imageInfo.className = 'uploaded-image-item';
 
                 // ファイル名はユーザー入力なので HTML として解釈させず textContent で入れる
                 const label = document.createElement('strong');
                 label.textContent = 'アップロード済み:';
-                const caption = document.createElement('small');
-                caption.append(label, ' ', altText);
                 const captionWrapper = document.createElement('div');
-                captionWrapper.append(caption);
+                captionWrapper.className = 'uploaded-image-meta';
+                captionWrapper.append(label, ' ', altText);
 
                 const deleteButton = document.createElement('button');
                 deleteButton.type = 'button';
-                deleteButton.className = 'btn btn-sm btn-danger delete-image-btn';
+                deleteButton.className = 'btn btn-danger-soft btn-sm delete-image-btn';
                 deleteButton.dataset.fileId = fileId;
                 deleteButton.textContent = '削除';
                 deleteButton.addEventListener('click', () => {
@@ -320,7 +392,7 @@
                     return;
                 }
 
-                // CSRFトークンを取得
+                // CSRF トークンを取得
                 const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
                 const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
 
@@ -349,23 +421,33 @@
                 });
             }
 
-            // エラー表示
-            function showError(message) {
-                uploadStatus.style.display = 'block';
-                const alert = document.createElement('div');
-                alert.className = 'alert alert-danger';
-                alert.textContent = message;
-                uploadStatus.innerHTML = '';
-                uploadStatus.appendChild(alert);
+            // エラー表示をクリア
+            function clearError() {
+                clearTimeout(errorHideTimer);
+                if (!uploadError) return;
+                uploadError.hidden = true;
+                uploadError.style.display = 'none';
+                uploadError.textContent = '';
+            }
 
-                // 5秒後にステータスを非表示
-                setTimeout(() => {
-                    uploadStatus.style.display = 'none';
+            // エラー表示 (#uploadStatus を破壊せず専用の #uploadError に表示する)
+            function showError(message) {
+                clearTimeout(statusHideTimer);
+                clearTimeout(errorHideTimer);
+                uploadStatus.style.display = 'none';
+
+                if (!uploadError) return;
+                uploadError.textContent = message;
+                uploadError.hidden = false;
+                uploadError.style.display = '';
+
+                // 5 秒後にエラーを非表示
+                errorHideTimer = setTimeout(() => {
+                    clearError();
                 }, 5000);
             }
         });
     </script>
-
 </section>
 </body>
 </html>
