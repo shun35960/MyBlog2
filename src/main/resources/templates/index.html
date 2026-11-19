@@ -4,36 +4,76 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
 <head>
-    <meta charset="UTF-8">
-    <title>ようこそ</title>
+    <title>記事一覧</title>
 </head>
 <body>
 <section layout:fragment="content">
-    <div class="hero">
-        <h1 class="display-3" th:text="${Indextitle}"></h1>
-        <div class="action-buttons">
-            <a th:href="@{/Series}" class="btn btn-tonal">シリーズ一覧</a>
-        </div>
-    </div>
-    <div class="row" th:if="${articles != null and !articles.empty}">
-        <div th:each="article : ${articles}">
-            <div class="col">
-                <article class="card">
-                    <h2 class="card-title" th:text="${article.title}">タイトル</h2>
-                    <div>
-                        <a th:href="@{/ViewDescription/{id}(id=${article.id})}" class="card-link">詳細</a>
-                        <span class="text-muted" th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
-                        <a th:if="${article.seriesId != null and seriesTitles != null and seriesTitles.containsKey(article.seriesId)}"
-                           th:href="@{/Series/{id}(id=${article.seriesId})}"
-                           class="md-chip"
-                           th:text="${seriesTitles[article.seriesId]}"></a>
-                    </div>
-                </article>
+    <header class="hero-banner">
+        <div class="hero-inner">
+            <p class="hero-eyebrow">TECH NOTES &amp; ESSAYS</p>
+            <h1 class="page-title" th:text="${Indextitle}">ようこそ</h1>
+            <p class="hero-lead">ソフトウェア開発の試行錯誤や設計メモ、日々の学びを静かに書き留めています。</p>
+            <div class="action-bar">
+                <a th:href="@{/Series}" class="btn btn-secondary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path>
+                    </svg>
+                    <span>シリーズ一覧</span>
+                </a>
+                <a th:href="@{/about}" class="btn btn-ghost">このサイトについて</a>
             </div>
         </div>
+    </header>
+
+    <div class="section-heading">
+        <h2>最新の記事</h2>
+        <span class="section-count" th:if="${articles != null}" th:text="|${#lists.size(articles)} 件|">0 件</span>
     </div>
-    <div class="md-empty-state" th:unless="${articles != null and !articles.empty}">
-        <p>記事はありません。</p>
+
+    <div class="card-grid" th:if="${articles != null and !articles.empty}">
+        <article class="card" th:each="article : ${articles}">
+            <div class="card-meta">
+                <time class="meta-date"
+                      th:if="${article.createdAt != null}"
+                      th:attr="datetime=${#dates.format(article.createdAt, 'yyyy-MM-dd''T''HH:mm')}"
+                      th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></time>
+            </div>
+            <h2 class="card-title">
+                <a class="card-link"
+                   th:href="@{/ViewDescription/{id}(id=${article.id})}"
+                   th:text="${article.title}">タイトル</a>
+            </h2>
+            <footer class="card-footer">
+                <a th:if="${article.seriesId != null and seriesTitles != null and seriesTitles.containsKey(article.seriesId)}"
+                   th:href="@{/Series/{id}(id=${article.seriesId})}"
+                   class="chip"
+                   th:text="${seriesTitles[article.seriesId]}"></a>
+                <span class="card-read-hint" aria-hidden="true" style="margin-inline-start: auto;">
+                    <span>記事を読む</span>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14"></path>
+                        <path d="m12 5 7 7-7 7"></path>
+                    </svg>
+                </span>
+            </footer>
+        </article>
+    </div>
+
+    <div class="empty-state" th:unless="${articles != null and !articles.empty}">
+        <span class="empty-state-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path>
+                <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>
+                <path d="M10 9H8"></path>
+                <path d="M16 13H8"></path>
+                <path d="M16 17H8"></path>
+            </svg>
+        </span>
+        <p class="empty-state-title">記事はありません</p>
+        <p class="empty-state-text">公開されている記事が追加されると、ここに表示されます。</p>
     </div>
 </section>
 </body>

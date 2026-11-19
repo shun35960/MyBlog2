@@ -4,57 +4,140 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
 <head>
-    <title th:text="${series.title}"></title>
+    <title th:text="${series.title}">シリーズ詳細</title>
 </head>
 <body>
 <section layout:fragment="content">
-    <h1 class="display-3" th:text="${series.title}">シリーズ名</h1>
-    <div class="article-content" th:if="${renderedDescription != null and !renderedDescription.isEmpty()}"
-         th:utext="${renderedDescription}"></div>
+    <div class="reading-progress" aria-hidden="true"></div>
+    <div th:replace="~{layout/layout :: adminBar('series')}"></div>
 
-    <div class="action-buttons">
-        <a th:href="@{/Hello/Series}" class="btn btn-tonal">シリーズ一覧へ戻る</a>
-        <form th:action="@{/Hello/Series/{id}(id=${series.id})}"
-              th:method="delete"
-              data-confirm="シリーズを削除しますか？"
-              data-confirm-detail="シリーズに含まれる記事は削除されません。">
-            <button type="submit" class="btn btn-danger">シリーズを削除</button>
-        </form>
-    </div>
+    <div class="reading-container">
+        <header class="page-header">
+            <nav class="breadcrumb-nav" aria-label="パンくずリスト">
+                <ol class="breadcrumb-list">
+                    <li><span>管理</span></li>
+                    <li><a th:href="@{/Hello/Series}">シリーズ</a></li>
+                    <li aria-current="page" th:text="${series.title}">シリーズ名</li>
+                </ol>
+            </nav>
 
-    <!-- シリーズ名・説明の編集フォーム -->
-    <details>
-        <summary>シリーズ情報を編集</summary>
-        <form class="edit-form" th:action="@{/Hello/Series/{id}(id=${series.id})}" method="post">
-            <div class="form-group">
-                <label for="title">シリーズ名</label>
-                <input class="form-control" type="text" id="title" name="title" th:value="${series.title}" required>
-            </div>
-            <div class="form-group">
-                <label for="description">説明(Markdown可)</label>
-                <textarea class="form-control" id="description" name="description" rows="5"
-                          th:text="${series.description}"></textarea>
-            </div>
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary">更新</button>
-            </div>
-        </form>
-    </details>
+            <h1 class="page-title" th:text="${series.title}">シリーズ名</h1>
 
-    <!-- 所属する公開記事を作成日時順に連結表示 -->
-    <div th:if="${articleViews != null and !articleViews.empty}">
-        <article th:each="view : ${articleViews}">
-            <hr class="md-divider">
-            <h2>
-                <a th:href="@{/Hello/Description/{id}(id=${view.article.id})}"
-                   th:text="${view.article.title}">記事タイトル</a>
-            </h2>
-            <p class="text-muted" th:text="${#dates.format(view.article.createdAt, 'yyyy-MM-dd HH:mm')}"></p>
-            <div class="article-content" th:utext="${view.html}"></div>
-        </article>
-    </div>
-    <div class="md-empty-state" th:unless="${articleViews != null and !articleViews.empty}">
-        <p>このシリーズに公開記事はありません。</p>
+            <div class="meta-row" th:if="${series.createdAt != null or articleViews != null}">
+                <time class="meta-date"
+                      th:if="${series.createdAt != null}"
+                      th:attr="datetime=${#dates.format(series.createdAt, 'yyyy-MM-dd''T''HH:mm')}"
+                      th:text="${#dates.format(series.createdAt, 'yyyy-MM-dd HH:mm')}"></time>
+                <span class="chip-static" th:if="${articleViews != null}"
+                      th:text="|公開 ${#lists.size(articleViews)} 記事|"></span>
+            </div>
+
+            <div class="action-bar">
+                <a class="btn btn-ghost" th:href="@{/Hello/Series}">シリーズ一覧へ戻る</a>
+                <a class="btn btn-secondary" th:href="@{/Series/{id}(id=${series.id})}">公開シリーズページ</a>
+                <form th:action="@{/Hello/Series/{id}(id=${series.id})}"
+                      th:method="delete"
+                      class="inline-form"
+                      data-confirm="シリーズを削除しますか？"
+                      data-confirm-detail="シリーズに含まれる記事は削除されません。">
+                    <button type="submit" class="btn btn-danger-soft">シリーズを削除</button>
+                </form>
+            </div>
+        </header>
+
+        <!-- シリーズ説明 -->
+        <div class="article-surface" th:if="${renderedDescription != null and !renderedDescription.isEmpty()}">
+            <div class="article-content" th:utext="${renderedDescription}"></div>
+        </div>
+
+        <!-- シリーズ名・説明の編集フォーム -->
+        <details class="accordion-panel">
+            <summary>シリーズ情報を編集</summary>
+            <div class="accordion-body">
+                <form th:action="@{/Hello/Series/{id}(id=${series.id})}" method="post">
+                    <div class="field">
+                        <label for="title" class="field-label">シリーズ名</label>
+                        <input class="field-control"
+                               type="text"
+                               id="title"
+                               name="title"
+                               th:value="${series.title}"
+                               maxlength="200"
+                               required
+                               data-error="seriesTitleError">
+                        <p id="seriesTitleError" class="field-error">シリーズ名を入力してください</p>
+                    </div>
+                    <div class="field">
+                        <label for="description" class="field-label">説明（Markdown 可）</label>
+                        <span id="seriesDescriptionHint" class="field-hint">シリーズの概要を Markdown 形式で入力できます</span>
+                        <textarea class="field-control field-control--compact"
+                                  id="description"
+                                  name="description"
+                                  rows="5"
+                                  aria-describedby="seriesDescriptionHint"
+                                  th:text="${series.description}"></textarea>
+                    </div>
+                    <div class="action-bar">
+                        <button type="submit" class="btn btn-primary">更新する</button>
+                    </div>
+                </form>
+            </div>
+        </details>
+
+        <!-- 所属する公開記事の目次と全文連結表示 -->
+        <th:block th:if="${articleViews != null and !articleViews.empty}">
+            <nav class="series-toc" aria-label="シリーズの目次">
+                <h2 class="series-toc-title">目次</h2>
+                <ol class="series-toc-list">
+                    <li th:each="view, iterStat : ${articleViews}">
+                        <a class="series-toc-link" th:href="|#article-${view.article.id}|">
+                            <span class="series-toc-num" th:text="${#numbers.formatInteger(iterStat.count, 2)}">01</span>
+                            <span th:text="${view.article.title}">記事タイトル</span>
+                        </a>
+                    </li>
+                </ol>
+            </nav>
+
+            <div class="series-entries">
+                <article class="series-article-entry"
+                         th:each="view, iterStat : ${articleViews}"
+                         th:id="|article-${view.article.id}|">
+                    <header class="series-article-header">
+                        <div>
+                            <span class="series-article-kicker"
+                                  th:text="|PART ${#numbers.formatInteger(iterStat.count, 2)}|">PART 01</span>
+                            <h2 class="series-article-title">
+                                <a th:href="@{/Hello/Description/{id}(id=${view.article.id})}"
+                                   th:text="${view.article.title}">記事タイトル</a>
+                            </h2>
+                            <div class="meta-row" th:if="${view.article.createdAt != null}">
+                                <time class="meta-date"
+                                      th:attr="datetime=${#dates.format(view.article.createdAt, 'yyyy-MM-dd''T''HH:mm')}"
+                                      th:text="${#dates.format(view.article.createdAt, 'yyyy-MM-dd HH:mm')}"></time>
+                            </div>
+                        </div>
+                        <div class="card-actions-group">
+                            <a class="btn btn-ghost btn-sm"
+                               th:href="@{/Hello/Edit/{id}(id=${view.article.id})}">編集</a>
+                        </div>
+                    </header>
+                    <div class="article-content" th:utext="${view.html}"></div>
+                </article>
+            </div>
+        </th:block>
+
+        <div class="empty-state" th:unless="${articleViews != null and !articleViews.empty}">
+            <span class="empty-state-icon" aria-hidden="true">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+            </span>
+            <h2 class="empty-state-title">このシリーズに公開記事はありません</h2>
+            <p class="empty-state-text">記事の作成・編集画面でこのシリーズを選択して公開すると、ここに表示されます。</p>
+            <a class="btn btn-primary" th:href="@{/Hello/Edit}">記事を作成する</a>
+        </div>
     </div>
 </section>
 </body>

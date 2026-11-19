@@ -4,29 +4,59 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
 <head>
-    <title>下書き一覧</title>
+    <title th:text="${Drafttitle}">下書き一覧</title>
 </head>
 <body>
 <section layout:fragment="content">
-    <h1 class="display-3" th:text="${Drafttitle}"></h1>
-    <div class="action-buttons">
-        <a th:href="@{/Hello/Edit}" class="btn btn-primary">新規作成</a>
-        <a th:href="@{/Hello}" class="btn btn-tonal">公開記事一覧</a>
-    </div>
-    <div class="row" th:if="${drafts != null and !drafts.empty}">
-        <div th:each="article : ${drafts}">
-            <div class="col">
-                <article class="card">
-                    <h2 class="card-title" th:text="${article.title}">タイトル</h2>
-                    <div>
-                        <a th:href="@{/Hello/Description/{id}(id=${article.id})}" class="card-link">詳細</a>
-                    </div>
-                </article>
-            </div>
+    <div th:replace="~{layout/layout :: adminBar('drafts')}"></div>
+
+    <header class="page-header">
+        <div class="page-header-row">
+            <h1 class="page-title" th:text="${Drafttitle}">下書き一覧</h1>
+            <span class="chip-static" th:if="${drafts != null}"
+                  th:text="|下書き ${#lists.size(drafts)} 件|"></span>
         </div>
+    </header>
+
+    <div class="card-grid" th:if="${drafts != null and !drafts.empty}">
+        <article class="card" th:each="article : ${drafts}">
+            <div class="card-meta">
+                <time class="meta-date"
+                      th:if="${article.createdAt != null}"
+                      th:attr="datetime=${#dates.format(article.createdAt, 'yyyy-MM-dd''T''HH:mm')}"
+                      th:text="${#dates.format(article.createdAt, 'yyyy-MM-dd HH:mm')}"></time>
+                <span class="status-pill status-pill--draft">
+                    <span class="status-dot" aria-hidden="true"></span>
+                    <span>下書き</span>
+                </span>
+            </div>
+
+            <h2 class="card-title">
+                <a class="card-link"
+                   th:href="@{/Hello/Description/{id}(id=${article.id})}"
+                   th:text="${article.title}">タイトル</a>
+            </h2>
+
+            <footer class="card-footer">
+                <span class="card-read-hint" aria-hidden="true">詳細を見る →</span>
+                <div class="card-actions-group">
+                    <a class="btn btn-ghost btn-sm" th:href="@{/Hello/Edit/{id}(id=${article.id})}">編集する</a>
+                </div>
+            </footer>
+        </article>
     </div>
-    <div class="md-empty-state" th:unless="${drafts != null and !drafts.empty}">
-        <p>記事はありません。</p>
+
+    <div class="empty-state" th:unless="${drafts != null and !drafts.empty}">
+        <span class="empty-state-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+            </svg>
+        </span>
+        <h2 class="empty-state-title">下書きはありません</h2>
+        <p class="empty-state-text">書きかけの記事を下書き保存すると、ここに表示されます。</p>
+        <a class="btn btn-primary" th:href="@{/Hello/Edit}">新規作成</a>
     </div>
 </section>
 </body>

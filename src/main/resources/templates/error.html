@@ -10,14 +10,24 @@
 <section layout:fragment="content">
     <!-- GlobalExceptionHandler 経由では errorTitle / errorMessage が、
          Spring Boot 既定の /error 経由では status / error が入る。両方に対応する -->
-    <h1 class="display-3"
-        th:with="statusText=${status != null ? status + ' ' + error : 'エラーが発生しました'}"
-        th:text="${errorTitle} ?: ${statusText}">エラーが発生しました</h1>
-    <div class="md-empty-state">
-        <p th:text="${errorMessage} ?: '申し訳ございません。ページを表示できませんでした'">申し訳ございません。ページを表示できませんでした</p>
-    </div>
-    <div class="action-buttons">
-        <a th:href="@{/}" class="btn btn-primary">トップページに戻る</a>
+    <div class="reading-container">
+        <div class="empty-state"
+             th:with="statusText=${status != null ? status + ' ' + error : 'エラーが発生しました'}">
+            <span class="empty-state-icon" aria-hidden="true">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 9v4"></path>
+                    <path d="M12 17h.01"></path>
+                    <path d="m10.29 3.86-8.48 14.7A2 2 0 0 0 3.53 21.5h16.94a2 2 0 0 0 1.72-2.94l-8.48-14.7a2 2 0 0 0-3.42 0Z"></path>
+                </svg>
+            </span>
+            <h1 class="page-title" th:text="${errorTitle} ?: ${statusText}">エラーが発生しました</h1>
+            <p class="empty-state-text"
+               th:text="${errorMessage} ?: '申し訳ございません。ページを表示できませんでした'">申し訳ございません。ページを表示できませんでした</p>
+            <div class="action-bar">
+                <a th:href="@{/}" class="btn btn-primary">トップページに戻る</a>
+            </div>
+        </div>
     </div>
 </section>
 </body>

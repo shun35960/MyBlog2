@@ -4,27 +4,67 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
 <head>
-    <meta charset="UTF-8">
-    <title>login</title>
+    <title>ログイン</title>
 </head>
 <body>
 <section layout:fragment="content">
-    <div class="md-form-surface md-auth-card">
-        <h1 class="md-headline-small">ログイン</h1>
+    <div class="surface-card auth-card">
+        <header class="auth-header">
+            <h1 class="auth-title">ログイン</h1>
+            <p class="auth-subtitle">記事の作成や管理を行うにはサインインしてください。</p>
+        </header>
+
+        <div class="alert alert-error" role="alert" th:if="${errormessage != null}">
+            <svg class="alert-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 8v4"></path>
+                <path d="M12 16h.01"></path>
+            </svg>
+            <span th:text="${errormessage}"></span>
+        </div>
+
         <form th:action="@{/authenticate}" method="post">
-            <div class="form-floating">
-                <input type="text" id="floatlngInput" name="username" class="form-control" placeholder="ユーザー名"
-                       autocomplete="username" required>
-                <label for="floatlngInput">ユーザー名</label>
+            <div class="field">
+                <label class="field-label" for="loginUsername">ユーザー名</label>
+                <input type="text"
+                       id="loginUsername"
+                       name="username"
+                       class="field-control"
+                       autocomplete="username"
+                       spellcheck="false"
+                       autocorrect="off"
+                       autocapitalize="none"
+                       enterkeyhint="next"
+                       required
+                       data-error="loginUsernameError">
+                <p id="loginUsernameError" class="field-error">ユーザー名を入力してください</p>
             </div>
-            <div class="form-floating">
-                <input type="password" id="floatingPassword" name="password" class="form-control" placeholder="パスワード"
-                       autocomplete="current-password" required>
-                <label for="floatingPassword">パスワード</label>
+
+            <div class="field">
+                <label class="field-label" for="loginPassword">パスワード</label>
+                <div class="password-field">
+                    <input type="password"
+                           id="loginPassword"
+                           name="password"
+                           class="field-control"
+                           autocomplete="current-password"
+                           enterkeyhint="done"
+                           required
+                           data-error="loginPasswordError">
+                    <button type="button"
+                            class="password-toggle"
+                            data-toggle-password="loginPassword"
+                            aria-pressed="false"
+                            aria-label="パスワードを表示">
+                        <span data-toggle-label>表示</span>
+                    </button>
+                </div>
+                <p id="loginPasswordError" class="field-error">パスワードを入力してください</p>
             </div>
-            <p class="md-error-text" th:if="${errormessage != null}" th:text="${errormessage}"></p>
-            <div class="action-buttons">
-                <button type="submit" class="btn btn-primary">ログイン</button>
+
+            <div class="action-bar">
+                <button type="submit" class="btn btn-primary" style="inline-size: 100%;">ログイン</button>
             </div>
         </form>
     </div>

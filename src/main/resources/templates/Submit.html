@@ -4,17 +4,39 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
 <head>
-    <title>登録</title>
+    <title th:text="${Submit != null} ? ${Submit} : '登録完了'">登録完了</title>
 </head>
 <body>
 <section layout:fragment="content">
-    <h1 class="display-3" th:text="${Submit}"></h1>
-    <div class="article-content">
-        <p th:text="'記事のタイトル : ' + ${savedArticle.title}"></p>
-        <p th:text="'記事の内容 : ' + ${savedArticle.content}"></p>
-    </div>
-    <div class="action-buttons">
-        <a th:href="@{/Hello}" class="btn btn-tonal">記事一覧へ戻る</a>
+    <div th:replace="~{layout/layout :: adminBar('')}"></div>
+
+    <div class="reading-container">
+        <header class="page-header">
+            <div class="meta-row">
+                <span class="status-pill status-pill--published">
+                    <span class="status-dot" aria-hidden="true"></span>
+                    <span>保存完了</span>
+                </span>
+            </div>
+            <h1 class="page-title" th:text="${Submit}">登録完了</h1>
+        </header>
+
+        <div class="surface-card" th:if="${savedArticle != null}">
+            <div class="article-content">
+                <p><strong>記事のタイトル:</strong> <span th:text="${savedArticle.title}"></span></p>
+                <p><strong>記事の内容:</strong> <span th:text="${savedArticle.content}"></span></p>
+            </div>
+            <div class="action-bar">
+                <a class="btn btn-primary" th:href="@{/Hello}">記事一覧へ戻る</a>
+                <a class="btn btn-ghost"
+                   th:if="${savedArticle.id != null}"
+                   th:href="@{/Hello/Description/{id}(id=${savedArticle.id})}">記事詳細を見る</a>
+            </div>
+        </div>
+
+        <div class="action-bar" th:if="${savedArticle == null}">
+            <a class="btn btn-primary" th:href="@{/Hello}">記事一覧へ戻る</a>
+        </div>
     </div>
 </section>
 </body>

@@ -1,4 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="12" fill="#1f2937"/>
-  <path d="M18 18h28v6H35v22h-6V24H18z" fill="#f9fafb"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="nb-bg" x1="6" y1="6" x2="58" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#14192d"/>
+      <stop offset="100%" stop-color="#222a4d"/>
+    </linearGradient>
+    <linearGradient id="nb-accent" x1="16" y1="16" x2="50" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#nb-bg)"/>
+  <rect x="2" y="2" width="60" height="60" rx="14" stroke="url(#nb-accent)" stroke-opacity="0.35" stroke-width="1.5"/>
+  <path d="M19 44V20h6.4l13.2 16.4V20H45v24h-6.2L25.4 27.4V44H19Z" fill="url(#nb-accent)"/>
+  <circle cx="46" cy="18" r="3" fill="#38bdf8"/>
 </svg>
